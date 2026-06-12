@@ -1,65 +1,279 @@
-import Image from "next/image";
+import Link from 'next/link';
+import { POLICIES, COUNTRIES, CATEGORIES } from '@/lib/constants';
+
+export const metadata = {
+  title: "Plastic Policy Database — Asia Pacific",
+  description: "Research, track, and visualize plastic-pollution regulations across 12 Asia Pacific countries.",
+};
 
 export default function Home() {
+  const total = POLICIES.length;
+  const inForce = POLICIES.filter((p) => p.status === "In Force").length;
+  const proposed = POLICIES.filter((p) => p.status === "Proposed").length;
+  const earliest = Math.min(...POLICIES.map((p) => p.year));
+  const recent = [...POLICIES].sort((a, b) => b.year - a.year).slice(0, 6);
+
+  // category counts for the bar
+  const catCounts = CATEGORIES.map((c) => ({
+    name: c,
+    count: POLICIES.filter((p) => p.category === c).length,
+  })).sort((a, b) => b.count - a.count);
+  const maxCat = Math.max(...catCounts.map((c) => c.count), 1);
+
+  const categoryColors: Record<string, string> = {
+    "Plastic Ban": "bg-coral/20 text-coral",
+    "EPR": "bg-ocean/20 text-ocean",
+    "Waste Management": "bg-sand text-ink",
+    "Circular Economy": "bg-ocean-deep/20 text-ocean-deep",
+  };
+
+  const statusColors: Record<string, string> = {
+    "In Force": "bg-ocean text-white",
+    "Proposed": "bg-coral text-white",
+    "Phased": "bg-sand text-ink",
+    "Repealed": "bg-ink/10 text-ink/60",
+  };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="w-full">
+      {/* HERO */}
+      <section className="grain relative overflow-hidden border-b border-rule">
+        <div className="mx-auto grid max-w-[1400px] gap-12 px-6 pb-20 pt-14 lg:grid-cols-[1.45fr_1.0fr] lg:gap-16 lg:px-10 lg:pt-20">
+          <div>
+            <h1 className="font-display text-[clamp(2.5rem,6vw,5.5rem)] font-semibold leading-[0.95] tracking-[-0.03em] text-ink">
+              Every plastic
+              <br />
+              <em className="not-italic text-coral">policy</em>, one place,<br />
+              one ocean.
+            </h1>
+            <p className="mt-8 max-w-xl text-pretty text-lg text-ink/75">
+              A living repository of national and regional regulations responding to plastic
+              pollution across the Asia Pacific — built for advocates, researchers, journalists,
+              and policymakers who need to know what's actually on the books.
+            </p>
+            <div className="mt-10 flex flex-wrap gap-3">
+              <Link
+                href="/search"
+                className="group inline-flex items-center gap-2 rounded-full bg-ink px-6 py-3 font-mono text-[12px] uppercase tracking-[0.18em] text-paper transition hover:bg-ocean-deep"
+              >
+                Explore the database
+                <span className="transition group-hover:translate-x-1">→</span>
+              </Link>
+              <Link
+                href="/countries"
+                className="inline-flex items-center gap-2 rounded-full border border-ink/30 px-6 py-3 font-mono text-[12px] uppercase tracking-[0.18em] text-ink transition hover:bg-ink/5"
+              >
+                Browse by country
+              </Link>
+            </div>
+          </div>
+
+          {/* Stat block */}
+          <div className="relative">
+            <div className="rounded-2xl border border-ink/10 bg-card p-8 shadow-[0_30px_80px_-40px_rgba(20,40,60,0.35)]">
+              <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+                Snapshot
+              </div>
+              <div className="mt-6 grid grid-cols-2 gap-y-8 gap-x-4">
+                <Stat n={total.toString()} label="Policies indexed" />
+                <Stat n="12" label="Countries covered" />
+                <Stat n={inForce.toString()} label="In force" accent />
+                <Stat n={proposed.toString()} label="Proposed / in draft" />
+              </div>
+              <div className="mt-8 border-t border-rule pt-6">
+                <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+                  Earliest record
+                </div>
+                <div className="mt-1 font-display text-2xl font-semibold">{earliest}</div>
+                <div className="text-sm text-muted-foreground">
+                  Philippines · Ecological Solid Waste Management Act
+                </div>
+              </div>
+            </div>
+            <div className="pointer-events-none absolute -right-6 -top-6 hidden h-24 w-24 rounded-full bg-coral/20 blur-3xl md:block" />
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+      </section>
+
+      {/* CATEGORY BAR */}
+      <section className="border-b border-rule">
+        <div className="mx-auto max-w-[1400px] px-6 py-20 lg:px-10">
+          <SectionHeading
+            eyebrow="What's regulated"
+            title={<>Where governments are <em className="text-ocean">acting</em>.</>}
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+            Distribution of indexed instruments by policy type. Bans and EPR dominate the
+            first wave; circular economy remains growing.
+          </SectionHeading>
+
+          <div className="space-y-3">
+            {catCounts.map((c) => (
+              <div key={c.name} className="grid grid-cols-[200px_1fr_3ch] items-center gap-4 border-t border-rule py-4 md:grid-cols-[260px_1fr_3ch]">
+                <div className="font-fraunces text-lg font-medium">{c.name}</div>
+                <div className="relative h-2 overflow-hidden rounded-full bg-sand">
+                  <div
+                    className="absolute inset-y-0 left-0 rounded-full bg-ocean-deep transition-all"
+                    style={{ width: `${(c.count / maxCat) * 100}%` }}
+                  />
+                </div>
+                <div className="text-right font-mono text-sm tabular-nums text-ink/70">{c.count}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* COUNTRIES GRID */}
+      <section className="border-b border-rule">
+        <div className="mx-auto max-w-[1400px] px-6 py-20 lg:px-10">
+          <SectionHeading
+            eyebrow="12 countries · phase 1"
+            title="From Jakarta to Wellington."
+          >
+            Coverage spans Southeast Asia, South Asia, East Asia, and Oceania. Each country page
+            lists the full text of indexed regulations, their status, and instrument type.
+          </SectionHeading>
+
+          <div className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-rule bg-rule md:grid-cols-3 lg:grid-cols-4">
+            {COUNTRIES.map((c) => {
+              const count = POLICIES.filter((p) => p.country === c.code).length;
+              return (
+                <Link
+                  key={c.code}
+                  href={`/countries/${c.code.toLowerCase()}`}
+                  className="group relative flex flex-col justify-between bg-paper p-6 transition hover:bg-sand"
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-ink/60">
+                      {c.region}
+                    </div>
+                    <span className="font-mono text-[11px] tabular-nums text-ink/50">
+                      {String(count).padStart(2, "0")}
+                    </span>
+                  </div>
+                  <div className="mt-12">
+                    <div className="font-mono text-[11px] tracking-[0.2em] text-coral">{c.code}</div>
+                    <div className="mt-1 font-fraunces text-2xl font-semibold leading-tight">{c.name}</div>
+                  </div>
+                  <span className="mt-6 inline-flex items-center gap-1 font-mono text-[11px] uppercase tracking-[0.16em] text-ink/60 transition group-hover:text-coral">
+                    View policies <span className="transition group-hover:translate-x-1">→</span>
+                  </span>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* RECENT */}
+      <section className="border-b border-rule bg-sand/50">
+        <div className="mx-auto max-w-[1400px] px-6 py-20 lg:px-10">
+          <div className="flex items-end justify-between gap-6">
+            <SectionHeading
+              eyebrow="Newest entries"
+              title="Recently indexed."
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            <Link
+              href="/search"
+              className="hidden shrink-0 font-mono text-[11px] uppercase tracking-[0.18em] text-ink/70 underline-offset-4 hover:text-coral hover:underline md:inline-block"
+            >
+              See full database →
+            </Link>
+          </div>
+
+          <ul className="divide-y divide-rule border-y border-rule">
+            {recent.map((p) => {
+              const country = COUNTRIES.find((c) => c.code === p.country)!;
+              return (
+                <li key={p.id} className="group grid gap-3 py-6 md:grid-cols-[120px_60px_1fr_auto] md:items-center md:gap-6">
+                  <div className="font-mono text-sm tabular-nums text-ink/60">{p.year}</div>
+                  <div className="font-mono text-[11px] uppercase tracking-[0.18em] text-coral">{p.country}</div>
+                  <div>
+                    <div className="font-fraunces text-xl font-medium leading-snug text-ink group-hover:text-ocean">
+                      {p.title}
+                    </div>
+                    <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-ink/60">
+                      <span>{country.name}</span>
+                      <span className="text-ink/30">·</span>
+                      <span>{p.instrument}</span>
+                      <span className="text-ink/30">·</span>
+                      <span className={`inline-block rounded-full px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.12em] font-semibold ${categoryColors[p.category] || 'bg-sand text-ink'}`}>
+                        {p.category}
+                      </span>
+                    </div>
+                  </div>
+                  <div className={`inline-block rounded-full px-3 py-1 font-mono text-[10px] uppercase tracking-[0.14em] font-semibold whitespace-nowrap ${statusColors[p.status] || statusColors["In Force"]}`}>
+                    {p.status}
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
         </div>
-      </main>
+      </section>
+
+      {/* MANIFESTO */}
+      <section className="relative overflow-hidden">
+        <div className="mx-auto max-w-[1400px] px-6 py-24 lg:px-10">
+          <div className="grid gap-12 lg:grid-cols-[1fr_1.4fr]">
+            <div>
+              <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-coral">
+                Why this exists
+              </span>
+            </div>
+            <div>
+              <p className="font-fraunces text-pretty text-3xl font-medium leading-tight text-ink md:text-4xl">
+                Plastic pollution isn't an opinion problem — it's a coordination problem.
+                We built this database so the next press release, parliamentary brief, or
+                campaign strategy can start from <em className="text-coral">what already exists</em>,
+                not from a blank page.
+              </p>
+              <div className="mt-10 grid gap-6 sm:grid-cols-3">
+                <Tenet n="01" title="Repository, not analysis">Primary-source instruments, summarized faithfully and tagged.</Tenet>
+                <Tenet n="02" title="Civil-society-led">Curated and validated with members across the region.</Tenet>
+                <Tenet n="03" title="Open & evolving">Phased rollout — more countries, languages, and detail to come.</Tenet>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function Stat({ n, label, accent }: { n: string; label: string; accent?: boolean }) {
+  return (
+    <div>
+      <div className={`font-display text-5xl font-semibold leading-none tracking-tight ${accent ? "text-coral" : "text-ink"}`}>
+        {n}
+      </div>
+      <div className="mt-2 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{label}</div>
+    </div>
+  );
+}
+
+function Tenet({ n, title, children }: { n: string; title: string; children: React.ReactNode }) {
+  return (
+    <div className="border-t border-ink/15 pt-4">
+      <div className="font-mono text-[11px] tracking-[0.2em] text-coral">{n}</div>
+      <div className="mt-2 font-fraunces text-lg font-semibold">{title}</div>
+      <p className="mt-1 text-sm text-ink/60">{children}</p>
+    </div>
+  );
+}
+
+function SectionHeading({ eyebrow, title, children }: { eyebrow: string; title: React.ReactNode; children?: React.ReactNode }) {
+  return (
+    <div className="mb-12">
+      <div className="font-mono text-[11px] uppercase tracking-[0.22em] text-coral">{eyebrow}</div>
+      <h2 className="mt-3 font-fraunces text-4xl font-semibold leading-tight text-ink md:text-5xl">
+        {title}
+      </h2>
+      {children && (
+        <p className="mt-4 max-w-2xl text-lg text-ink/75">
+          {children}
+        </p>
+      )}
     </div>
   );
 }

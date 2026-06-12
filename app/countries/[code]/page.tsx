@@ -1,0 +1,120 @@
+import Link from 'next/link';
+import { COUNTRIES, POLICIES, CATEGORIES } from '@/app/data/policies';
+import { notFound } from 'next/navigation';
+
+export const metadata = {
+  title: "Country — Plastic Policy Database",
+  description: "Plastic-pollution policy regulations for Asia Pacific countries.",
+};
+
+export default async function CountryPage({ params }: { params: Promise<{ code: string }> }) {
+  const resolvedParams = await params;
+  const country = COUNTRIES.find((c) => c.code.toLowerCase() === resolvedParams.code);
+  
+  if (!country) {
+    notFound();
+  }
+
+  const policies = POLICIES.filter((p) => p.country === country.code).sort((a, b) => b.year - a.year);
+  const byCat = CATEGORIES.map((c) => ({
+    name: c,
+    count: policies.filter((p) => p.category === c).length,
+  })).filter((c) => c.count > 0);
+
+  const categoryColors: Record<string, string> = {
+    "Plastic Ban": "bg-coral/20 text-coral",
+    "EPR": "bg-ocean/20 text-ocean",
+    "Waste Management": "bg-sand text-ink",
+    "Circular Economy": "bg-ocean-deep/20 text-ocean-deep",
+  };
+
+  const statusColors: Record<string, string> = {
+    "In Force": "bg-ocean text-white",
+    "Proposed": "bg-coral text-white",
+    "Phased": "bg-sand text-ink",
+    "Repealed": "bg-ink/10 text-ink/60",
+  };
+
+  return (
+    <div className="w-full">
+      {/* Header Section */}
+      <section className="border-b border-rule">
+        <div className="mx-auto max-w-[1400px] px-6 pb-16 pt-12 lg:px-10">
+          <Link 
+            href="/countries" 
+            className="font-mono text-[11px] uppercase tracking-[0.18em] text-ink/60 hover:text-coral transition"
+          >
+            ← All countries
+          </Link>
+          <div className="mt-8 grid gap-10 lg:grid-cols-[1.4fr_1fr] lg:items-end">
+            <div>
+              <div className="font-mono text-[11px] uppercase tracking-[0.22em] text-coral">{country.region}</div>
+              <h1 className="mt-3 font-fraunces text-[clamp(2.5rem,6vw,4.5rem)] font-semibold leading-[0.92] tracking-[-0.03em]">
+                {country.name}
+              </h1>
+            </div>
+            <div className="grid grid-cols-3 gap-6 border-t border-ink/15 pt-6">
+              <Mini n={policies.length} label="Indexed" />
+              <Mini n={policies.filter((p) => p.status === "In Force").length} label="In force" />
+              <Mini n={byCat.length} label="Categories" />
+            </div>
+          </div>
+
+          {byCat.length > 0 && (
+            <div className="mt-8 flex flex-wrap gap-2">
+              {byCat.map((c) => (
+                <span key={c.name} className="inline-block rounded-full border border-ink/15 bg-paper px-3 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-ink/75">
+                  {c.name} <span className="ml-1 text-ink/40">{c.count}</span>
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Policies List */}
+      <section>
+        <div className="mx-auto max-w-[1400px] px-6 py-16 lg:px-10">
+          {policies.length === 0 ? (
+            <p className="text-ink/60">No policies indexed for this country yet.</p>
+          ) : (
+            <ol className="overflow-hidden rounded-2xl border border-rule bg-rule">
+              {policies.map((p, i) => (
+                <li key={p.id} className="grid gap-3 bg-paper p-8 md:grid-cols-[60px_1fr_auto] md:items-start md:gap-8">
+                  <div className="font-mono text-sm tabular-nums text-ink/40">{String(i + 1).padStart(2, "0")}</div>
+                  <div>
+                    <div className="flex flex-wrap items-baseline gap-3">
+                      <span className="font-mono text-sm tabular-nums text-coral">{p.year}</span>
+                      <h3 className="font-fraunces text-2xl font-medium leading-snug text-ink">{p.title}</h3>
+                    </div>
+                    <p className="mt-3 max-w-3xl text-pretty text-base text-ink/75">{p.summary}</p>
+                    <div className="mt-4 flex flex-wrap items-center gap-2">
+                      <span className={`inline-block rounded-full px-3 py-1 font-mono text-[10px] uppercase tracking-[0.14em] font-semibold ${categoryColors[p.category] || 'bg-sand text-ink'}`}>
+                        {p.category}
+                      </span>
+                      <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink/50">
+                        {p.instrument} · {p.level}
+                      </span>
+                    </div>
+                  </div>
+                  <div className={`inline-block rounded-full px-3 py-1 font-mono text-[10px] uppercase tracking-[0.14em] font-semibold whitespace-nowrap ${statusColors[p.status] || statusColors["In Force"]}`}>
+                    {p.status}
+                  </div>
+                </li>
+              ))}
+            </ol>
+          )}
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function Mini({ n, label }: { n: number; label: string }) {
+  return (
+    <div>
+      <div className="font-fraunces text-4xl font-semibold tracking-tight">{n}</div>
+      <div className="mt-1 font-mono text-[10px] uppercase tracking-[0.18em] text-ink/60">{label}</div>
+    </div>
+  );
+}
