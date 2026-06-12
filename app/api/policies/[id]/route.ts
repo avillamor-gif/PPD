@@ -9,9 +9,10 @@ import { validatePolicy } from '@/lib/utils/validation';
  */
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const body = await request.json();
 
     // Validate input
@@ -33,7 +34,7 @@ export async function PUT(
     // const { data, error } = await supabase
     //   .from('policies')
     //   .update(policyData)
-    //   .eq('id', params.id);
+    //   .eq('id', id);
     //
     // if (error) throw error;
     //
@@ -42,7 +43,7 @@ export async function PUT(
     //   { status: 200 }
     // );
 
-    console.log('Policy update:', params.id, policyData);
+    console.log('Policy update:', id, policyData);
 
     return NextResponse.json(
       {
@@ -69,14 +70,16 @@ export async function PUT(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
+    
     // TODO: When Supabase is connected
     // const { error } = await supabase
     //   .from('policies')
     //   .delete()
-    //   .eq('id', params.id);
+    //   .eq('id', id);
     //
     // if (error) throw error;
     //
@@ -85,7 +88,7 @@ export async function DELETE(
     //   { status: 200 }
     // );
 
-    console.log('Policy delete:', params.id);
+    console.log('Policy delete:', id);
 
     return NextResponse.json(
       {
