@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { COUNTRIES, CATEGORIES, STATUSES } from '@/lib/constants';
-import type { Policy, PolicyLevel } from '@/lib/types';
+import type { Policy, PolicyLevel, PolicyStatus } from '@/lib/types';
 
 const LEVELS: PolicyLevel[] = ['National', 'Sub-national', 'Regional', 'International'];
 
@@ -24,7 +24,7 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
     country: initialData?.country || '',
     level: (initialData?.level || 'National') as PolicyLevel,
     category: initialData?.category || '',
-    status: (initialData?.status || 'Proposed') as const,
+    status: (initialData?.status || 'Proposed') as PolicyStatus,
     instrument: initialData?.instrument || '',
     authority: initialData?.authority || '',
     link: initialData?.link || '',
