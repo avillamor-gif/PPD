@@ -17,7 +17,7 @@ export default function AdminLayout({
             </div>
             <Link
               href="/"
-              className="font-mono text-sm uppercase tracking-[0.1em] text-ocean hover:text-ocean-deep transition"
+              className="font-mono text-sm uppercase tracking-widest text-ocean hover:text-ocean-deep transition"
             >
               ← Back to Site
             </Link>
@@ -31,19 +31,19 @@ export default function AdminLayout({
           <nav className="flex gap-8">
             <Link
               href="/admin"
-              className="py-4 border-b-2 border-transparent hover:border-ocean transition font-mono text-sm uppercase tracking-[0.1em] text-ink/60 hover:text-ink"
+              className="py-4 border-b-2 border-transparent hover:border-ocean transition font-mono text-sm uppercase tracking-widest text-ink/60 hover:text-ink"
             >
               Dashboard
             </Link>
             <Link
               href="/admin/submit"
-              className="py-4 border-b-2 border-transparent hover:border-ocean transition font-mono text-sm uppercase tracking-[0.1em] text-ink/60 hover:text-ink"
+              className="py-4 border-b-2 border-transparent hover:border-ocean transition font-mono text-sm uppercase tracking-widest text-ink/60 hover:text-ink"
             >
               Submit Entry
             </Link>
             <Link
               href="/admin/manage"
-              className="py-4 border-b-2 border-transparent hover:border-ocean transition font-mono text-sm uppercase tracking-[0.1em] text-ink/60 hover:text-ink"
+              className="py-4 border-b-2 border-transparent hover:border-ocean transition font-mono text-sm uppercase tracking-widest text-ink/60 hover:text-ink"
             >
               Manage Entries
             </Link>

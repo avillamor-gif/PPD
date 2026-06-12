@@ -184,7 +184,7 @@ export default function AdminDashboard() {
                   <div className="flex-1">
                     <h3 className="font-fraunces text-lg font-medium text-ink">{policy.title}</h3>
                     <div className="mt-2 flex flex-wrap items-center gap-2">
-                      <span className="inline-block px-2 py-1 text-xs font-mono uppercase tracking-[0.1em] rounded bg-sand text-ink">
+                      <span className="inline-block px-2 py-1 text-xs font-mono uppercase tracking-widest rounded bg-sand text-ink">
                         {policy.category}
                       </span>
                       <span className="inline-block px-2 py-1 text-xs font-mono text-ink/60">

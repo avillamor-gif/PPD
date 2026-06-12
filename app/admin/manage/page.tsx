@@ -37,12 +37,12 @@ export default function AdminManagePage() {
           <table className="w-full">
             <thead className="border-b border-rule bg-sand/30">
               <tr>
-                <th className="px-6 py-4 text-left text-sm font-mono uppercase tracking-[0.1em] text-ink/60">Title</th>
-                <th className="px-6 py-4 text-left text-sm font-mono uppercase tracking-[0.1em] text-ink/60">Country</th>
-                <th className="px-6 py-4 text-left text-sm font-mono uppercase tracking-[0.1em] text-ink/60">Category</th>
-                <th className="px-6 py-4 text-left text-sm font-mono uppercase tracking-[0.1em] text-ink/60">Status</th>
-                <th className="px-6 py-4 text-left text-sm font-mono uppercase tracking-[0.1em] text-ink/60">Year</th>
-                <th className="px-6 py-4 text-left text-sm font-mono uppercase tracking-[0.1em] text-ink/60">Actions</th>
+                <th className="px-6 py-4 text-left text-sm font-mono uppercase tracking-widest text-ink/60">Title</th>
+                <th className="px-6 py-4 text-left text-sm font-mono uppercase tracking-widest text-ink/60">Country</th>
+                <th className="px-6 py-4 text-left text-sm font-mono uppercase tracking-widest text-ink/60">Category</th>
+                <th className="px-6 py-4 text-left text-sm font-mono uppercase tracking-widest text-ink/60">Status</th>
+                <th className="px-6 py-4 text-left text-sm font-mono uppercase tracking-widest text-ink/60">Year</th>
+                <th className="px-6 py-4 text-left text-sm font-mono uppercase tracking-widest text-ink/60">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-rule">
@@ -107,13 +107,13 @@ export default function AdminManagePage() {
                             <div className="mt-6 flex gap-3">
                               <button
                                 onClick={() => handleDelete(policy.id)}
-                                className="flex-1 rounded-lg bg-coral px-4 py-2 font-mono text-xs uppercase tracking-[0.1em] text-white hover:bg-coral/90 transition"
+                                className="flex-1 rounded-lg bg-coral px-4 py-2 font-mono text-xs uppercase tracking-widest text-white hover:bg-coral/90 transition"
                               >
                                 Delete
                               </button>
                               <button
                                 onClick={() => setDeleteConfirm(null)}
-                                className="flex-1 rounded-lg border border-ink/20 px-4 py-2 font-mono text-xs uppercase tracking-[0.1em] text-ink hover:bg-ink/5 transition"
+                                className="flex-1 rounded-lg border border-ink/20 px-4 py-2 font-mono text-xs uppercase tracking-widest text-ink hover:bg-ink/5 transition"
                               >
                                 Cancel
                               </button>
