@@ -161,7 +161,7 @@ export default function AdminDashboard() {
             {policyByCountry.map(({ code, name, count }) => (
               <div key={code} className="flex items-center justify-between p-3 rounded-lg hover:bg-sand/50 transition">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-ocean to-ocean-deep flex items-center justify-center text-white text-xs font-bold">
+                  <div className="w-10 h-10 rounded-full bg-linear-to-br from-ocean to-ocean-deep flex items-center justify-center text-white text-xs font-bold">
                     {code}
                   </div>
                   <span className="font-medium text-ink">{name}</span>

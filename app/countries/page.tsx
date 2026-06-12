@@ -13,7 +13,7 @@ export default function CountriesPage() {
     <div className="w-full">
       {/* Header Section */}
       <section className="border-b border-rule">
-        <div className="mx-auto max-w-[1400px] px-6 pb-16 pt-14 lg:px-10">
+        <div className="mx-auto max-w-350 px-6 pb-16 pt-14 lg:px-10">
           <div className="font-mono text-[11px] uppercase tracking-[0.22em] text-coral">
             The Countries
           </div>
@@ -29,7 +29,7 @@ export default function CountriesPage() {
 
       {/* Regions Grid */}
       <section>
-        <div className="mx-auto max-w-[1400px] px-6 py-16 lg:px-10">
+        <div className="mx-auto max-w-350 px-6 py-16 lg:px-10">
           {regions.map((region) => {
             const list = COUNTRIES.filter((c) => c.region === region);
             return (

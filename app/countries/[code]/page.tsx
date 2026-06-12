@@ -39,7 +39,7 @@ export default async function CountryPage({ params }: { params: Promise<{ code: 
     <div className="w-full">
       {/* Header Section */}
       <section className="border-b border-rule">
-        <div className="mx-auto max-w-[1400px] px-6 pb-16 pt-12 lg:px-10">
+        <div className="mx-auto max-w-350 px-6 pb-16 pt-12 lg:px-10">
           <Link 
             href="/countries" 
             className="font-mono text-[11px] uppercase tracking-[0.18em] text-ink/60 hover:text-coral transition"
@@ -74,7 +74,7 @@ export default async function CountryPage({ params }: { params: Promise<{ code: 
 
       {/* Policies List */}
       <section>
-        <div className="mx-auto max-w-[1400px] px-6 py-16 lg:px-10">
+        <div className="mx-auto max-w-350 px-6 py-16 lg:px-10">
           {policies.length === 0 ? (
             <p className="text-ink/60">No policies indexed for this country yet.</p>
           ) : (

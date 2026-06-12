@@ -38,7 +38,7 @@ export default function Home() {
     <div className="w-full">
       {/* HERO */}
       <section className="grain relative overflow-hidden border-b border-rule">
-        <div className="mx-auto grid max-w-[1400px] gap-12 px-6 pb-20 pt-14 lg:grid-cols-[1.45fr_1.0fr] lg:gap-16 lg:px-10 lg:pt-20">
+        <div className="mx-auto grid max-w-350 gap-12 px-6 pb-20 pt-14 lg:grid-cols-[1.45fr_1.0fr] lg:gap-16 lg:px-10 lg:pt-20">
           <div>
             <h1 className="font-display text-[clamp(2.5rem,6vw,5.5rem)] font-semibold leading-[0.95] tracking-[-0.03em] text-ink">
               Every plastic
@@ -97,7 +97,7 @@ export default function Home() {
 
       {/* CATEGORY BAR */}
       <section className="border-b border-rule">
-        <div className="mx-auto max-w-[1400px] px-6 py-20 lg:px-10">
+        <div className="mx-auto max-w-350 px-6 py-20 lg:px-10">
           <SectionHeading
             eyebrow="What's regulated"
             title={<>Where governments are <em className="text-ocean">acting</em>.</>}
@@ -125,7 +125,7 @@ export default function Home() {
 
       {/* COUNTRIES GRID */}
       <section className="border-b border-rule">
-        <div className="mx-auto max-w-[1400px] px-6 py-20 lg:px-10">
+        <div className="mx-auto max-w-350 px-6 py-20 lg:px-10">
           <SectionHeading
             eyebrow="12 countries · phase 1"
             title="From Jakarta to Wellington."
@@ -167,7 +167,7 @@ export default function Home() {
 
       {/* RECENT */}
       <section className="border-b border-rule bg-sand/50">
-        <div className="mx-auto max-w-[1400px] px-6 py-20 lg:px-10">
+        <div className="mx-auto max-w-350 px-6 py-20 lg:px-10">
           <div className="flex items-end justify-between gap-6">
             <SectionHeading
               eyebrow="Newest entries"
@@ -214,7 +214,7 @@ export default function Home() {
 
       {/* MANIFESTO */}
       <section className="relative overflow-hidden">
-        <div className="mx-auto max-w-[1400px] px-6 py-24 lg:px-10">
+        <div className="mx-auto max-w-350 px-6 py-24 lg:px-10">
           <div className="grid gap-12 lg:grid-cols-[1fr_1.4fr]">
             <div>
               <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-coral">

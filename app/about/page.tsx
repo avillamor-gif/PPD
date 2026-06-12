@@ -34,7 +34,7 @@ export default function AboutPage() {
     <div className="w-full">
       {/* Header Section */}
       <section className="border-b border-rule">
-        <div className="mx-auto max-w-[1400px] px-6 pb-20 pt-14 lg:px-10">
+        <div className="mx-auto max-w-350 px-6 pb-20 pt-14 lg:px-10">
           <div className="font-mono text-[11px] uppercase tracking-[0.22em] text-coral">About</div>
           <h1 className="mt-4 max-w-4xl font-fraunces text-[clamp(2.5rem,6vw,4.5rem)] font-semibold leading-[0.98] tracking-[-0.02em]">
             A repository, not a verdict.
@@ -50,7 +50,7 @@ export default function AboutPage() {
 
       {/* In Scope / Out of Scope Section */}
       <section className="border-b border-rule">
-        <div className="mx-auto grid max-w-[1400px] gap-12 px-6 py-20 lg:grid-cols-2 lg:px-10">
+        <div className="mx-auto grid max-w-350 gap-12 px-6 py-20 lg:grid-cols-2 lg:px-10">
           {/* In Scope */}
           <div>
             <div className="mb-8">
@@ -87,7 +87,7 @@ export default function AboutPage() {
 
       {/* Methodology Section */}
       <section className="border-b border-rule bg-sand/50">
-        <div className="mx-auto max-w-[1400px] px-6 py-20 lg:px-10">
+        <div className="mx-auto max-w-350 px-6 py-20 lg:px-10">
           <div className="mb-12">
             <div className="font-mono text-[11px] uppercase tracking-[0.22em] text-coral">Method</div>
             <h2 className="mt-2 font-fraunces text-3xl font-semibold">How an entry gets in.</h2>
@@ -106,8 +106,8 @@ export default function AboutPage() {
 
       {/* CTA Section */}
       <section>
-        <div className="mx-auto max-w-[1400px] px-6 py-24 lg:px-10">
-          <div className="rounded-3xl border border-ocean-deep/15 bg-gradient-to-br from-ocean to-ocean-deep p-12 text-paper md:p-16">
+        <div className="mx-auto max-w-350 px-6 py-24 lg:px-10">
+          <div className="rounded-3xl border border-ocean-deep/15 bg-linear-to-br from-ocean to-ocean-deep p-12 text-paper md:p-16">
             <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-coral">Get involved</span>
             <h2 className="mt-4 max-w-3xl font-fraunces text-4xl font-semibold leading-tight md:text-5xl">
               Spotted a missing policy, an error, or a translation we should add?

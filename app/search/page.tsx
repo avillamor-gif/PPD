@@ -294,7 +294,7 @@ export default function SearchPage() {
     <div className="w-full">
       {/* Header */}
       <section className="border-b border-rule">
-        <div className="mx-auto max-w-[1400px] px-6 pb-10 pt-14 lg:px-10">
+        <div className="mx-auto max-w-350 px-6 pb-10 pt-14 lg:px-10">
           <div className="font-mono text-[11px] uppercase tracking-[0.22em] text-coral">
             The database · {POLICIES.length} entries
           </div>
@@ -309,9 +309,9 @@ export default function SearchPage() {
       </section>
 
       {/* Sticky Controls */}
-      <section className="sticky top-[72px] z-20 border-b border-rule bg-paper/95 backdrop-blur">
-        <div className="mx-auto flex max-w-[1400px] flex-wrap items-center gap-3 px-6 py-4 lg:px-10">
-          <div className="relative min-w-[240px] flex-1">
+      <section className="sticky top-18 z-20 border-b border-rule bg-paper/95 backdrop-blur">
+        <div className="mx-auto flex max-w-350 flex-wrap items-center gap-3 px-6 py-4 lg:px-10">
+          <div className="relative min-w-60 flex-1">
             <input
               value={q}
               onChange={(e) => setQ(e.target.value)}
@@ -346,7 +346,7 @@ export default function SearchPage() {
 
       {/* Results Table */}
       <section>
-        <div className="mx-auto max-w-[1400px] px-6 py-10 lg:px-10">
+        <div className="mx-auto max-w-350 px-6 py-10 lg:px-10">
           {rows.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-ink/20 p-16 text-center">
               <div className="font-fraunces text-2xl font-semibold">No matches</div>
@@ -380,7 +380,7 @@ export default function SearchPage() {
                     {p.level}
                   </div>
                   <div><StatusPill status={p.status} /></div>
-                  <div className="text-xs text-ink/60 leading-snug break-words">
+                  <div className="text-xs text-ink/60 leading-snug wrap-break-word">
                     {p.authority}
                   </div>
                   <div className="text-xs text-ocean hover:text-ocean-deep transition">
