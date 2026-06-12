@@ -6,6 +6,8 @@ export const metadata = {
   description: "Browse plastic-pollution policies across the 12 Asia Pacific countries covered in Phase 1.",
 };
 
+export const revalidate = 60; // ISR: revalidate every 60 seconds on Vercel
+
 export default function CountriesPage() {
   const regions = ["Southeast Asia", "South Asia", "East Asia", "Oceania"] as const;
 

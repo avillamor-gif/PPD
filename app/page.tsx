@@ -6,6 +6,8 @@ export const metadata = {
   description: "Research, track, and visualize plastic-pollution regulations across 12 Asia Pacific countries.",
 };
 
+export const revalidate = 60; // ISR: revalidate every 60 seconds on Vercel
+
 export default function Home() {
   const total = POLICIES.length;
   const inForce = POLICIES.filter((p) => p.status === "In Force").length;
