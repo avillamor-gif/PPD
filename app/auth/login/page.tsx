@@ -52,6 +52,18 @@ export default function LoginPage() {
         throw new Error('Please enter a valid email address');
       }
 
+      // ADMIN TEST ACCOUNT: Temporary bypass for testing
+      // TODO: Replace with proper Supabase auth once email/password recovery is working
+      if (email === 'akawar@gmail.com' && password === '2ngbatang2ng!@#') {
+        setSubmitted(true);
+        setEmail('');
+        setPassword('');
+        setTimeout(() => {
+          router.push('/admin');
+        }, 1000);
+        return;
+      }
+
       // Sign in with Supabase
       const { data: { user }, error: signInError } = await supabase.auth.signInWithPassword({
         email,
