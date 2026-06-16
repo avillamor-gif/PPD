@@ -35,12 +35,19 @@ export default function LoginPage() {
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log('Login attempted with:', email);
     setError(null);
     setLoginLoading(true);
 
     try {
-      if (!email.trim()) throw new Error('Email is required');
-      if (!password.trim()) throw new Error('Password is required');
+      if (!email.trim()) {
+        console.log('Email empty');
+        throw new Error('Email is required');
+      }
+      if (!password.trim()) {
+        console.log('Password empty');
+        throw new Error('Password is required');
+      }
 
       // Validate email format
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -66,36 +73,9 @@ export default function LoginPage() {
         throw new Error('Login failed - no user returned');
       }
 
-      // Check if user has admin role (bypass email verification for admins)
-      const { data: profile, error: profileError } = await supabase
-        .from('user_profiles')
-        .select('email_verified, role_id')
-        .eq('id', user.id)
-        .single();
-
-      if (profileError) {
-        // If profile doesn't exist, that's okay - will create on first login
-        console.log('Profile fetch error (may be first login):', profileError);
-      }
-
-      // Get user role
-      const adminRoleId = (await supabase
-        .from('roles')
-        .select('id')
-        .eq('name', 'admin')
-        .single()
-        .then(r => r.data?.id)
-        .catch(() => null)) as any;
-
-      const isAdmin = profile?.role_id === adminRoleId;
-
-      // Only require email verification for non-admin users
-      if (!isAdmin && !profile?.email_verified) {
-        // Sign out since email not verified
-        await supabase.auth.signOut();
-        throw new Error('Please verify your email before logging in. Check your inbox for the verification link.');
-      }
-
+      // TODO: Re-enable email verification check once email service is configured
+      // For now, allow login regardless of email verification status
+      
       setSubmitted(true);
       setEmail('');
       setPassword('');
