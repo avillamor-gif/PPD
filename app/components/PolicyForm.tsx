@@ -20,11 +20,12 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
   const [formData, setFormData] = useState({
     title: initialData?.title || '',
     summary: initialData?.summary || '',
-    year: initialData?.year || new Date().getFullYear(),
+    enactmentDate: initialData?.year ? `${initialData.year}-01-01` : new Date().toISOString().split('T')[0],
     region: '',
     country: initialData?.country || '',
     level: (initialData?.level || 'National') as PolicyLevel,
     category: initialData?.category || '',
+    keywords: '',
     status: (initialData?.status || 'Proposed') as PolicyStatus,
     instrument: initialData?.instrument || '',
     authority: initialData?.authority || '',
@@ -37,14 +38,7 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
   ) => {
     const { name, value } = e.target;
     
-    if (name === 'year') {
-      // Handle date input - extract year from YYYY-MM-DD format
-      const year = parseInt(value.split('-')[0], 10);
-      setFormData((prev) => ({
-        ...prev,
-        year: isNaN(year) ? prev.year : year,
-      }));
-    } else if (name === 'region') {
+    if (name === 'region') {
       // When region changes, reset country to empty
       setFormData((prev) => ({
         ...prev,
@@ -73,7 +67,7 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
       // Validation
       if (!formData.title.trim()) throw new Error('Policy title is required');
       if (!formData.country) throw new Error('Country is required');
-      if (!formData.category) throw new Error('Category is required');
+      if (!formData.category) throw new Error('Themes is required');
       if (!formData.authority.trim()) throw new Error('Authority is required');
       if (!formData.link.trim()) throw new Error('Policy link is required');
 
@@ -88,10 +82,17 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
       const method = isEditing ? 'PUT' : 'POST';
       const url = isEditing ? `/api/policies/${initialData?.id}` : '/api/policies';
       
+      // Extract year from enactmentDate for API compatibility
+      const year = parseInt(formData.enactmentDate.split('-')[0], 10);
+      const apiData = {
+        ...formData,
+        year,
+      };
+      
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(apiData),
       });
 
       if (!response.ok) {
@@ -106,11 +107,12 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
         setFormData({
           title: '',
           summary: '',
-          year: new Date().getFullYear(),
+          enactmentDate: new Date().toISOString().split('T')[0],
           region: '',
           country: '',
           level: 'National',
           category: '',
+          keywords: '',
           status: 'Proposed',
           instrument: '',
           authority: '',
@@ -224,28 +226,40 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
             <label className="block text-sm font-medium text-ink mb-2">Date of Enactment or Commencement</label>
             <input
               type="date"
-              name="year"
-              value={`${String(formData.year).padStart(4, '0')}-01-01`}
+              name="enactmentDate"
+              value={formData.enactmentDate}
               onChange={handleChange}
               className="w-full rounded-lg border border-ink/20 bg-paper px-4 py-2 text-ink focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-ink mb-2">Category *</label>
+            <label className="block text-sm font-medium text-ink mb-2">Themes *</label>
             <select
               name="category"
               value={formData.category}
               onChange={handleChange}
               className="w-full rounded-lg border border-ink/20 bg-paper px-4 py-2 text-ink focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20"
             >
-              <option value="">Select a category...</option>
+              <option value="">Select themes...</option>
               {CATEGORIES.map((c) => (
                 <option key={c} value={c}>
                   {c}
                 </option>
               ))}
             </select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-ink mb-2">Keywords</label>
+            <input
+              type="text"
+              name="keywords"
+              value={formData.keywords}
+              onChange={handleChange}
+              placeholder="e.g., plastic ban, single-use, recyclable"
+              className="w-full rounded-lg border border-ink/20 bg-paper px-4 py-2 text-ink placeholder:text-ink/40 focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20"
+            />
           </div>
 
           <div>
@@ -350,8 +364,8 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
           <button
             type="reset"
             onClick={() => setFormData({
-              title: '', summary: '', year: new Date().getFullYear(),
-              region: '', country: '', level: 'National', category: '', status: 'Proposed',
+              title: '', summary: '', enactmentDate: new Date().toISOString().split('T')[0],
+              region: '', country: '', level: 'National', category: '', keywords: '', status: 'Proposed',
               instrument: '', authority: '', link: '', language: '',
             })}
             className="inline-flex items-center gap-2 rounded-full border border-ink/30 px-8 py-3 font-mono text-sm uppercase tracking-[0.18em] text-ink transition hover:bg-ink/5"
