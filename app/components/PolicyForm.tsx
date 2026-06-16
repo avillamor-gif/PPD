@@ -30,6 +30,7 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
     instrument: initialData?.instrument || '',
     authority: initialData?.authority || '',
     link: initialData?.link || '',
+    otherLinks: '',
     language: initialData?.language || '',
   });
 
@@ -117,6 +118,7 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
           instrument: '',
           authority: '',
           link: '',
+          otherLinks: '',
           language: '',
         });
       }
@@ -338,6 +340,18 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
           </div>
 
           <div>
+            <label className="block text-sm font-medium text-ink mb-2">Other Links</label>
+            <input
+              type="text"
+              name="otherLinks"
+              value={formData.otherLinks}
+              onChange={handleChange}
+              placeholder="e.g., https://example.com/related, https://example.com/docs"
+              className="w-full rounded-lg border border-ink/20 bg-paper px-4 py-2 text-ink placeholder:text-ink/40 focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20"
+            />
+          </div>
+
+          <div>
             <label className="block text-sm font-medium text-ink mb-2">Language</label>
             <input
               type="text"
@@ -366,7 +380,7 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
             onClick={() => setFormData({
               title: '', summary: '', enactmentDate: new Date().toISOString().split('T')[0],
               region: '', country: '', level: 'National', category: '', keywords: '', status: 'Proposed',
-              instrument: '', authority: '', link: '', language: '',
+              instrument: '', authority: '', link: '', otherLinks: '', language: '',
             })}
             className="inline-flex items-center gap-2 rounded-full border border-ink/30 px-8 py-3 font-mono text-sm uppercase tracking-[0.18em] text-ink transition hover:bg-ink/5"
           >
