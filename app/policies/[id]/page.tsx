@@ -177,7 +177,8 @@ export default async function PolicyPage({ params }: { params: Promise<{ id: str
               </div>
             </div>
 
-            {/* Community Discussion Card */}
+            {/* Community Discussion Card - HIDDEN FOR NOW */}
+            {false && (
             <div className="rounded-xl border-2 border-dashed border-coral/40 bg-coral/5 p-6 space-y-4">
               <h2 className="text-xl font-bold text-ink flex items-center gap-2">
                 <MessageCircle className="w-5 h-5 text-coral" />
@@ -204,6 +205,7 @@ export default async function PolicyPage({ params }: { params: Promise<{ id: str
                 + Start Discussion
               </button>
             </div>
+            )}
           </div>
 
           {/* Right Sidebar */}
