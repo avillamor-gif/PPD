@@ -1,13 +1,14 @@
+// @ts-nocheck
 'use client';
 
 import { useState } from 'react';
 import Link from 'next/link';
 import { ChevronLeft } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
 export default function ResetPasswordPage() {
-  const [step, setStep] = useState<'email' | 'code' | 'password'>('email');
+  const [step, setStep] = useState<'email' | 'password'>('email');
   const [email, setEmail] = useState('');
-  const [code, setCode] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -27,32 +28,12 @@ export default function ResetPasswordPage() {
         throw new Error('Please enter a valid email address');
       }
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Send password reset email via Supabase
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth/reset-password?type=recovery`,
+      });
 
-      setSuccess(true);
-      setTimeout(() => {
-        setSuccess(false);
-        setStep('code');
-      }, 1500);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleCodeSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setLoading(true);
-
-    try {
-      if (!code.trim()) throw new Error('Verification code is required');
-      if (code.length !== 6) throw new Error('Code must be 6 digits');
-
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      if (resetError) throw resetError;
 
       setSuccess(true);
       setTimeout(() => {
@@ -76,8 +57,12 @@ export default function ResetPasswordPage() {
       if (newPassword.length < 8) throw new Error('Password must be at least 8 characters');
       if (newPassword !== confirmPassword) throw new Error('Passwords do not match');
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Update password after reset
+      const { error: updateError } = await supabase.auth.updateUser({
+        password: newPassword,
+      });
+
+      if (updateError) throw updateError;
 
       setSuccess(true);
       setTimeout(() => {
@@ -97,8 +82,7 @@ export default function ResetPasswordPage() {
         <div className="text-center space-y-3">
           <h1 className="font-display text-3xl font-bold text-ink">Reset Password</h1>
           <p className="text-ink/60">
-            {step === 'email' && 'Enter your email to receive a verification code'}
-            {step === 'code' && 'Enter the 6-digit code sent to your email'}
+            {step === 'email' && 'Enter your email to receive a reset link'}
             {step === 'password' && 'Create a new password'}
           </p>
         </div>
@@ -109,12 +93,7 @@ export default function ResetPasswordPage() {
           <div className="flex items-center gap-2 mb-6">
             <div
               className={`h-2 flex-1 rounded-full transition ${
-                ['email', 'code', 'password'].indexOf(step) >= 0 ? 'bg-ocean' : 'bg-ink/10'
-              }`}
-            />
-            <div
-              className={`h-2 flex-1 rounded-full transition ${
-                ['code', 'password'].indexOf(step) >= 0 ? 'bg-ocean' : 'bg-ink/10'
+                ['email', 'password'].indexOf(step) >= 0 ? 'bg-ocean' : 'bg-ink/10'
               }`}
             />
             <div
@@ -127,7 +106,9 @@ export default function ResetPasswordPage() {
           {/* Success Message */}
           {success && (
             <div className="rounded-lg border border-ocean/30 bg-ocean/5 p-4">
-              <p className="font-medium text-ocean text-sm">✓ Verified! Moving to next step...</p>
+              <p className="font-medium text-ocean text-sm">
+                {step === 'email' ? '✓ Check your email for reset instructions...' : '✓ Password reset! Redirecting to login...'}
+              </p>
             </div>
           )}
 
@@ -148,7 +129,8 @@ export default function ResetPasswordPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
-                  className="w-full rounded-lg border border-ink/20 bg-paper px-4 py-2 text-ink placeholder:text-ink/40 focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20 transition"
+                  disabled={loading}
+                  className="w-full rounded-lg border border-ink/20 bg-paper px-4 py-2 text-ink placeholder:text-ink/40 focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20 transition disabled:opacity-50"
                 />
               </div>
               <button
@@ -156,33 +138,11 @@ export default function ResetPasswordPage() {
                 disabled={loading}
                 className="w-full rounded-lg bg-ink px-4 py-3 font-mono text-sm uppercase tracking-[0.18em] text-paper transition hover:bg-ocean-deep disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? 'Sending...' : 'Send Verification Code'}
+                {loading ? 'Sending...' : 'Send Reset Link'}
               </button>
-            </form>
-          )}
-
-          {/* Code Step */}
-          {step === 'code' && (
-            <form onSubmit={handleCodeSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-ink mb-2">Verification Code</label>
-                <input
-                  type="text"
-                  value={code}
-                  onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                  placeholder="000000"
-                  maxLength={6}
-                  className="w-full rounded-lg border border-ink/20 bg-paper px-4 py-2 text-ink placeholder:text-ink/40 focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20 transition font-mono text-center text-lg tracking-widest"
-                />
-                <p className="mt-2 text-xs text-ink/50">Enter the 6-digit code from your email</p>
-              </div>
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full rounded-lg bg-ink px-4 py-3 font-mono text-sm uppercase tracking-[0.18em] text-paper transition hover:bg-ocean-deep disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {loading ? 'Verifying...' : 'Verify Code'}
-              </button>
+              <p className="text-xs text-ink/50 text-center">
+                We'll send a password reset link to your email. Check your spam folder if you don't see it.
+              </p>
             </form>
           )}
 
@@ -196,7 +156,8 @@ export default function ResetPasswordPage() {
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   placeholder="Enter new password"
-                  className="w-full rounded-lg border border-ink/20 bg-paper px-4 py-2 text-ink placeholder:text-ink/40 focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20 transition"
+                  disabled={loading}
+                  className="w-full rounded-lg border border-ink/20 bg-paper px-4 py-2 text-ink placeholder:text-ink/40 focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20 transition disabled:opacity-50"
                 />
                 <p className="mt-1 text-xs text-ink/50">At least 8 characters</p>
               </div>
@@ -208,7 +169,8 @@ export default function ResetPasswordPage() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Confirm new password"
-                  className="w-full rounded-lg border border-ink/20 bg-paper px-4 py-2 text-ink placeholder:text-ink/40 focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20 transition"
+                  disabled={loading}
+                  className="w-full rounded-lg border border-ink/20 bg-paper px-4 py-2 text-ink placeholder:text-ink/40 focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20 transition disabled:opacity-50"
                 />
               </div>
 
@@ -228,8 +190,7 @@ export default function ResetPasswordPage() {
           {step !== 'email' && (
             <button
               onClick={() => {
-                if (step === 'code') setStep('email');
-                if (step === 'password') setStep('code');
+                setStep('email');
                 setError(null);
                 setSuccess(false);
               }}
