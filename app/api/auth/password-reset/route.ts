@@ -22,35 +22,21 @@ export async function POST(request: Request) {
       },
     });
 
-    // Send password reset email
-    const { data, error } = await supabase.auth.admin.createUser({
-      email,
-      password: 'temp_password_to_be_reset',
-      email_confirm: true,
+    // Try to generate a recovery link for existing user
+    const resetResult = await supabase.auth.admin.generateLink({
+      type: 'recovery',
+      email: email,
+      options: {
+        redirectTo: `${new URL(request.url).origin}/auth/reset-password?type=recovery`,
+      },
     });
 
-    if (error) {
-      // User might already exist, try sending reset email instead
-      const resetResult = await supabase.auth.admin.generateLink({
-        type: 'recovery',
-        email: email,
-        options: {
-          redirectTo: `${new URL(request.url).origin}/auth/reset-password?type=recovery`,
-        },
-      });
-
-      if (resetResult.error) {
-        console.error('Password reset error:', resetResult.error);
-        return Response.json(
-          { error: resetResult.error.message || 'Failed to send reset link' },
-          { status: 400 }
-        );
-      }
-
-      return Response.json({
-        success: true,
-        message: 'Password reset link sent to your email',
-      });
+    if (resetResult.error) {
+      console.error('Password reset error:', JSON.stringify(resetResult.error));
+      return Response.json(
+        { error: resetResult.error.message || 'Failed to send reset link' },
+        { status: 400 }
+      );
     }
 
     return Response.json({
