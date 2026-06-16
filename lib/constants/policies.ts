@@ -8,15 +8,29 @@ export const COUNTRIES: Country[] = [
   { code: "TH", name: "Thailand", region: "Southeast Asia" },
   { code: "MY", name: "Malaysia", region: "Southeast Asia" },
   { code: "SG", name: "Singapore", region: "Southeast Asia" },
+  { code: "KH", name: "Cambodia", region: "Southeast Asia" },
+  { code: "LA", name: "Laos", region: "Southeast Asia" },
+  { code: "MM", name: "Myanmar", region: "Southeast Asia" },
+  { code: "BN", name: "Brunei", region: "Southeast Asia" },
   // South Asia
   { code: "IN", name: "India", region: "South Asia" },
+  { code: "PK", name: "Pakistan", region: "South Asia" },
+  { code: "BD", name: "Bangladesh", region: "South Asia" },
+  { code: "LK", name: "Sri Lanka", region: "South Asia" },
+  { code: "NP", name: "Nepal", region: "South Asia" },
+  { code: "BT", name: "Bhutan", region: "South Asia" },
   // East Asia
   { code: "JP", name: "Japan", region: "East Asia" },
   { code: "KR", name: "South Korea", region: "East Asia" },
   { code: "CN", name: "China", region: "East Asia" },
+  { code: "TW", name: "Taiwan", region: "East Asia" },
+  { code: "MN", name: "Mongolia", region: "East Asia" },
   // Oceania
   { code: "AU", name: "Australia", region: "Oceania" },
   { code: "NZ", name: "New Zealand", region: "Oceania" },
+  { code: "FJ", name: "Fiji", region: "Oceania" },
+  { code: "PG", name: "Papua New Guinea", region: "Oceania" },
+  { code: "SB", name: "Solomon Islands", region: "Oceania" },
 ];
 
 export const REGIONS: string[] = [
