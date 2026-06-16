@@ -47,10 +47,10 @@ export function StatusPill({ status }: { status: string }) {
   );
 }
 
-export function CategoryTag({ category }: { category: string }) {
+export function ThemeTag({ theme }: { theme: string }) {
   return (
     <span className="inline-flex items-center rounded-sm border border-ink/15 bg-paper px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] text-ink/75">
-      {category}
+      {theme}
     </span>
   );
 }

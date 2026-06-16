@@ -22,9 +22,9 @@ export function validatePolicy(data: Partial<Policy>): ValidationError[] {
     errors.push({ field: 'country', message: 'Country is required' });
   }
 
-  // Category validation
+  // Theme validation
   if (!data.category) {
-    errors.push({ field: 'category', message: 'Category is required' });
+    errors.push({ field: 'category', message: 'Theme is required' });
   }
 
   // Status validation

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { COUNTRIES, REGIONS, CATEGORIES, STATUSES } from '@/lib/constants';
+import { COUNTRIES, REGIONS, THEMES, STATUSES } from '@/lib/constants';
 import type { Policy, PolicyLevel, PolicyStatus } from '@/lib/types';
 
 const LEVELS: PolicyLevel[] = ['National', 'Sub-national', 'Regional', 'International'];
@@ -244,7 +244,7 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
               className="w-full rounded-lg border border-ink/20 bg-paper px-4 py-2 text-ink focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20"
             >
               <option value="">Select themes...</option>
-              {CATEGORIES.map((c) => (
+              {THEMES.map((c) => (
                 <option key={c} value={c}>
                   {c}
                 </option>

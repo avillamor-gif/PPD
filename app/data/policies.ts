@@ -17,7 +17,7 @@ export const COUNTRIES = [
   { code: "NZ", name: "New Zealand", region: "Oceania" },
 ];
 
-export const CATEGORIES = [
+export const THEMES = [
   "Plastic Ban",
   "EPR",
   "Waste Management",

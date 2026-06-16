@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { POLICIES, COUNTRIES, CATEGORIES } from '@/lib/constants';
+import { POLICIES, COUNTRIES, THEMES } from '@/lib/constants';
 
 export const metadata = {
   title: "Plastic Policy Database — Asia Pacific",
@@ -15,14 +15,14 @@ export default function Home() {
   const earliest = Math.min(...POLICIES.map((p) => p.year));
   const recent = [...POLICIES].sort((a, b) => b.year - a.year).slice(0, 6);
 
-  // category counts for the bar
-  const catCounts = CATEGORIES.map((c) => ({
+  // theme counts for the bar
+  const themeCounts = THEMES.map((c) => ({
     name: c,
     count: POLICIES.filter((p) => p.category === c).length,
   })).sort((a, b) => b.count - a.count);
   const maxCat = Math.max(...catCounts.map((c) => c.count), 1);
 
-  const categoryColors: Record<string, string> = {
+  const themeColors: Record<string, string> = {
     "Plastic Ban": "bg-coral/20 text-coral",
     "EPR": "bg-ocean/20 text-ocean",
     "Waste Management": "bg-sand text-ink",
@@ -97,7 +97,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CATEGORY BAR */}
+      {/* THEME BAR */}
       <section className="border-b border-rule">
         <div className="mx-auto max-w-350 px-6 py-20 lg:px-10">
           <SectionHeading
@@ -199,7 +199,7 @@ export default function Home() {
                       <span className="text-ink/30">·</span>
                       <span>{p.instrument}</span>
                       <span className="text-ink/30">·</span>
-                      <span className={`inline-block rounded-full px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.12em] font-semibold ${categoryColors[p.category] || 'bg-sand text-ink'}`}>
+                      <span className={`inline-block rounded-full px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.12em] font-semibold ${themeColors[p.category] || 'bg-sand text-ink'}`}>
                         {p.category}
                       </span>
                     </div>

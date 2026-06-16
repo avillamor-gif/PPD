@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { COUNTRIES, POLICIES, CATEGORIES } from '@/app/data/policies';
+import { COUNTRIES, POLICIES, THEMES } from '@/app/data/policies';
 import { notFound } from 'next/navigation';
 
 export const metadata = {
@@ -16,12 +16,12 @@ export default async function CountryPage({ params }: { params: Promise<{ code: 
   }
 
   const policies = POLICIES.filter((p) => p.country === country.code).sort((a, b) => b.year - a.year);
-  const byCat = CATEGORIES.map((c) => ({
+  const byTheme = THEMES.map((c) => ({
     name: c,
     count: policies.filter((p) => p.category === c).length,
   })).filter((c) => c.count > 0);
 
-  const categoryColors: Record<string, string> = {
+  const themeColors: Record<string, string> = {
     "Plastic Ban": "bg-coral/20 text-coral",
     "EPR": "bg-ocean/20 text-ocean",
     "Waste Management": "bg-sand text-ink",
@@ -56,7 +56,7 @@ export default async function CountryPage({ params }: { params: Promise<{ code: 
             <div className="grid grid-cols-3 gap-6 border-t border-ink/15 pt-6">
               <Mini n={policies.length} label="Indexed" />
               <Mini n={policies.filter((p) => p.status === "In Force").length} label="In force" />
-              <Mini n={byCat.length} label="Categories" />
+              <Mini n={byTheme.length} label="Themes" />
             </div>
           </div>
 
@@ -89,7 +89,7 @@ export default async function CountryPage({ params }: { params: Promise<{ code: 
                     </div>
                     <p className="mt-3 max-w-3xl text-pretty text-base text-ink/75">{p.summary}</p>
                     <div className="mt-4 flex flex-wrap items-center gap-2">
-                      <span className={`inline-block rounded-full px-3 py-1 font-mono text-[10px] uppercase tracking-[0.14em] font-semibold ${categoryColors[p.category] || 'bg-sand text-ink'}`}>
+                      <span className={`inline-block rounded-full px-3 py-1 font-mono text-[10px] uppercase tracking-[0.14em] font-semibold ${themeColors[p.category] || 'bg-sand text-ink'}`}>
                         {p.category}
                       </span>
                       <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink/50">

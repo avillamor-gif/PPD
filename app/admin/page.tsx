@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { POLICIES, COUNTRIES, CATEGORIES, STATUSES } from '@/lib/constants';
+import { POLICIES, COUNTRIES, THEMES, STATUSES } from '@/lib/constants';
 import type { Policy, PolicyStatus } from '@/lib/types';
 import Link from 'next/link';
 
@@ -34,13 +34,13 @@ export default function AdminDashboard() {
       .sort((a, b) => b.count - a.count);
   }, []);
 
-  const policyByCategory = useMemo(() => {
+  const policyByTheme = useMemo(() => {
     const counts: Record<string, number> = {};
     POLICIES.forEach((p) => {
       counts[p.category] = (counts[p.category] || 0) + 1;
     });
     return Object.entries(counts)
-      .map(([category, count]) => ({ category, count }))
+      .map(([theme, count]) => ({ theme, count }))
       .sort((a, b) => b.count - a.count);
   }, []);
 
@@ -126,16 +126,16 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Category Distribution */}
+        {/* Theme Distribution */}
         <div className="rounded-2xl border border-ink/10 bg-card p-8">
-          <h2 className="font-display text-2xl font-bold text-ink">By Category</h2>
+          <h2 className="font-display text-2xl font-bold text-ink">By Theme</h2>
           <div className="mt-6 space-y-4">
-            {policyByCategory.map(({ category, count }) => {
+            {policyByTheme.map(({ theme, count }) => {
               const percentage = ((count / totalPolicies) * 100).toFixed(0);
               return (
-                <div key={category}>
+                <div key={theme}>
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-ink">{category}</span>
+                    <span className="text-sm font-medium text-ink">{theme}</span>
                     <span className="text-sm font-mono text-ink/60">
                       {count} ({percentage}%)
                     </span>

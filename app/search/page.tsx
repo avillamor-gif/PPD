@@ -202,8 +202,8 @@ const COUNTRIES = [
   { code: "NZ", name: "New Zealand" },
 ];
 
-const CATEGORIES = [
-  "All categories",
+const THEMES = [
+  "All themes",
   "Plastic Ban",
   "EPR",
   "Waste Management",
@@ -271,14 +271,14 @@ function Select({
 export default function SearchPage() {
   const [q, setQ] = useState("");
   const [country, setCountry] = useState("all");
-  const [category, setCategory] = useState("All categories");
+  const [theme, setTheme] = useState("All themes");
   const [status, setStatus] = useState("Any status");
 
   const rows = useMemo(() => {
     const s = q.trim().toLowerCase();
     return POLICIES
       .filter((p) => (country === "all" ? true : p.countryCode === country))
-      .filter((p) => (category === "All categories" ? true : p.category === category))
+      .filter((p) => (theme === "All themes" ? true : p.category === theme))
       .filter((p) => (status === "Any status" ? true : p.status === status))
       .filter((p) =>
         s
@@ -288,7 +288,7 @@ export default function SearchPage() {
           : true,
       )
       .sort((a, b) => b.year - a.year);
-  }, [q, country, category, status]);
+  }, [q, country, theme, status]);
 
   return (
     <div className="w-full">
@@ -302,7 +302,7 @@ export default function SearchPage() {
             Search every indexed regulation.
           </h1>
           <p className="mt-4 max-w-2xl text-pretty text-ink/60">
-            Filter by country, category, status, or full-text search. All entries link to their originating
+            Filter by country, theme, status, or full-text search. All entries link to their originating
             instrument and summarize what the regulation does, not what we think about it.
           </p>
         </div>
@@ -327,10 +327,10 @@ export default function SearchPage() {
             options={COUNTRIES.map((c) => [c.code, c.name] as [string, string])} 
           />
           <Select 
-            label="Category" 
-            value={category} 
-            onChange={setCategory} 
-            options={CATEGORIES.map((c) => [c, c] as [string, string])} 
+            label="Theme" 
+            value={theme} 
+            onChange={setTheme} 
+            options={THEMES.map((c) => [c, c] as [string, string])} 
           />
           <Select 
             label="Status" 
@@ -370,7 +370,7 @@ export default function SearchPage() {
                     </div>
                     <p className="mt-1 max-w-3xl text-sm text-ink/60">{p.summary}</p>
                     <div className="mt-2 flex flex-wrap items-center gap-2">
-                      <CategoryTag category={p.category} />
+                      <ThemeTag theme={p.category} />
                       <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink/50">
                         {p.instrument}
                       </span>

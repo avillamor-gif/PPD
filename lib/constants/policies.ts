@@ -37,7 +37,7 @@ export const REGIONS: string[] = [
   ...new Set(COUNTRIES.map(c => c.region))
 ].sort();
 
-export const CATEGORIES: PolicyCategory[] = [
+export const THEMES: PolicyCategory[] = [
   "Plastic Ban",
   "EPR",
   "Waste Management",
