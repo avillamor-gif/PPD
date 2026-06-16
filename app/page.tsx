@@ -20,7 +20,7 @@ export default function Home() {
     name: c,
     count: POLICIES.filter((p) => p.category === c).length,
   })).sort((a, b) => b.count - a.count);
-  const maxCat = Math.max(...catCounts.map((c) => c.count), 1);
+  const maxCat = Math.max(...themeCounts.map((c) => c.count), 1);
 
   const themeColors: Record<string, string> = {
     "Plastic Ban": "bg-coral/20 text-coral",
@@ -109,7 +109,7 @@ export default function Home() {
           </SectionHeading>
 
           <div className="space-y-3">
-            {catCounts.map((c) => (
+            {themeCounts.map((c) => (
               <div key={c.name} className="grid grid-cols-[200px_1fr_3ch] items-center gap-4 border-t border-rule py-4 md:grid-cols-[260px_1fr_3ch]">
                 <div className="font-fraunces text-lg font-medium">{c.name}</div>
                 <div className="relative h-2 overflow-hidden rounded-full bg-sand">

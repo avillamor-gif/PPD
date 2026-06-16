@@ -232,10 +232,10 @@ function StatusPill({ status }: { status: string }) {
   );
 }
 
-function CategoryTag({ category }: { category: string }) {
+function ThemeTag({ theme }: { theme: string }) {
   return (
     <span className="inline-block px-3 py-1 rounded-full font-mono text-[10px] uppercase tracking-[0.14em] font-semibold bg-sand/70 text-ink">
-      {category}
+      {theme}
     </span>
   );
 }
