@@ -39,8 +39,7 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
     
     if (name === 'year') {
       // Handle date input - extract year from YYYY-MM-DD format
-      const date = new Date(value);
-      const year = date.getFullYear();
+      const year = parseInt(value.split('-')[0], 10);
       setFormData((prev) => ({
         ...prev,
         year: isNaN(year) ? prev.year : year,
@@ -222,11 +221,11 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-ink mb-2">Year</label>
+            <label className="block text-sm font-medium text-ink mb-2">Date of Enactment or Commencement</label>
             <input
               type="date"
               name="year"
-              value={`${formData.year}-01-01`}
+              value={`${String(formData.year).padStart(4, '0')}-01-01`}
               onChange={handleChange}
               className="w-full rounded-lg border border-ink/20 bg-paper px-4 py-2 text-ink focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20"
             />
