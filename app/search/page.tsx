@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useState, useMemo } from 'react';
 import { Search, ChevronDown } from 'lucide-react';
 
@@ -365,9 +366,11 @@ export default function SearchPage() {
                     <div className="text-xs text-ink/60 mt-1">{p.countryCode}</div>
                   </div>
                   <div>
-                    <div className="font-fraunces text-lg font-medium leading-snug text-ink group-hover:text-ocean transition-colors">
-                      {p.title}
-                    </div>
+                    <Link href={`/policies/${p.id}`} className="block group/title">
+                      <div className="font-fraunces text-lg font-medium leading-snug text-ink group-hover/title:text-coral transition-colors">
+                        {p.title}
+                      </div>
+                    </Link>
                     <p className="mt-1 max-w-3xl text-sm text-ink/60">{p.summary}</p>
                     <div className="mt-2 flex flex-wrap items-center gap-2">
                       <ThemeTag theme={p.category} />
