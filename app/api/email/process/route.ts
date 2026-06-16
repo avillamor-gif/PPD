@@ -3,7 +3,19 @@ import { supabaseAdmin } from '@/lib/supabase-admin';
 import { Resend } from 'resend';
 import { NextRequest, NextResponse } from 'next/server';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+let resendClient: any = null;
+
+// Lazy-initialize Resend to avoid requiring API key at build time
+function getResend() {
+  if (!resendClient) {
+    const apiKey = process.env.RESEND_API_KEY;
+    if (!apiKey) {
+      throw new Error('Missing Resend API key');
+    }
+    resendClient = new Resend(apiKey);
+  }
+  return resendClient;
+}
 
 export async function GET(req: NextRequest) {
   try {
@@ -90,7 +102,7 @@ export async function GET(req: NextRequest) {
         }
 
         // Send email via Resend
-        const result = await resend.emails.send({
+        const result = await getResend().emails.send({
           from: 'Plastic Policy Database <noreply@plasticpolicydatabase.com>',
           to: email.recipient_email,
           subject,
