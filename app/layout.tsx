@@ -40,6 +40,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      data-scroll-behavior="smooth"
       className={`${playfair.variable} ${fraunces.variable} ${inter.variable} ${jetbrainsMono.variable} scroll-smooth`}
     >
       <body className="bg-paper text-foreground min-h-screen flex flex-col font-sans">

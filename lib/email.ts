@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { Resend } from 'resend';
-import { supabase, supabaseAdmin } from './supabase';
+import { supabase } from './supabase';
+import { supabaseAdmin } from './supabase-admin';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 

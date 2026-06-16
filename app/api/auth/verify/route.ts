@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { supabaseAdmin } from '@/lib/supabase';
+import { supabaseAdmin } from '@/lib/supabase-admin';
 import { sendVerificationEmail } from '@/lib/email';
 import { randomBytes } from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
