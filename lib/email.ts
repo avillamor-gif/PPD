@@ -3,13 +3,26 @@ import { Resend } from 'resend';
 import { supabase } from './supabase';
 import { supabaseAdmin } from './supabase-admin';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+let resendClient: any = null;
+
+// Lazy-initialize Resend to avoid requiring API key at build time
+function getResend() {
+  if (!resendClient) {
+    const apiKey = process.env.RESEND_API_KEY;
+    if (!apiKey) {
+      console.error('Missing Resend API key');
+      throw new Error('Missing Resend configuration');
+    }
+    resendClient = new Resend(apiKey);
+  }
+  return resendClient;
+}
 
 export async function sendVerificationEmail(email: string, token: string) {
   const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL}/auth/verify?token=${token}`;
 
   try {
-    await resend.emails.send({
+    await getResend().emails.send({
       from: 'noreply@plasticpolicydatabase.com',
       to: email,
       subject: 'Verify your email - Plastic Policy Database',
@@ -34,7 +47,7 @@ export async function sendPasswordResetEmail(email: string, token: string) {
   const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL}/auth/reset-password?token=${token}`;
 
   try {
-    await resend.emails.send({
+    await getResend().emails.send({
       from: 'noreply@plasticpolicydatabase.com',
       to: email,
       subject: 'Reset your password - Plastic Policy Database',
@@ -66,7 +79,7 @@ export async function sendCommentNotificationEmail(
   const policyUrl = `${process.env.NEXT_PUBLIC_APP_URL}/policies/${policyId}`;
 
   try {
-    await resend.emails.send({
+    await getResend().emails.send({
       from: 'noreply@plasticpolicydatabase.com',
       to: recipientEmail,
       subject: `${authorName} replied to your comment`,
