@@ -2,15 +2,40 @@
 import { createClient } from '@supabase/supabase-js';
 import { Database } from '@/lib/types/database';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+let supabaseClient: any = null;
+let supabaseAdminClient: any = null;
 
-// Client for browser/client components
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
+// Client for browser/client components (lazy initialization)
+export const supabase = new Proxy({}, {
+  get(target: any, prop: string) {
+    if (!supabaseClient) {
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+      if (!supabaseUrl || !supabaseAnonKey) {
+        console.error('Missing Supabase URL or Anon Key');
+        throw new Error('Missing Supabase configuration');
+      }
+      supabaseClient = createClient<Database>(supabaseUrl, supabaseAnonKey);
+    }
+    return (supabaseClient as any)[prop];
+  }
+});
 
-// Admin client for server components (use carefully!)
-export const supabaseAdmin = createClient<Database>(supabaseUrl, supabaseServiceKey);
+// Admin client for server components (lazy initialization)
+export const supabaseAdmin = new Proxy({}, {
+  get(target: any, prop: string) {
+    if (!supabaseAdminClient) {
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+      if (!supabaseUrl || !supabaseServiceKey) {
+        console.error('Missing Supabase URL or Service Key');
+        throw new Error('Missing Supabase configuration');
+      }
+      supabaseAdminClient = createClient<Database>(supabaseUrl, supabaseServiceKey);
+    }
+    return (supabaseAdminClient as any)[prop];
+  }
+});
 
 // Get current user
 export async function getCurrentUser() {
