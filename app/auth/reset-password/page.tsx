@@ -1,12 +1,14 @@
 // @ts-nocheck
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { ChevronLeft } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
 export default function ResetPasswordPage() {
+  const searchParams = useSearchParams();
   const [step, setStep] = useState<'email' | 'password'>('email');
   const [email, setEmail] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -14,6 +16,16 @@ export default function ResetPasswordPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [hasRecoveryToken, setHasRecoveryToken] = useState(false);
+
+  // Check if user came back from email with recovery token
+  useEffect(() => {
+    const type = searchParams.get('type');
+    if (type === 'recovery') {
+      setHasRecoveryToken(true);
+      setStep('password');
+    }
+  }, [searchParams]);
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -83,7 +95,8 @@ export default function ResetPasswordPage() {
           <h1 className="font-display text-3xl font-bold text-ink">Reset Password</h1>
           <p className="text-ink/60">
             {step === 'email' && 'Enter your email to receive a reset link'}
-            {step === 'password' && 'Create a new password'}
+            {step === 'password' && hasRecoveryToken && 'Create a new password to regain access'}
+            {step === 'password' && !hasRecoveryToken && 'Create a new password'}
           </p>
         </div>
 
@@ -187,7 +200,7 @@ export default function ResetPasswordPage() {
 
         {/* Footer Navigation */}
         <div className="text-center space-y-3">
-          {step !== 'email' && (
+          {step !== 'email' && !hasRecoveryToken && (
             <button
               onClick={() => {
                 setStep('email');
@@ -200,9 +213,11 @@ export default function ResetPasswordPage() {
               Go Back
             </button>
           )}
-          <Link href="/auth/login" className="block text-sm text-ink/50 hover:text-ink transition">
-            ← Back to Login
-          </Link>
+          {!hasRecoveryToken && (
+            <Link href="/auth/login" className="block text-sm text-ink/50 hover:text-ink transition">
+              ← Back to Login
+            </Link>
+          )}
         </div>
       </div>
     </div>

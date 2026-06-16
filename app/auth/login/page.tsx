@@ -35,17 +35,14 @@ export default function LoginPage() {
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Login attempted with:', email);
     setError(null);
     setLoginLoading(true);
 
     try {
       if (!email.trim()) {
-        console.log('Email empty');
         throw new Error('Email is required');
       }
       if (!password.trim()) {
-        console.log('Password empty');
         throw new Error('Password is required');
       }
 
@@ -53,20 +50,6 @@ export default function LoginPage() {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
         throw new Error('Please enter a valid email address');
-      }
-
-      // TEMPORARY: For testing - skip password verification for admin account
-      if (email === 'akawar@gmail.com' && password === '2ngbatang2ng!@#') {
-        console.log('Admin test account - skipping password verification');
-        setSubmitted(true);
-        setEmail('');
-        setPassword('');
-        
-        // Redirect to admin after 1 second
-        setTimeout(() => {
-          router.push('/admin');
-        }, 1000);
-        return;
       }
 
       // Sign in with Supabase
