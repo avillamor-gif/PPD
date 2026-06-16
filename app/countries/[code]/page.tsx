@@ -60,9 +60,9 @@ export default async function CountryPage({ params }: { params: Promise<{ code: 
             </div>
           </div>
 
-          {byCat.length > 0 && (
+          {byTheme.length > 0 && (
             <div className="mt-8 flex flex-wrap gap-2">
-              {byCat.map((c) => (
+              {byTheme.map((c) => (
                 <span key={c.name} className="inline-block rounded-full border border-ink/15 bg-paper px-3 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-ink/75">
                   {c.name} <span className="ml-1 text-ink/40">{c.count}</span>
                 </span>
