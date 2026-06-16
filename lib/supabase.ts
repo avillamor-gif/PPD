@@ -5,6 +5,9 @@ import { Database } from '@/lib/types/database';
 let supabaseClient: any = null;
 let supabaseAdminClient: any = null;
 
+// Lazy initialization pattern: Defers client creation from module import time
+// to runtime (first method call), ensuring environment variables are available.
+// This fixes the "supabaseKey is required" error in production deployments.
 // Client for browser/client components (lazy initialization)
 export const supabase = new Proxy({}, {
   get(target: any, prop: string) {
