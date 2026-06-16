@@ -248,6 +248,38 @@ export type Database = {
         };
         Update: never;
       };
+      email_verification_tokens: {
+        Row: {
+          id: string;
+          user_id: string;
+          token: string;
+          email: string;
+          expires_at: string;
+          created_at: string;
+        };
+        Insert: {
+          user_id: string;
+          token: string;
+          email: string;
+          expires_at: string;
+        };
+        Update: never;
+      };
+      password_reset_tokens: {
+        Row: {
+          id: string;
+          user_id: string;
+          token: string;
+          expires_at: string;
+          created_at: string;
+        };
+        Insert: {
+          user_id: string;
+          token: string;
+          expires_at: string;
+        };
+        Update: never;
+      };
     };
     Views: {
       user_stats: {

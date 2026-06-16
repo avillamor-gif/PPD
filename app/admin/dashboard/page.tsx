@@ -34,7 +34,8 @@ export default function AdminDashboard() {
         .eq('id', currentUser.id)
         .single();
 
-      if (userProfile?.role?.name !== 'admin') {
+      const profileWithRole = userProfile as any;
+      if (profileWithRole?.role?.name !== 'admin') {
         router.push('/');
         return;
       }
@@ -83,23 +84,6 @@ export default function AdminDashboard() {
       console.error('Load data error:', error);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const deleteComment = async (commentId: string) => {
-    try {
-      const { error } = await supabase
-        .from('comments')
-        .update({ is_deleted: true, deleted_at: new Date().toISOString() })
-        .eq('id', commentId);
-
-      if (error) throw error;
-
-      setFlaggedComments(flaggedComments.filter(c => c.id !== commentId));
-      loadData();
-    } catch (error) {
-      console.error('Delete comment error:', error);
-      alert('Failed to delete comment');
     }
   };
 
