@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS user_profiles (
   bio TEXT,
   country_code VARCHAR(2),
   organization TEXT,
-  role_id BIGINT REFERENCES roles(id) DEFAULT (SELECT id FROM roles WHERE name = 'user'),
+  role_id BIGINT REFERENCES roles(id) DEFAULT 4, -- 4 = 'user' role (hardcoded per insertion order)
   email_verified BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
