@@ -40,18 +40,24 @@ export default function ResetPasswordPage() {
         throw new Error('Please enter a valid email address');
       }
 
-      // Send password reset email via Supabase
-      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/reset-password?type=recovery`,
+      // Call our API endpoint to send password reset email
+      const response = await fetch('/api/auth/password-reset', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
       });
 
-      if (resetError) throw resetError;
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to send reset link');
+      }
 
       setSuccess(true);
       setTimeout(() => {
         setSuccess(false);
-        setStep('password');
-      }, 1500);
+        setEmail('');
+      }, 3000);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -120,7 +126,7 @@ export default function ResetPasswordPage() {
           {success && (
             <div className="rounded-lg border border-ocean/30 bg-ocean/5 p-4">
               <p className="font-medium text-ocean text-sm">
-                {step === 'email' ? '✓ Check your email for reset instructions...' : '✓ Password reset! Redirecting to login...'}
+                ✓ Check your email for a password reset link
               </p>
             </div>
           )}
