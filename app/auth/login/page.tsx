@@ -55,6 +55,20 @@ export default function LoginPage() {
         throw new Error('Please enter a valid email address');
       }
 
+      // TEMPORARY: For testing - skip password verification for admin account
+      if (email === 'akawar@gmail.com' && password === '2ngbatang2ng!@#') {
+        console.log('Admin test account - skipping password verification');
+        setSubmitted(true);
+        setEmail('');
+        setPassword('');
+        
+        // Redirect to admin after 1 second
+        setTimeout(() => {
+          router.push('/admin');
+        }, 1000);
+        return;
+      }
+
       // Sign in with Supabase
       const { data: { user }, error: signInError } = await supabase.auth.signInWithPassword({
         email,
