@@ -309,7 +309,7 @@ export default function SearchPage() {
       </section>
 
       {/* Sticky Controls */}
-      <section className="sticky top-18 z-20 border-b border-rule bg-paper/95 backdrop-blur">
+      <section className="sticky top-0 z-20 border-b border-rule bg-paper/95 backdrop-blur">
         <div className="mx-auto flex max-w-350 flex-wrap items-center gap-3 px-6 py-4 lg:px-10">
           <div className="relative min-w-60 flex-1">
             <input
