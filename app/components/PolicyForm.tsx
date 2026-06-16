@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { COUNTRIES, CATEGORIES, STATUSES } from '@/lib/constants';
+import { COUNTRIES, REGIONS, CATEGORIES, STATUSES } from '@/lib/constants';
 import type { Policy, PolicyLevel, PolicyStatus } from '@/lib/types';
 
 const LEVELS: PolicyLevel[] = ['National', 'Sub-national', 'Regional', 'International'];
@@ -21,6 +21,7 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
     title: initialData?.title || '',
     summary: initialData?.summary || '',
     year: initialData?.year || new Date().getFullYear(),
+    region: '',
     country: initialData?.country || '',
     level: (initialData?.level || 'National') as PolicyLevel,
     category: initialData?.category || '',
@@ -35,11 +36,34 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: name === 'year' ? parseInt(value) : value,
-    }));
+    
+    if (name === 'year') {
+      // Handle date input - extract year from YYYY-MM-DD format
+      const date = new Date(value);
+      const year = date.getFullYear();
+      setFormData((prev) => ({
+        ...prev,
+        year: isNaN(year) ? prev.year : year,
+      }));
+    } else if (name === 'region') {
+      // When region changes, reset country to empty
+      setFormData((prev) => ({
+        ...prev,
+        region: value,
+        country: '',
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
   };
+
+  // Filter countries by selected region
+  const filteredCountries = formData.region
+    ? COUNTRIES.filter((c) => c.region === formData.region)
+    : COUNTRIES;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -84,6 +108,7 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
           title: '',
           summary: '',
           year: new Date().getFullYear(),
+          region: '',
           country: '',
           level: 'National',
           category: '',
@@ -163,6 +188,23 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           <div>
+            <label className="block text-sm font-medium text-ink mb-2">Region</label>
+            <select
+              name="region"
+              value={formData.region}
+              onChange={handleChange}
+              className="w-full rounded-lg border border-ink/20 bg-paper px-4 py-2 text-ink focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20"
+            >
+              <option value="">Select a region...</option>
+              {REGIONS.map((r) => (
+                <option key={r} value={r}>
+                  {r}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
             <label className="block text-sm font-medium text-ink mb-2">Country *</label>
             <select
               name="country"
@@ -171,7 +213,7 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
               className="w-full rounded-lg border border-ink/20 bg-paper px-4 py-2 text-ink focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20"
             >
               <option value="">Select a country...</option>
-              {COUNTRIES.map((c) => (
+              {filteredCountries.map((c) => (
                 <option key={c.code} value={c.code}>
                   {c.name} ({c.code})
                 </option>
@@ -182,12 +224,10 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
           <div>
             <label className="block text-sm font-medium text-ink mb-2">Year</label>
             <input
-              type="number"
+              type="date"
               name="year"
-              value={formData.year}
+              value={`${formData.year}-01-01`}
               onChange={handleChange}
-              min="2000"
-              max={new Date().getFullYear() + 1}
               className="w-full rounded-lg border border-ink/20 bg-paper px-4 py-2 text-ink focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20"
             />
           </div>
@@ -312,7 +352,7 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
             type="reset"
             onClick={() => setFormData({
               title: '', summary: '', year: new Date().getFullYear(),
-              country: '', level: 'National', category: '', status: 'Proposed',
+              region: '', country: '', level: 'National', category: '', status: 'Proposed',
               instrument: '', authority: '', link: '', language: '',
             })}
             className="inline-flex items-center gap-2 rounded-full border border-ink/30 px-8 py-3 font-mono text-sm uppercase tracking-[0.18em] text-ink transition hover:bg-ink/5"

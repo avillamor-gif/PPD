@@ -19,6 +19,10 @@ export const COUNTRIES: Country[] = [
   { code: "NZ", name: "New Zealand", region: "Oceania" },
 ];
 
+export const REGIONS: string[] = [
+  ...new Set(COUNTRIES.map(c => c.region))
+].sort();
+
 export const CATEGORIES: PolicyCategory[] = [
   "Plastic Ban",
   "EPR",

@@ -1,1 +1,1 @@
-export { COUNTRIES, CATEGORIES, STATUSES, POLICIES } from './policies';
+export { COUNTRIES, REGIONS, CATEGORIES, STATUSES, POLICIES } from './policies';
