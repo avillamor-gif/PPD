@@ -2,6 +2,8 @@ import Link from 'next/link';
 import { COUNTRIES, POLICIES, THEMES } from '@/app/data/policies';
 import { notFound } from 'next/navigation';
 import { ArrowLeft, MapPin, Calendar, Building2, Globe, MessageCircle, ThumbsUp, Eye } from 'lucide-react';
+import { CommentForm } from '@/app/components/CommentForm';
+import { CommentsList } from '@/app/components/CommentsList';
 
 const themeColors: Record<string, string> = {
   "Plastic Ban": "bg-coral/20 text-coral border-coral/30",
@@ -177,35 +179,22 @@ export default async function PolicyPage({ params }: { params: Promise<{ id: str
               </div>
             </div>
 
-            {/* Community Discussion Card - HIDDEN FOR NOW */}
-            {false && (
-            <div className="rounded-xl border-2 border-dashed border-coral/40 bg-coral/5 p-6 space-y-4">
+            {/* Community Discussion Card */}
+            <div className="rounded-xl border border-coral/20 bg-white p-6 space-y-6">
               <h2 className="text-xl font-bold text-ink flex items-center gap-2">
                 <MessageCircle className="w-5 h-5 text-coral" />
                 Community Discussion
               </h2>
-              <p className="text-ink/70">
-                Join the discussion about this policy. Share insights, ask questions, and learn from experts and community members.
-              </p>
-              <div className="grid grid-cols-3 gap-4">
-                <div className="rounded-lg bg-white p-3 text-center border border-coral/20">
-                  <p className="text-2xl font-bold text-coral">0</p>
-                  <p className="text-xs text-ink/60 mt-1">Comments</p>
-                </div>
-                <div className="rounded-lg bg-white p-3 text-center border border-coral/20">
-                  <p className="text-2xl font-bold text-coral">0</p>
-                  <p className="text-xs text-ink/60 mt-1">Discussions</p>
-                </div>
-                <div className="rounded-lg bg-white p-3 text-center border border-coral/20">
-                  <p className="text-2xl font-bold text-coral">0</p>
-                  <p className="text-xs text-ink/60 mt-1">Participants</p>
-                </div>
+
+              {/* Comment Form */}
+              <CommentForm policyId={policy.id} />
+
+              {/* Comments List */}
+              <div className="border-t border-ink/10 pt-6">
+                <h3 className="font-bold text-ink mb-4">Comments ({/* count */})</h3>
+                <CommentsList policyId={policy.id} />
               </div>
-              <button className="w-full mt-4 px-4 py-3 rounded-lg bg-coral text-white font-semibold hover:bg-coral/90 transition">
-                + Start Discussion
-              </button>
             </div>
-            )}
           </div>
 
           {/* Right Sidebar */}
