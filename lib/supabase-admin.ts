@@ -1,5 +1,3 @@
-'use server';
-
 // @ts-nocheck
 import { createClient } from '@supabase/supabase-js';
 import { Database } from '@/lib/types/database';
@@ -7,7 +5,8 @@ import { Database } from '@/lib/types/database';
 let supabaseAdminClient: any = null;
 
 // Admin client for server components (lazy initialization)
-// This file is marked with 'use server' to ensure it never gets bundled for the client
+// This module is only imported in server-side contexts (API routes and lib/email.ts)
+// so it will never be bundled for the client
 export const supabaseAdmin = new Proxy({}, {
   get(target: any, prop: string) {
     if (!supabaseAdminClient) {
