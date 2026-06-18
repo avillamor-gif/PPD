@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
 
     // Get user by email
     const { data: { users }, error: userError } = await supabaseAdmin.auth.admin.listUsers();
-    const user = users?.find(u => u.email === email);
+    const user = users?.find((u: any) => u.email === email);
 
     if (!user) {
       return NextResponse.json(

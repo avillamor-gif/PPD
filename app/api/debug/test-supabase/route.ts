@@ -31,7 +31,7 @@ export async function GET() {
     // Test 3: Check if test user exists
     const testEmail = 'test@example.com';
     console.log('🧪 [DEBUG] Checking for test user:', testEmail);
-    const testUser = users?.find(u => u.email === testEmail);
+    const testUser = users?.find((u: any) => u.email === testEmail);
     
     return NextResponse.json({
       success: true,
