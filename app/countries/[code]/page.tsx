@@ -85,7 +85,9 @@ export default async function CountryPage({ params }: { params: Promise<{ code: 
                   <div>
                     <div className="flex flex-wrap items-baseline gap-3">
                       <span className="font-mono text-sm tabular-nums text-coral">{p.year}</span>
-                      <h3 className="font-fraunces text-2xl font-medium leading-snug text-ink">{p.title}</h3>
+                      <Link href={`/policies/${p.id}`} className="font-fraunces text-2xl font-medium leading-snug text-ink hover:text-coral transition">
+                        {p.title}
+                      </Link>
                     </div>
                     <p className="mt-3 max-w-3xl text-pretty text-base text-ink/75">{p.summary}</p>
                     <div className="mt-4 flex flex-wrap items-center gap-2">
