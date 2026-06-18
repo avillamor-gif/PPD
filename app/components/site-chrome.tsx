@@ -102,18 +102,17 @@ export function SiteHeader() {
                 <div className="relative">
                   <button
                     onClick={() => setDropdownOpen(!dropdownOpen)}
-                    className="p-2 hover:bg-ink/5 rounded-lg transition text-ink flex items-center gap-2 font-medium"
+                    className="p-2 hover:bg-ink/5 rounded-full transition text-ink flex items-center justify-center font-medium"
                   >
                     {userProfile?.avatar_url ? (
                       <img
                         src={userProfile.avatar_url}
                         alt="Avatar"
-                        className="w-6 h-6 rounded-full object-cover border border-ink/20"
+                        className="w-8 h-8 rounded-full object-cover border border-ink/20"
                       />
                     ) : (
                       <User className="w-5 h-5" />
                     )}
-                    <span className="text-sm max-w-[100px] truncate">{userProfile?.display_name || user.email}</span>
                   </button>
                   
                   {dropdownOpen && (
@@ -123,7 +122,7 @@ export function SiteHeader() {
                           <img
                             src={userProfile.avatar_url}
                             alt="Avatar"
-                            className="w-10 h-10 rounded-lg object-cover border border-ink/20"
+                            className="w-10 h-10 rounded-full object-cover border border-ink/20"
                           />
                         ) : (
                           <div className="w-10 h-10 rounded-full bg-sand border border-ink/20 flex items-center justify-center text-lg">
