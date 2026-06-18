@@ -26,30 +26,36 @@ export default function AdminLayout({
       </div>
 
       {/* Admin Navigation */}
-      <div className="border-b border-rule bg-paper sticky top-0 z-40">
+      <div className="border-b border-rule bg-paper sticky top-0 z-40 overflow-x-auto">
         <div className="mx-auto max-w-7xl px-6 lg:px-10">
-          <nav className="flex gap-8">
+          <nav className="flex gap-8 min-w-min">
             <Link
               href="/admin"
-              className="py-4 border-b-2 border-transparent hover:border-ocean transition font-mono text-sm uppercase tracking-widest text-ink/60 hover:text-ink"
+              className="py-4 border-b-2 border-transparent hover:border-ocean transition font-mono text-sm uppercase tracking-widest text-ink/60 hover:text-ink whitespace-nowrap"
             >
               Dashboard
             </Link>
             <Link
               href="/admin/users"
-              className="py-4 border-b-2 border-transparent hover:border-ocean transition font-mono text-sm uppercase tracking-widest text-ink/60 hover:text-ink"
+              className="py-4 border-b-2 border-transparent hover:border-ocean transition font-mono text-sm uppercase tracking-widest text-ink/60 hover:text-ink whitespace-nowrap"
             >
               Users
             </Link>
             <Link
+              href="/admin/moderation"
+              className="py-4 border-b-2 border-transparent hover:border-ocean transition font-mono text-sm uppercase tracking-widest text-ink/60 hover:text-ink whitespace-nowrap"
+            >
+              Moderation
+            </Link>
+            <Link
               href="/admin/submit"
-              className="py-4 border-b-2 border-transparent hover:border-ocean transition font-mono text-sm uppercase tracking-widest text-ink/60 hover:text-ink"
+              className="py-4 border-b-2 border-transparent hover:border-ocean transition font-mono text-sm uppercase tracking-widest text-ink/60 hover:text-ink whitespace-nowrap"
             >
               Submit Entry
             </Link>
             <Link
               href="/admin/manage"
-              className="py-4 border-b-2 border-transparent hover:border-ocean transition font-mono text-sm uppercase tracking-widest text-ink/60 hover:text-ink"
+              className="py-4 border-b-2 border-transparent hover:border-ocean transition font-mono text-sm uppercase tracking-widest text-ink/60 hover:text-ink whitespace-nowrap"
             >
               Manage Entries
             </Link>

@@ -106,7 +106,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Admin Tools */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <Link
           href="/admin/users"
           className="rounded-lg border border-ink/20 bg-card p-6 hover:border-ocean hover:shadow-lg transition"
@@ -117,12 +117,12 @@ export default function AdminDashboard() {
         </Link>
 
         <Link
-          href="/admin/dashboard"
+          href="/admin/moderation"
           className="rounded-lg border border-ink/20 bg-card p-6 hover:border-ocean hover:shadow-lg transition"
         >
-          <div className="text-sm font-mono uppercase tracking-[0.18em] text-coral font-semibold">💬</div>
+          <div className="text-sm font-mono uppercase tracking-[0.18em] text-coral font-semibold">🛡️</div>
           <h3 className="mt-3 font-semibold text-ink">Forum Moderation</h3>
-          <p className="mt-1 text-sm text-ink/60">Manage discussions & comments</p>
+          <p className="mt-1 text-sm text-ink/60">Review & manage discussions</p>
         </Link>
 
         <Link
@@ -132,6 +132,15 @@ export default function AdminDashboard() {
           <div className="text-sm font-mono uppercase tracking-[0.18em] text-sand font-semibold">➕</div>
           <h3 className="mt-3 font-semibold text-ink">Add New Policy</h3>
           <p className="mt-1 text-sm text-ink/60">Submit a new policy to database</p>
+        </Link>
+
+        <Link
+          href="/admin/manage"
+          className="rounded-lg border border-ink/20 bg-card p-6 hover:border-ocean hover:shadow-lg transition"
+        >
+          <div className="text-sm font-mono uppercase tracking-[0.18em] text-ink font-semibold">📋</div>
+          <h3 className="mt-3 font-semibold text-ink">Manage Policies</h3>
+          <p className="mt-1 text-sm text-ink/60">Edit, delete, and organize entries</p>
         </Link>
       </div>
 
