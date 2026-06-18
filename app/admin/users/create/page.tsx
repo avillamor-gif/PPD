@@ -97,7 +97,9 @@ export default function CreateUserPage() {
         <form onSubmit={handleCreateUser} className="space-y-6 p-8 rounded-lg border border-ink/10 bg-card">
           {error && (
             <div className="p-4 rounded-lg bg-coral/10 border border-coral/20 text-coral text-sm flex gap-3">
-            <AlertCircle className="w-5 h-5 shrink-0" />
+              <AlertCircle className="w-5 h-5 shrink-0" />
+              <span>{error}</span>
+            </div>
           )}
 
           <div>
