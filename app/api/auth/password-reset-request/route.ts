@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const user = users.find((u) => u.email === email);
+    const user = users.find((u: any) => u.email === email);
 
     if (!user) {
       // Don't reveal if user exists or not (security)
