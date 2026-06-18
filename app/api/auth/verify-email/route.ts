@@ -67,17 +67,25 @@ export async function POST(req: NextRequest) {
       console.log('🔐 [VERIFY] User profile marked as verified');
     }
 
-    // Update auth user to confirm email (this is what login checks)
-    console.log('🔐 [VERIFY] Updating auth user email_confirmed...');
-    const { error: authUpdateError } = await supabaseAdmin.auth.admin.updateUserById(data.user_id, {
-      email_confirm: true,
+    // Update auth.users.email_confirmed directly via SQL (bypasses RLS issues)
+    console.log('🔐 [VERIFY] Marking email confirmed in auth.users via SQL...');
+    const { error: sqlError } = await supabaseAdmin.rpc('update_user_email_confirmed', {
+      user_id: data.user_id,
     });
 
-    if (authUpdateError) {
-      console.warn('🔐 [VERIFY] Auth update had issues (may still be OK):', authUpdateError?.message);
-      // Don't throw - user_profiles is updated which is what matters
+    if (sqlError) {
+      // Fallback: try the admin API
+      console.warn('🔐 [VERIFY] RPC failed, trying admin API:', sqlError?.message);
+      const { error: authUpdateError } = await supabaseAdmin.auth.admin.updateUserById(data.user_id, {
+        email_confirm: true,
+      });
+      if (authUpdateError) {
+        console.warn('🔐 [VERIFY] Admin API also failed:', authUpdateError?.message);
+      } else {
+        console.log('🔐 [VERIFY] Auth user email confirmed via admin API');
+      }
     } else {
-      console.log('🔐 [VERIFY] Auth user email confirmed');
+      console.log('🔐 [VERIFY] Auth user email confirmed via RPC');
     }
 
     // Delete the token after use
