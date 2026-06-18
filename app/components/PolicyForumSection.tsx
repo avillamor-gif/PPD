@@ -38,7 +38,7 @@ export function PolicyForumSection({ policyId }: { policyId: string }) {
   const loadThreads = async () => {
     try {
       console.log('Loading threads for policy:', policyId);
-      // First, just get the threads without relationships
+      // Get all threads
       const { data, error: fetchError } = await supabase
         .from('discussion_threads')
         .select('*')
@@ -47,24 +47,29 @@ export function PolicyForumSection({ policyId }: { policyId: string }) {
         .order('is_pinned', { ascending: false })
         .order('created_at', { ascending: false });
 
-      console.log('Threads response:', { data, fetchError });
-
       if (fetchError) throw fetchError;
 
-      // Then fetch author names separately if needed
-      const threadsWithAuthor = await Promise.all((data || []).map(async (t: any) => {
-        let displayName = 'Unknown User';
-        if (t.author_id) {
-          const { data: author } = await supabase
-            .from('user_profiles')
-            .select('display_name')
-            .eq('id', t.author_id)
-            .single();
-          if (author) {
-            displayName = author.display_name || 'Unknown User';
-          }
+      // Batch fetch all author profiles in one query (avoid N+1)
+      const authorIds = [...new Set((data || []).map((t: any) => t.author_id).filter(Boolean))];
+      let authorMap: Record<string, string> = {};
+
+      if (authorIds.length > 0) {
+        const { data: authors } = await supabase
+          .from('user_profiles')
+          .select('id, display_name')
+          .in('id', authorIds);
+
+        if (authors) {
+          authorMap = Object.fromEntries(
+            authors.map((a: any) => [a.id, a.display_name || 'Unknown User'])
+          );
         }
-        return { ...t, display_name: displayName };
+      }
+
+      // Map threads with author names
+      const threadsWithAuthor = (data || []).map((t: any) => ({
+        ...t,
+        display_name: t.author_id ? authorMap[t.author_id] || 'Unknown User' : 'Unknown User',
       }));
 
       console.log('Processed threads:', threadsWithAuthor);

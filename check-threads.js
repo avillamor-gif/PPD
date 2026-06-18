@@ -7,15 +7,15 @@ const supabase = createClient(
 );
 
 (async () => {
+  // Check threads in database
   const { data: threads, error } = await supabase
     .from('discussion_threads')
-    .select('id, title, policy_id')
-    .limit(10);
+    .select('*')
+    .eq('policy_id', 'thai-2022-01')
+    .is('deleted_at', null);
   
-  if (error) {
-    console.log('Error:', error);
-  } else {
-    console.log('All threads:');
-    console.log(JSON.stringify(threads, null, 2));
-  }
+  console.log('Threads for thai-2022-01:');
+  console.log('Error:', error?.message || 'None');
+  console.log('Data:', threads);
+  console.log('Count:', threads?.length || 0);
 })();
