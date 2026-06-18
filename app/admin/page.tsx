@@ -105,6 +105,36 @@ export default function AdminDashboard() {
         <p className="mt-2 text-ink/60">Overview of all policies in the database</p>
       </div>
 
+      {/* Admin Tools */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <Link
+          href="/admin/users"
+          className="rounded-lg border border-ink/20 bg-card p-6 hover:border-ocean hover:shadow-lg transition"
+        >
+          <div className="text-sm font-mono uppercase tracking-[0.18em] text-ocean font-semibold">👥</div>
+          <h3 className="mt-3 font-semibold text-ink">User Management</h3>
+          <p className="mt-1 text-sm text-ink/60">Manage users, roles & permissions</p>
+        </Link>
+
+        <Link
+          href="/admin/dashboard"
+          className="rounded-lg border border-ink/20 bg-card p-6 hover:border-ocean hover:shadow-lg transition"
+        >
+          <div className="text-sm font-mono uppercase tracking-[0.18em] text-coral font-semibold">💬</div>
+          <h3 className="mt-3 font-semibold text-ink">Forum Moderation</h3>
+          <p className="mt-1 text-sm text-ink/60">Manage discussions & comments</p>
+        </Link>
+
+        <Link
+          href="/admin/submit"
+          className="rounded-lg border border-ink/20 bg-card p-6 hover:border-ocean hover:shadow-lg transition"
+        >
+          <div className="text-sm font-mono uppercase tracking-[0.18em] text-sand font-semibold">➕</div>
+          <h3 className="mt-3 font-semibold text-ink">Add New Policy</h3>
+          <p className="mt-1 text-sm text-ink/60">Submit a new policy to database</p>
+        </Link>
+      </div>
+
       {/* Key Metrics */}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-2xl border border-ink/10 bg-card p-6">
