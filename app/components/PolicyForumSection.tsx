@@ -37,6 +37,7 @@ export function PolicyForumSection({ policyId }: { policyId: string }) {
 
   const loadThreads = async () => {
     try {
+      console.log('Loading threads for policy:', policyId);
       const { data, error: fetchError } = await supabase
         .from('discussion_threads')
         .select(`
@@ -48,6 +49,8 @@ export function PolicyForumSection({ policyId }: { policyId: string }) {
         .order('is_pinned', { ascending: false })
         .order('created_at', { ascending: false });
 
+      console.log('Threads response:', { data, fetchError });
+
       if (fetchError) throw fetchError;
 
       const threadsWithAuthor = (data || []).map((t: any) => ({
@@ -55,6 +58,7 @@ export function PolicyForumSection({ policyId }: { policyId: string }) {
         display_name: t.author?.display_name || 'Unknown User',
       }));
 
+      console.log('Processed threads:', threadsWithAuthor);
       setThreads(threadsWithAuthor);
     } catch (err) {
       console.error('Load threads error:', err);
