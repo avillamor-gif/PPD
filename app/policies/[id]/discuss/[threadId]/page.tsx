@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { MessageSquare, Heart, Share2, Flag, ArrowLeft, Trash2 } from 'lucide-react';
+import { MessageSquare, Heart, Share2, Flag, ArrowLeft } from 'lucide-react';
 import { CommentForm } from '@/app/components/CommentForm';
 import { CommentsList } from '@/app/components/CommentsList';
 
@@ -32,10 +32,7 @@ export default function ThreadPage({
   const [comments, setComments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<any>(null);
-  const [userRole, setUserRole] = useState<number | null>(null);
   const [canReply, setCanReply] = useState(false);
-  const [deleteConfirm, setDeleteConfirm] = useState(false);
-  const [deleting, setDeleting] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -48,34 +45,39 @@ export default function ThreadPage({
     const { data: { user } } = await supabase.auth.getUser();
     setUser(user);
     setCanReply(!!user);
-    
-    if (user) {
-      const { data: profile } = await supabase
-        .from('user_profiles')
-        .select('role_id')
-        .eq('id', user.id)
-        .single();
-      setUserRole(profile?.role_id || null);
-    }
   };
 
   const loadThread = async () => {
     try {
       const { data, error } = await supabase
         .from('discussion_threads')
-        .select(`
-          *,
-          author:user_profiles(display_name, avatar_url)
-        `)
+        .select('*')
         .eq('id', params.threadId)
         .single();
 
       if (error) throw error;
 
+      // Fetch author profile separately
+      let displayName = 'Unknown User';
+      let avatarUrl = null;
+      
+      if (data.author_id) {
+        const { data: profile } = await supabase
+          .from('user_profiles')
+          .select('display_name, avatar_url')
+          .eq('id', data.author_id)
+          .single();
+        
+        if (profile) {
+          displayName = profile.display_name || 'Unknown User';
+          avatarUrl = profile.avatar_url;
+        }
+      }
+
       setThread({
         ...data,
-        display_name: (data as any).author?.display_name || 'Unknown',
-        avatar_url: (data as any).author?.avatar_url || null,
+        display_name: displayName,
+        avatar_url: avatarUrl,
       });
     } catch (error) {
       console.error('Load thread error:', error);
@@ -86,11 +88,7 @@ export default function ThreadPage({
     try {
       const { data, error } = await supabase
         .from('comments')
-        .select(`
-          *,
-          author:user_profiles(display_name, avatar_url),
-          reactions:comment_reactions(reaction_type)
-        `)
+        .select('*')
         .eq('thread_id', params.threadId)
         .is('parent_comment_id', null)
         .is('deleted_at', null)
@@ -98,28 +96,35 @@ export default function ThreadPage({
 
       if (error) throw error;
 
-      setComments(data || []);
+      // Batch fetch all author profiles
+      const authorIds = [...new Set((data || []).map((c: any) => c.author_id).filter(Boolean))];
+      let authorMap: Record<string, any> = {};
+
+      if (authorIds.length > 0) {
+        const { data: profiles } = await supabase
+          .from('user_profiles')
+          .select('id, display_name, avatar_url')
+          .in('id', authorIds);
+
+        if (profiles) {
+          authorMap = Object.fromEntries(
+            profiles.map((p: any) => [p.id, { display_name: p.display_name || 'Unknown User', avatar_url: p.avatar_url }])
+          );
+        }
+      }
+
+      // Map comments with author data
+      const commentsWithAuthors = (data || []).map((c: any) => ({
+        ...c,
+        author: c.author_id ? (authorMap[c.author_id] || { display_name: 'Unknown User', avatar_url: null }) : { display_name: 'Unknown User', avatar_url: null },
+        reactions: [], // Fetch separately if needed
+      }));
+
+      setComments(commentsWithAuthors);
     } catch (error) {
       console.error('Load comments error:', error);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const deleteThread = async () => {
-    setDeleting(true);
-    try {
-      const { error } = await supabase
-        .from('discussion_threads')
-        .delete()
-        .eq('id', params.threadId);
-
-      if (error) throw error;
-      router.push(`/policies/${params.id}`);
-    } catch (error) {
-      console.error('Delete thread error:', error);
-    } finally {
-      setDeleting(false);
     }
   };
 
@@ -159,32 +164,21 @@ export default function ThreadPage({
 
       {/* Thread header */}
       <div className="space-y-4">
-        <div className="flex items-center justify-between gap-2 flex-wrap">
-          <div className="flex items-center gap-2">
-            {thread.is_pinned && (
-              <span className="px-2 py-1 rounded text-xs font-mono bg-coral/10 text-coral">
-                PINNED
-              </span>
-            )}
-            <span
-              className={`px-2 py-1 rounded text-xs font-mono ${
-                thread.status === 'closed'
-                  ? 'bg-ink/10 text-ink/60'
-                  : 'bg-ocean/10 text-ocean'
-              }`}
-            >
-              {thread.status}
+        <div className="flex items-center gap-2 flex-wrap">
+          {thread.is_pinned && (
+            <span className="px-2 py-1 rounded text-xs font-mono bg-coral/10 text-coral">
+              PINNED
             </span>
-          </div>
-          {(userRole === 1 || user?.id === thread.author_id) && (
-            <button
-              onClick={() => setDeleteConfirm(true)}
-              className="p-2 hover:bg-coral/10 rounded transition text-coral"
-              title="Delete thread"
-            >
-              <Trash2 className="w-5 h-5" />
-            </button>
           )}
+          <span
+            className={`px-2 py-1 rounded text-xs font-mono ${
+              thread.status === 'closed'
+                ? 'bg-ink/10 text-ink/60'
+                : 'bg-ocean/10 text-ocean'
+            }`}
+          >
+            {thread.status}
+          </span>
         </div>
         <h1 className="text-4xl font-bold text-ink">{thread.title}</h1>
         {thread.description && (
@@ -207,34 +201,6 @@ export default function ThreadPage({
           </div>
         </div>
       </div>
-
-      <hr className="border-ink/10" />
-
-      {/* Delete confirmation */}
-      {deleteConfirm && (
-        <div className="p-6 rounded-lg bg-coral/5 border border-coral/20 space-y-4">
-          <h3 className="font-semibold text-ink">Delete this thread?</h3>
-          <p className="text-sm text-ink/60">
-            This will permanently delete the thread and all its comments. This action cannot be undone.
-          </p>
-          <div className="flex gap-2">
-            <button
-              onClick={deleteThread}
-              disabled={deleting}
-              className="px-4 py-2 rounded bg-coral text-white hover:bg-coral/90 disabled:opacity-50 font-medium transition"
-            >
-              {deleting ? 'Deleting...' : 'Delete Thread'}
-            </button>
-            <button
-              onClick={() => setDeleteConfirm(false)}
-              disabled={deleting}
-              className="px-4 py-2 rounded border border-ink/20 text-ink hover:bg-ink/5 font-medium transition"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
 
       <hr className="border-ink/10" />
 
