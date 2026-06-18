@@ -38,10 +38,8 @@ function VerifyContent() {
         setStatus('success');
         setMessage('Email verified successfully!');
 
-        // Redirect to login after 2 seconds
-        setTimeout(() => {
-          router.push('/auth/login');
-        }, 2000);
+        // Redirect to login immediately
+        router.push('/auth/login');
       } catch (error) {
         setStatus('error');
         setMessage(error instanceof Error ? error.message : 'An error occurred');
