@@ -25,14 +25,19 @@ function LoginContent() {
   const [error, setError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
   const [resetSuccess, setResetSuccess] = useState(false);
+  const [redirected, setRedirected] = useState(false);
 
-  // Check if user is already logged in
+  // Check if user is already logged in (run once on mount)
   useEffect(() => {
+    if (redirected) return; // Prevent multiple redirects
+
     const checkAuth = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         if (session?.user) {
+          setRedirected(true);
           router.push('/admin');
+          return;
         }
         
         // Check for password reset success message
@@ -50,7 +55,7 @@ function LoginContent() {
     };
 
     checkAuth();
-  }, [router, searchParams]);
+  }, []); // Only run on mount
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -95,6 +100,7 @@ function LoginContent() {
 
       // Redirect to admin after brief delay to ensure session is set
       setTimeout(() => {
+        setRedirected(true);
         router.push('/admin');
       }, 300);
     } catch (err) {
