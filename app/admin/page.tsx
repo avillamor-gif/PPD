@@ -1,9 +1,38 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { POLICIES, COUNTRIES, THEMES, STATUSES } from '@/lib/constants';
 import type { Policy, PolicyStatus } from '@/lib/types';
 import Link from 'next/link';
+import { supabase } from '@/lib/supabase';
+
+export default function AdminDashboard() {
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // Check authentication on mount
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.user) {
+          // Redirect to login if not authenticated
+          router.push('/auth/login');
+          return;
+        }
+        setIsAuthenticated(true);
+      } catch (err) {
+        console.error('Auth check error:', err);
+        router.push('/auth/login');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkAuth();
+  }, [router]);
 
 export default function AdminDashboard() {
   // Analytics data
@@ -53,6 +82,21 @@ export default function AdminDashboard() {
     () => [...POLICIES].sort((a, b) => b.year - a.year).slice(0, 5),
     []
   );
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-paper flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block w-8 h-8 border-4 border-ocean/20 border-t-ocean rounded-full animate-spin"></div>
+          <p className="mt-4 text-ink/60">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return null; // Will redirect via useEffect
+  }
 
   return (
     <div className="space-y-8">

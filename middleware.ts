@@ -4,50 +4,11 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function middleware(request: NextRequest) {
   const requestUrl = new URL(request.url);
 
-  // Check if this is an admin route that needs protection
-  if (requestUrl.pathname.startsWith('/admin')) {
-    // Create Supabase client with simple cookie handling
-    let response = NextResponse.next();
-    
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() {
-            // Parse cookies from request headers
-            const cookieHeader = request.headers.get('cookie') || '';
-            const cookies = cookieHeader.split(';').map(c => {
-              const [name, ...rest] = c.trim().split('=');
-              return {
-                name: name.trim(),
-                value: decodeURIComponent(rest.join('=').trim()),
-              };
-            });
-            return cookies;
-          },
-          setAll(cookiesToSet) {
-            cookiesToSet.forEach(({ name, value, options }) => {
-              response.cookies.set(name, value, options as any);
-            });
-          },
-        },
-      }
-    );
-
-    // Check session
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-
-    if (!session) {
-      return NextResponse.redirect(new URL('/auth/login', request.url));
-    }
-  }
-
+  // Admin authentication is handled client-side, so we don't need server middleware checks
+  // Client-side authentication in /app/admin/page.tsx will redirect to login if needed
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ['/admin/:path*'],
+  matcher: [],
 };
