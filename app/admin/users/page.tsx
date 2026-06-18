@@ -46,7 +46,13 @@ export default function UserManagementPage() {
   }, []);
 
   useEffect(() => {
-    if (loading === false) {
+    if (!loading) {
+      loadUsers();
+    }
+  }, [loading]);
+
+  useEffect(() => {
+    if (!loading) {
       loadUsers();
     }
   }, [search, roleFilter, offset]);

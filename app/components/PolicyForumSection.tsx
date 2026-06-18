@@ -38,12 +38,10 @@ export function PolicyForumSection({ policyId }: { policyId: string }) {
   const loadThreads = async () => {
     try {
       console.log('Loading threads for policy:', policyId);
+      // First, just get the threads without relationships
       const { data, error: fetchError } = await supabase
         .from('discussion_threads')
-        .select(`
-          *,
-          author:user_profiles(display_name)
-        `)
+        .select('*')
         .eq('policy_id', policyId)
         .is('deleted_at', null)
         .order('is_pinned', { ascending: false })
@@ -53,9 +51,20 @@ export function PolicyForumSection({ policyId }: { policyId: string }) {
 
       if (fetchError) throw fetchError;
 
-      const threadsWithAuthor = (data || []).map((t: any) => ({
-        ...t,
-        display_name: t.author?.display_name || 'Unknown User',
+      // Then fetch author names separately if needed
+      const threadsWithAuthor = await Promise.all((data || []).map(async (t: any) => {
+        let displayName = 'Unknown User';
+        if (t.author_id) {
+          const { data: author } = await supabase
+            .from('user_profiles')
+            .select('display_name')
+            .eq('id', t.author_id)
+            .single();
+          if (author) {
+            displayName = author.display_name || 'Unknown User';
+          }
+        }
+        return { ...t, display_name: displayName };
       }));
 
       console.log('Processed threads:', threadsWithAuthor);
