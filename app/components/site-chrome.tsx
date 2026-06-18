@@ -61,10 +61,7 @@ export function SiteHeader() {
       .select('display_name, avatar_url, role_id, role:roles(name)')
       .eq('id', userId)
       .single();
-    if (profile) {
-      console.log('Loaded profile:', profile); // Debug log
-      setUserProfile(profile);
-    }
+    if (profile) setUserProfile(profile);
   };
 
   const checkUser = async () => {
