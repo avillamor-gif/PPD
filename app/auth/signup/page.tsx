@@ -101,8 +101,10 @@ export default function SignupPage() {
       setPassword('');
       setConfirmPassword('');
 
-      // Redirect to verification page immediately
-      router.push(`/auth/verify-pending?email=${encodeURIComponent(email)}`);
+      // Redirect to verification page after brief delay
+      setTimeout(() => {
+        router.push(`/auth/verify-pending?email=${encodeURIComponent(email)}`);
+      }, 300);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {

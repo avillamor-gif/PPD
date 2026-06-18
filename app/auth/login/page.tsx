@@ -93,8 +93,10 @@ function LoginContent() {
       setEmail('');
       setPassword('');
 
-      // Redirect to admin immediately
-      router.push('/admin');
+      // Redirect to admin after brief delay to ensure session is set
+      setTimeout(() => {
+        router.push('/admin');
+      }, 300);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred during login');
     } finally {
