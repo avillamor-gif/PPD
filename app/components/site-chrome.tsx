@@ -19,19 +19,39 @@ export function SiteHeader() {
 
   useEffect(() => {
     checkUser();
+
+    // Listen for auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event: string, session: any) => {
+        if (session?.user) {
+          setUser(session.user);
+          loadProfile(session.user.id);
+        } else {
+          setUser(null);
+          setUserProfile(null);
+        }
+      }
+    );
+
+    return () => {
+      subscription?.unsubscribe();
+    };
   }, []);
+
+  const loadProfile = async (userId: string) => {
+    const { data: profile } = await supabase
+      .from('user_profiles')
+      .select('display_name, avatar_url, role:roles(name)')
+      .eq('id', userId)
+      .single();
+    if (profile) setUserProfile(profile);
+  };
 
   const checkUser = async () => {
     const { data: { session } } = await supabase.auth.getSession();
     if (session?.user) {
       setUser(session.user);
-      // Get profile
-      const { data: profile } = await supabase
-        .from('user_profiles')
-        .select('display_name, avatar_url, role:roles(name)')
-        .eq('id', session.user.id)
-        .single();
-      if (profile) setUserProfile(profile);
+      loadProfile(session.user.id);
     }
   };
 
