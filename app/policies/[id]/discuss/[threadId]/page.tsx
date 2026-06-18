@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { MessageSquare, Heart, Share2, Flag, ArrowLeft } from 'lucide-react';
 import { CommentForm } from '@/app/components/CommentForm';
@@ -23,11 +23,8 @@ interface ThreadDetail {
   is_pinned: boolean;
 }
 
-export default function ThreadPage({
-  params,
-}: {
-  params: { id: string; threadId: string };
-}) {
+export default function ThreadPage() {
+  const params = useParams() as { id: string; threadId: string };
   const [thread, setThread] = useState<ThreadDetail | null>(null);
   const [comments, setComments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -36,6 +33,7 @@ export default function ThreadPage({
   const router = useRouter();
 
   useEffect(() => {
+    if (!params.threadId) return;
     checkAuth();
     loadThread();
     loadComments();
