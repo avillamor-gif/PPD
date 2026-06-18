@@ -1,4 +1,4 @@
-import { createServerClient, parse, serialize } from '@supabase/ssr';
+import { createServerClient } from '@supabase/ssr';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function middleware(request: NextRequest) {
@@ -13,7 +13,16 @@ export async function middleware(request: NextRequest) {
       {
         cookies: {
           getAll() {
-            return parse(request.headers.getSetCookie().join(';'));
+            // Parse cookies from request headers
+            const cookieHeader = request.headers.get('cookie') || '';
+            const cookies = cookieHeader.split(';').map(c => {
+              const [name, ...rest] = c.trim().split('=');
+              return {
+                name: name.trim(),
+                value: decodeURIComponent(rest.join('=').trim()),
+              };
+            });
+            return cookies;
           },
           setAll(cookiesToSet) {
             const response = NextResponse.next();
