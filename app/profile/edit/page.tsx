@@ -27,6 +27,8 @@ export default function EditProfilePage() {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [avatarUrl, setAvatarUrl] = useState('');
+  const [avatarUploading, setAvatarUploading] = useState(false);
 
   useEffect(() => {
     loadProfile();
@@ -53,6 +55,7 @@ export default function EditProfilePage() {
         setBio(userProfile.bio || '');
         setOrganization(userProfile.organization || '');
         setCountryCode(userProfile.country_code || '');
+        setAvatarUrl(userProfile.avatar_url || '');
       }
     } catch (err) {
       console.error('Error loading profile:', err);
@@ -135,6 +138,48 @@ export default function EditProfilePage() {
     }
   };
 
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setAvatarUploading(true);
+    setError(null);
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        throw new Error('Not authenticated');
+      }
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const response = await fetch('/api/avatar', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Upload failed');
+      }
+
+      const data = await response.json();
+      setAvatarUrl(data.avatarUrl);
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 3000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to upload avatar');
+    } finally {
+      setAvatarUploading(false);
+      // Reset input
+      if (e.target) e.target.value = '';
+    }
+  };
+
   if (loading) {
     return (
       <div className="w-full min-h-screen bg-paper flex items-center justify-center">
@@ -194,6 +239,36 @@ export default function EditProfilePage() {
               </div>
 
               <form onSubmit={handleSaveProfile} className="space-y-4">
+                {/* Avatar Upload */}
+                <div className="flex items-start gap-4 pb-4 border-b border-ink/10">
+                  <div className="flex-shrink-0">
+                    {avatarUrl ? (
+                      <img
+                        src={avatarUrl}
+                        alt="Avatar"
+                        className="w-16 h-16 rounded-lg object-cover border border-ink/20"
+                      />
+                    ) : (
+                      <div className="w-16 h-16 rounded-lg bg-sand border border-ink/20 flex items-center justify-center">
+                        <span className="text-2xl">📷</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <label className="block text-sm font-medium text-ink mb-2">Profile Photo</label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleAvatarUpload}
+                      disabled={avatarUploading}
+                      className="block w-full text-sm text-ink/60 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border file:border-ink/20 file:bg-paper file:text-ink file:cursor-pointer hover:file:bg-sand disabled:opacity-50 disabled:cursor-not-allowed"
+                    />
+                    <p className="mt-1 text-xs text-ink/50">JPG, PNG or GIF (max 5MB)</p>
+                    {avatarUploading && <p className="mt-1 text-xs text-ocean">Uploading...</p>}
+                  </div>
+                </div>
+
+                {/* Display Name */}
                 <div>
                   <label className="block text-sm font-medium text-ink mb-2">Display Name</label>
                   <input

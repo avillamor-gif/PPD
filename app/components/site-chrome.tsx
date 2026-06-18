@@ -28,7 +28,7 @@ export function SiteHeader() {
       // Get profile
       const { data: profile } = await supabase
         .from('user_profiles')
-        .select('display_name, role:roles(name)')
+        .select('display_name, avatar_url, role:roles(name)')
         .eq('id', session.user.id)
         .single();
       if (profile) setUserProfile(profile);
@@ -84,15 +84,36 @@ export function SiteHeader() {
                     onClick={() => setDropdownOpen(!dropdownOpen)}
                     className="p-2 hover:bg-ink/5 rounded-lg transition text-ink flex items-center gap-2 font-medium"
                   >
-                    <User className="w-5 h-5" />
+                    {userProfile?.avatar_url ? (
+                      <img
+                        src={userProfile.avatar_url}
+                        alt="Avatar"
+                        className="w-6 h-6 rounded-full object-cover border border-ink/20"
+                      />
+                    ) : (
+                      <User className="w-5 h-5" />
+                    )}
                     <span className="text-sm max-w-[100px] truncate">{userProfile?.display_name || user.email}</span>
                   </button>
                   
                   {dropdownOpen && (
                     <div className="absolute right-0 mt-2 w-48 bg-paper border border-rule rounded-lg shadow-lg z-50">
-                      <div className="p-3 border-b border-rule">
-                        <p className="text-sm font-medium text-ink">{userProfile?.display_name || user.email}</p>
-                        <p className="text-xs text-ink/60">{userProfile?.role?.name || 'user'}</p>
+                      <div className="p-3 border-b border-rule flex items-center gap-3">
+                        {userProfile?.avatar_url ? (
+                          <img
+                            src={userProfile.avatar_url}
+                            alt="Avatar"
+                            className="w-10 h-10 rounded-lg object-cover border border-ink/20"
+                          />
+                        ) : (
+                          <div className="w-10 h-10 rounded-lg bg-sand border border-ink/20 flex items-center justify-center text-lg">
+                            📷
+                          </div>
+                        )}
+                        <div>
+                          <p className="text-sm font-medium text-ink">{userProfile?.display_name || user.email}</p>
+                          <p className="text-xs text-ink/60">{userProfile?.role?.name || 'user'}</p>
+                        </div>
                       </div>
                       <Link
                         href={`/profile/edit`}
