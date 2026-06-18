@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Menu, X, LogIn, LogOut, User, Settings } from 'lucide-react';
+import { Menu, X, LogIn, LogOut, User, Settings, LayoutDashboard } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Button from './Button';
@@ -134,6 +134,16 @@ export function SiteHeader() {
                           <p className="text-xs text-ink/60">{userProfile?.role?.name || 'user'}</p>
                         </div>
                       </div>
+                      {userProfile?.role?.name === 'admin' && (
+                        <Link
+                          href="/admin"
+                          className="block px-4 py-2 text-sm text-coral hover:bg-sand transition flex items-center gap-2 border-b border-rule font-medium"
+                          onClick={() => setDropdownOpen(false)}
+                        >
+                          <LayoutDashboard className="w-4 h-4" />
+                          Admin Dashboard
+                        </Link>
+                      )}
                       <Link
                         href={`/profile/edit`}
                         className="block px-4 py-2 text-sm text-ink hover:bg-sand transition flex items-center gap-2"
@@ -142,15 +152,6 @@ export function SiteHeader() {
                         <Settings className="w-4 h-4" />
                         Edit Profile
                       </Link>
-                      {userProfile?.role?.name === 'admin' && (
-                        <Link
-                          href="/admin"
-                          className="block px-4 py-2 text-sm text-ink hover:bg-sand transition"
-                          onClick={() => setDropdownOpen(false)}
-                        >
-                          Admin Dashboard
-                        </Link>
-                      )}
                       <button
                         onClick={handleLogout}
                         className="w-full text-left px-4 py-2 text-sm text-ink hover:bg-sand transition flex items-center gap-2 border-t border-rule"
