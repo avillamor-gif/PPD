@@ -373,7 +373,7 @@ BEGIN
   VALUES (
     NEW.id,
     COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.email),
-    NEW.email_confirmed_at IS NOT NULL
+    FALSE
   );
 
   INSERT INTO user_preferences (user_id)

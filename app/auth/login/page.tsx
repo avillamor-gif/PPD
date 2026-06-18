@@ -1,19 +1,30 @@
 // @ts-nocheck
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
+import PasswordInput from '@/app/components/PasswordInput';
 
 export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-paper flex items-center justify-center"><p className="text-ink/60">Loading...</p></div>}>
+      <LoginContent />
+    </Suspense>
+  );
+}
+
+function LoginContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(true);
   const [loginLoading, setLoginLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
+  const [resetSuccess, setResetSuccess] = useState(false);
 
   // Check if user is already logged in
   useEffect(() => {
@@ -23,6 +34,14 @@ export default function LoginPage() {
         if (session?.user) {
           router.push('/admin');
         }
+        
+        // Check for password reset success message
+        if (searchParams.get('reset') === 'success') {
+          setResetSuccess(true);
+          setTimeout(() => {
+            setResetSuccess(false);
+          }, 5000);
+        }
       } catch (err) {
         console.error('Auth check error:', err);
       } finally {
@@ -31,7 +50,7 @@ export default function LoginPage() {
     };
 
     checkAuth();
-  }, [router]);
+  }, [router, searchParams]);
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,18 +71,6 @@ export default function LoginPage() {
         throw new Error('Please enter a valid email address');
       }
 
-      // ADMIN TEST ACCOUNT: Temporary bypass for testing
-      // TODO: Replace with proper Supabase auth once email/password recovery is working
-      if (email === 'akawar@gmail.com' && password === '2ngbatang2ng!@#') {
-        setSubmitted(true);
-        setEmail('');
-        setPassword('');
-        setTimeout(() => {
-          router.push('/admin');
-        }, 1000);
-        return;
-      }
-
       // Sign in with Supabase
       const { data: { user }, error: signInError } = await supabase.auth.signInWithPassword({
         email,
@@ -81,9 +88,6 @@ export default function LoginPage() {
       if (!user) {
         throw new Error('Login failed - no user returned');
       }
-
-      // TODO: Re-enable email verification check once email service is configured
-      // For now, allow login regardless of email verification status
       
       setSubmitted(true);
       setEmail('');
@@ -127,6 +131,13 @@ export default function LoginPage() {
               </div>
             )}
 
+            {/* Password Reset Success Message */}
+            {resetSuccess && (
+              <div className="rounded-lg border border-ocean/30 bg-ocean/5 p-4">
+                <p className="font-medium text-ocean text-sm">✓ Password reset successfully! Sign in with your new password.</p>
+              </div>
+            )}
+
             {/* Error Message */}
             {error && (
               <div className="rounded-lg border border-coral/30 bg-coral/5 p-4">
@@ -150,13 +161,12 @@ export default function LoginPage() {
 
               <div>
                 <label className="block text-sm font-medium text-ink mb-2">Password</label>
-                <input
-                  type="password"
+                <PasswordInput
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
                   disabled={loginLoading}
-                  className="w-full rounded-lg border border-ink/20 bg-paper px-4 py-2 text-ink placeholder:text-ink/40 focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20 transition disabled:opacity-50"
+                  autoComplete="current-password"
                 />
               </div>
 

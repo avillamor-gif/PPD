@@ -2,6 +2,7 @@
 import { Resend } from 'resend';
 import { supabase } from './supabase';
 import { supabaseAdmin } from './supabase-admin';
+import config from './config';
 
 let resendClient: any = null;
 
@@ -19,16 +20,16 @@ function getResend() {
 }
 
 export async function sendVerificationEmail(email: string, token: string) {
-  const verificationUrl = `${process.env.NEXT_PUBLIC_APP_URL}/auth/verify?token=${token}`;
+  const verificationUrl = `${config.app.url}/auth/verify?token=${token}`;
 
   try {
     await getResend().emails.send({
-      from: 'noreply@plasticpolicydatabase.com',
+      from: config.email.from,
       to: email,
-      subject: 'Verify your email - Plastic Policy Database',
+      subject: `Verify your email - ${config.email.appName}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-          <h2 style="color: #E88860;">Welcome to Plastic Policy Database</h2>
+          <h2 style="color: #E88860;">Welcome to ${config.email.appName}</h2>
           <p>Click the button below to verify your email address:</p>
           <a href="${verificationUrl}" style="display: inline-block; padding: 12px 24px; background-color: #E88860; color: white; text-decoration: none; border-radius: 8px; margin: 20px 0;">Verify Email</a>
           <p style="color: #666; font-size: 14px;">Or paste this link in your browser: ${verificationUrl}</p>
@@ -44,13 +45,13 @@ export async function sendVerificationEmail(email: string, token: string) {
 }
 
 export async function sendPasswordResetEmail(email: string, token: string) {
-  const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL}/auth/reset-password?token=${token}`;
+  const resetUrl = `${config.app.url}/auth/reset-password?token=${token}`;
 
   try {
     await getResend().emails.send({
-      from: 'noreply@plasticpolicydatabase.com',
+      from: config.email.from,
       to: email,
-      subject: 'Reset your password - Plastic Policy Database',
+      subject: `Reset your password - ${config.email.appName}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2 style="color: #E88860;">Password Reset Request</h2>
@@ -76,11 +77,11 @@ export async function sendCommentNotificationEmail(
   policyId: string,
   commentPreview: string
 ) {
-  const policyUrl = `${process.env.NEXT_PUBLIC_APP_URL}/policies/${policyId}`;
+  const policyUrl = `${config.app.url}/policies/${policyId}`;
 
   try {
     await getResend().emails.send({
-      from: 'noreply@plasticpolicydatabase.com',
+      from: config.email.from,
       to: recipientEmail,
       subject: `${authorName} replied to your comment`,
       html: `

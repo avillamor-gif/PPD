@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
+import config from '@/lib/config';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -27,7 +28,7 @@ export async function POST(request: Request) {
       type: 'recovery',
       email: email,
       options: {
-        redirectTo: `${new URL(request.url).origin}/auth/reset-password?type=recovery`,
+        redirectTo: `${config.app.url}/auth/reset-password?type=recovery`,
       },
     });
 

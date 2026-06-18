@@ -4,25 +4,26 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import config from '@/lib/config';
+import PasswordInput from '@/app/components/PasswordInput';
 import { ChevronLeft } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
 
 function ResetPasswordContent() {
   const searchParams = useSearchParams();
   const [step, setStep] = useState<'email' | 'password'>('email');
   const [email, setEmail] = useState('');
+  const [token, setToken] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-  const [hasRecoveryToken, setHasRecoveryToken] = useState(false);
 
-  // Check if user came back from email with recovery token
+  // Check if user has a token in the URL
   useEffect(() => {
-    const type = searchParams.get('type');
-    if (type === 'recovery') {
-      setHasRecoveryToken(true);
+    const urlToken = searchParams.get('token');
+    if (urlToken) {
+      setToken(urlToken);
       setStep('password');
     }
   }, [searchParams]);
@@ -40,8 +41,8 @@ function ResetPasswordContent() {
         throw new Error('Please enter a valid email address');
       }
 
-      // Call our API endpoint to send password reset email
-      const response = await fetch('/api/auth/password-reset', {
+      // Call API to send password reset email
+      const response = await fetch('/api/auth/password-reset-request', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
@@ -72,15 +73,24 @@ function ResetPasswordContent() {
 
     try {
       if (!newPassword.trim()) throw new Error('New password is required');
-      if (newPassword.length < 8) throw new Error('Password must be at least 8 characters');
+      if (newPassword.length < config.auth.passwordMinLength) throw new Error(`Password must be at least ${config.auth.passwordMinLength} characters`);
       if (newPassword !== confirmPassword) throw new Error('Passwords do not match');
 
-      // Update password after reset
-      const { error: updateError } = await supabase.auth.updateUser({
-        password: newPassword,
+      // Call API to confirm password reset
+      const response = await fetch('/api/auth/password-reset-confirm', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          token,
+          newPassword,
+        }),
       });
 
-      if (updateError) throw updateError;
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to reset password');
+      }
 
       setSuccess(true);
       setTimeout(() => {
@@ -101,8 +111,7 @@ function ResetPasswordContent() {
           <h1 className="font-display text-3xl font-bold text-ink">Reset Password</h1>
           <p className="text-ink/60">
             {step === 'email' && 'Enter your email to receive a reset link'}
-            {step === 'password' && hasRecoveryToken && 'Create a new password to regain access'}
-            {step === 'password' && !hasRecoveryToken && 'Create a new password'}
+            {step === 'password' && 'Create a new password'}
           </p>
         </div>
 
@@ -112,7 +121,7 @@ function ResetPasswordContent() {
           <div className="flex items-center gap-2 mb-6">
             <div
               className={`h-2 flex-1 rounded-full transition ${
-                ['email', 'password'].indexOf(step) >= 0 ? 'bg-ocean' : 'bg-ink/10'
+                step === 'email' ? 'bg-ocean' : 'bg-ink/10'
               }`}
             />
             <div
@@ -126,7 +135,8 @@ function ResetPasswordContent() {
           {success && (
             <div className="rounded-lg border border-ocean/30 bg-ocean/5 p-4">
               <p className="font-medium text-ocean text-sm">
-                ✓ Check your email for a password reset link
+                {step === 'email' && '✓ Check your email for a password reset link'}
+                {step === 'password' && '✓ Password reset successfully! Redirecting...'}
               </p>
             </div>
           )}
@@ -170,26 +180,22 @@ function ResetPasswordContent() {
             <form onSubmit={handlePasswordSubmit} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-ink mb-2">New Password</label>
-                <input
-                  type="password"
+                <PasswordInput
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   placeholder="Enter new password"
                   disabled={loading}
-                  className="w-full rounded-lg border border-ink/20 bg-paper px-4 py-2 text-ink placeholder:text-ink/40 focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20 transition disabled:opacity-50"
                 />
-                <p className="mt-1 text-xs text-ink/50">At least 8 characters</p>
+                <p className="mt-1 text-xs text-ink/50">At least {config.auth.passwordMinLength} characters</p>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-ink mb-2">Confirm Password</label>
-                <input
-                  type="password"
+                <PasswordInput
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Confirm new password"
                   disabled={loading}
-                  className="w-full rounded-lg border border-ink/20 bg-paper px-4 py-2 text-ink placeholder:text-ink/40 focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20 transition disabled:opacity-50"
                 />
               </div>
 
@@ -206,24 +212,23 @@ function ResetPasswordContent() {
 
         {/* Footer Navigation */}
         <div className="text-center space-y-3">
-          {step !== 'email' && !hasRecoveryToken && (
+          {step === 'password' && (
             <button
               onClick={() => {
                 setStep('email');
                 setError(null);
                 setSuccess(false);
+                setToken('');
               }}
               className="text-sm text-ink/50 hover:text-ink transition flex items-center justify-center gap-1 mx-auto"
             >
               <ChevronLeft className="w-4 h-4" />
-              Go Back
+              Try another email
             </button>
           )}
-          {!hasRecoveryToken && (
-            <Link href="/auth/login" className="block text-sm text-ink/50 hover:text-ink transition">
-              ← Back to Login
-            </Link>
-          )}
+          <Link href="/auth/login" className="block text-sm text-ink/50 hover:text-ink transition">
+            ← Back to Login
+          </Link>
         </div>
       </div>
     </div>

@@ -1,0 +1,118 @@
+import { supabaseAdmin } from '@/lib/supabase-admin';
+import { sendVerificationEmail } from '@/lib/email';
+import config from '@/lib/config';
+import { NextRequest, NextResponse } from 'next/server';
+import crypto from 'crypto';
+
+export async function POST(req: NextRequest) {
+  try {
+    const { email, password, displayName } = await req.json();
+
+    if (!email || !password || !displayName) {
+      return NextResponse.json(
+        { error: 'Email, password, and display name are required' },
+        { status: 400 }
+      );
+    }
+
+    if (password.length < config.auth.passwordMinLength) {
+      return NextResponse.json(
+        { error: `Password must be at least ${config.auth.passwordMinLength} characters` },
+        { status: 400 }
+      );
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return NextResponse.json(
+        { error: 'Please enter a valid email address' },
+        { status: 400 }
+      );
+    }
+
+    console.log('🔐 [SIGNUP] Starting signup for:', email);
+
+    try {
+      // Create auth user - trigger will auto-create user_profiles + preferences
+      console.log('🔐 [SIGNUP] Creating user in auth with email:', email);
+      
+      let user, authError;
+      try {
+        const result = await supabaseAdmin.auth.admin.createUser({
+          email,
+          password,
+          email_confirm: false,
+          user_metadata: {
+            full_name: displayName,
+          },
+        });
+        user = result.data?.user;
+        authError = result.error;
+        console.log('🔐 [SIGNUP] Result from createUser:', { user: !!user, error: authError });
+      } catch (createError) {
+        console.error('🔐 [SIGNUP] Exception during createUser:', createError);
+        const errorMsg = createError instanceof Error ? createError.message : String(createError);
+        return NextResponse.json(
+          { error: `Failed to create user: ${errorMsg}` },
+          { status: 500 }
+        );
+      }
+
+      if (authError) {
+        console.error('🔐 [SIGNUP] Auth error returned:', {
+          message: authError.message,
+          status: authError.status,
+          name: authError.name,
+          code: (authError as any).code,
+          statusCode: (authError as any).statusCode,
+          fullError: JSON.stringify(authError),
+          keys: Object.keys(authError),
+        });
+        const errorMsg = authError.message || (authError as any).code || JSON.stringify(authError) || 'Unknown auth error';
+        const statusCode = authError.status || (authError as any).statusCode || 400;
+        return NextResponse.json(
+          { error: `Auth failed: ${errorMsg}` },
+          { status: statusCode }
+        );
+      }
+
+      if (!user) {
+        console.error('🔐 [SIGNUP] No user returned from createUser');
+        return NextResponse.json(
+          { error: 'Failed to create user - no user returned' },
+          { status: 400 }
+        );
+      }
+
+      console.log('🔐 [SIGNUP] User successfully created:', user.id);
+
+      return NextResponse.json({
+        success: true,
+        user: {
+          id: user.id,
+          email: user.email,
+        },
+        message: 'Signup successful. Please verify your email.',
+      });
+    } catch (innerError) {
+      console.error('🔐 [SIGNUP] Outer inner catch:', {
+        error: innerError,
+        message: innerError instanceof Error ? innerError.message : String(innerError),
+        stack: innerError instanceof Error ? innerError.stack : 'no stack',
+      });
+      const msg = innerError instanceof Error ? innerError.message : String(innerError);
+      return NextResponse.json(
+        { error: `Signup error: ${msg}` },
+        { status: 500 }
+      );
+    }
+  } catch (error) {
+    console.error('🔐 [SIGNUP] Outer error:', error);
+    const msg = error instanceof Error ? error.message : 'Unknown error';
+    return NextResponse.json(
+      { error: `Error: ${msg}` },
+      { status: 500 }
+    );
+  }
+}

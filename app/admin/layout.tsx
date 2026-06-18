@@ -36,6 +36,12 @@ export default function AdminLayout({
               Dashboard
             </Link>
             <Link
+              href="/admin/users"
+              className="py-4 border-b-2 border-transparent hover:border-ocean transition font-mono text-sm uppercase tracking-widest text-ink/60 hover:text-ink"
+            >
+              Users
+            </Link>
+            <Link
               href="/admin/submit"
               className="py-4 border-b-2 border-transparent hover:border-ocean transition font-mono text-sm uppercase tracking-widest text-ink/60 hover:text-ink"
             >

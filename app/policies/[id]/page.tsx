@@ -2,8 +2,7 @@ import Link from 'next/link';
 import { COUNTRIES, POLICIES, THEMES } from '@/app/data/policies';
 import { notFound } from 'next/navigation';
 import { ArrowLeft, MapPin, Calendar, Building2, Globe, MessageCircle, ThumbsUp, Eye } from 'lucide-react';
-import { CommentForm } from '@/app/components/CommentForm';
-import { CommentsList } from '@/app/components/CommentsList';
+import { PolicyForumSection } from '@/app/components/PolicyForumSection';
 
 const themeColors: Record<string, string> = {
   "Plastic Ban": "bg-coral/20 text-coral border-coral/30",
@@ -163,7 +162,7 @@ export default async function PolicyPage({ params }: { params: Promise<{ id: str
               </h2>
               <div className="space-y-3">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-coral to-coral/50 flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-full bg-linear-to-br from-coral to-coral/50 flex items-center justify-center">
                     <span className="text-white font-bold">{policy.year}</span>
                   </div>
                   <div>
@@ -179,22 +178,8 @@ export default async function PolicyPage({ params }: { params: Promise<{ id: str
               </div>
             </div>
 
-            {/* Community Discussion Card */}
-            <div className="rounded-xl border border-coral/20 bg-white p-6 space-y-6">
-              <h2 className="text-xl font-bold text-ink flex items-center gap-2">
-                <MessageCircle className="w-5 h-5 text-coral" />
-                Community Discussion
-              </h2>
-
-              {/* Comment Form */}
-              <CommentForm policyId={policy.id} />
-
-              {/* Comments List */}
-              <div className="border-t border-ink/10 pt-6">
-                <h3 className="font-bold text-ink mb-4">Comments ({/* count */})</h3>
-                <CommentsList policyId={policy.id} />
-              </div>
-            </div>
+            {/* Community Discussion */}
+            <PolicyForumSection policyId={policy.id} />
           </div>
 
           {/* Right Sidebar */}

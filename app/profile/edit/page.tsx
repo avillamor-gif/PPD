@@ -5,6 +5,8 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
+import config from '@/lib/config';
+import PasswordInput from '@/app/components/PasswordInput';
 import { COUNTRIES, REGIONS } from '@/lib/constants/policies';
 import { ArrowLeft, Check, AlertCircle } from 'lucide-react';
 
@@ -101,7 +103,7 @@ export default function EditProfilePage() {
     try {
       if (!currentPassword) throw new Error('Current password is required');
       if (!newPassword) throw new Error('New password is required');
-      if (newPassword.length < 8) throw new Error('New password must be at least 8 characters');
+      if (newPassword.length < config.auth.passwordMinLength) throw new Error(`New password must be at least ${config.auth.passwordMinLength} characters`);
       if (newPassword !== confirmPassword) throw new Error('Passwords do not match');
 
       // Verify current password by attempting to sign in
@@ -263,35 +265,29 @@ export default function EditProfilePage() {
               <form onSubmit={handlePasswordChange} className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-ink mb-2">Current Password</label>
-                  <input
-                    type="password"
+                  <PasswordInput
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
                     placeholder="Enter current password"
-                    className="w-full rounded-lg border border-ink/20 bg-paper px-4 py-2 text-ink placeholder:text-ink/40 focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20 transition"
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-ink mb-2">New Password</label>
-                  <input
-                    type="password"
+                  <PasswordInput
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="Enter new password"
-                    className="w-full rounded-lg border border-ink/20 bg-paper px-4 py-2 text-ink placeholder:text-ink/40 focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20 transition"
                   />
-                  <p className="mt-1 text-xs text-ink/50">At least 8 characters</p>
+                  <p className="mt-1 text-xs text-ink/50">At least {config.auth.passwordMinLength} characters</p>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-ink mb-2">Confirm New Password</label>
-                  <input
-                    type="password"
+                  <PasswordInput
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Confirm new password"
-                    className="w-full rounded-lg border border-ink/20 bg-paper px-4 py-2 text-ink placeholder:text-ink/40 focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20 transition"
                   />
                 </div>
 
