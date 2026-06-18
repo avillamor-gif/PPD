@@ -126,7 +126,7 @@ export function SiteHeader() {
                             className="w-10 h-10 rounded-lg object-cover border border-ink/20"
                           />
                         ) : (
-                          <div className="w-10 h-10 rounded-lg bg-sand border border-ink/20 flex items-center justify-center text-lg">
+                          <div className="w-10 h-10 rounded-full bg-sand border border-ink/20 flex items-center justify-center text-lg">
                             📷
                           </div>
                         )}

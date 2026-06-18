@@ -252,7 +252,7 @@ export default function EditProfilePage() {
                         className="w-16 h-16 rounded-lg object-cover border border-ink/20"
                       />
                     ) : (
-                      <div className="w-16 h-16 rounded-lg bg-sand border border-ink/20 flex items-center justify-center">
+                      <div className="w-16 h-16 rounded-full bg-sand border border-ink/20 flex items-center justify-center">
                         <span className="text-2xl">📷</span>
                       </div>
                     )}
