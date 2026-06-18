@@ -174,6 +174,24 @@ export default function ForumModerationPage() {
     }
   };
 
+  const handleDeleteThread = async (threadId: string) => {
+    setActionInProgress(true);
+    try {
+      const { error } = await supabase
+        .from('discussion_threads')
+        .delete()
+        .eq('id', threadId);
+
+      if (error) throw error;
+      setDeleteConfirm(null);
+      loadThreads();
+    } catch (error) {
+      console.error('Delete thread error:', error);
+    } finally {
+      setActionInProgress(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -372,7 +390,36 @@ export default function ForumModerationPage() {
                       </span>
                     </div>
                   </div>
+                  <button
+                    onClick={() => setDeleteConfirm(thread.id)}
+                    className="p-2 hover:bg-coral/10 rounded transition text-coral"
+                    title="Delete thread"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
                 </div>
+
+                {/* Delete Confirmation */}
+                {deleteConfirm === thread.id && (
+                  <div className="mt-4 p-4 rounded bg-coral/5 border border-coral/20 space-y-3">
+                    <p className="text-sm text-ink">Delete this thread? All comments will also be deleted.</p>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleDeleteThread(thread.id)}
+                        disabled={actionInProgress}
+                        className="px-3 py-2 rounded bg-coral text-white hover:bg-coral/90 disabled:opacity-50 text-sm font-medium transition"
+                      >
+                        {actionInProgress ? 'Deleting...' : 'Delete'}
+                      </button>
+                      <button
+                        onClick={() => setDeleteConfirm(null)}
+                        className="px-3 py-2 rounded border border-ink/20 text-ink hover:bg-ink/5 text-sm font-medium transition"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             ))
           ) : (
