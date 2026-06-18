@@ -29,6 +29,7 @@ export default function EditProfilePage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [avatarUrl, setAvatarUrl] = useState('');
   const [avatarUploading, setAvatarUploading] = useState(false);
+  const [socialLinks, setSocialLinks] = useState<any>({});
 
   useEffect(() => {
     loadProfile();
@@ -56,6 +57,7 @@ export default function EditProfilePage() {
         setOrganization(userProfile.organization || '');
         setCountryCode(userProfile.country_code || '');
         setAvatarUrl(userProfile.avatar_url || '');
+        setSocialLinks(userProfile.social_links || {});
       }
     } catch (err) {
       console.error('Error loading profile:', err);
@@ -83,6 +85,7 @@ export default function EditProfilePage() {
           bio: bio || null,
           organization: organization || null,
           country_code: countryCode || null,
+          social_links: socialLinks,
         })
         .eq('id', user.id);
 
@@ -319,6 +322,25 @@ export default function EditProfilePage() {
                       </option>
                     ))}
                   </select>
+                </div>
+
+                {/* Social Links */}
+                <div className="border-t border-ink/10 pt-4 mt-4">
+                  <h3 className="text-sm font-semibold text-ink mb-3">Social Links</h3>
+                  <div className="space-y-3">
+                    {['twitter', 'linkedin', 'github', 'website'].map((platform) => (
+                      <div key={platform}>
+                        <label className="block text-sm font-medium text-ink mb-1 capitalize">{platform}</label>
+                        <input
+                          type="url"
+                          placeholder={`https://${platform}.com/yourprofile`}
+                          value={socialLinks[platform] || ''}
+                          onChange={(e) => setSocialLinks({ ...socialLinks, [platform]: e.target.value })}
+                          className="w-full rounded-lg border border-ink/20 bg-paper px-4 py-2 text-ink placeholder:text-ink/40 focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20 transition"
+                        />
+                      </div>
+                    ))}
+                  </div>
                 </div>
 
                 <button
