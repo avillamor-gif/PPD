@@ -38,32 +38,50 @@ export default function UserManagementPage() {
   const [total, setTotal] = useState(0);
   const [offset, setOffset] = useState(0);
   const [actionInProgress, setActionInProgress] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const router = useRouter();
   const limit = 25;
 
   useEffect(() => {
-    checkAuth();
+    checkAdminAccess();
   }, []);
 
   useEffect(() => {
-    if (isAuthenticated && !loading) {
+    if (loading === false) {
       loadUsers();
     }
-  }, [search, roleFilter, offset, isAuthenticated]);
+  }, [search, roleFilter, offset]);
 
-  const checkAuth = async () => {
+  const checkAdminAccess = async () => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user) {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
         router.push('/auth/login');
         return;
       }
-      setIsAuthenticated(true);
+
+      const { data: profile, error: profileError } = await supabase
+        .from('user_profiles')
+        .select('role:roles(name)')
+        .eq('id', user.id)
+        .single();
+
+      if (profileError) {
+        console.error('Profile fetch error:', profileError);
+        router.push('/');
+        return;
+      }
+
+      const profileData = profile as any;
+      if (profileData?.role?.name !== 'admin') {
+        console.log('User role:', profileData?.role?.name);
+        router.push('/');
+        return;
+      }
+
       setLoading(false);
     } catch (error) {
-      console.error('Auth check error:', error);
-      router.push('/auth/login');
+      console.error('Access check error:', error);
+      router.push('/');
     }
   };
 
