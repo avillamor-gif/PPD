@@ -4,11 +4,11 @@ import { NextRequest, NextResponse } from 'next/server';
 // PATCH update user role or status
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
     const { role, status } = await req.json();
-    const userId = params.userId;
+    const { userId } = await params;
 
     if (!role && !status) {
       return NextResponse.json(
@@ -82,10 +82,10 @@ export async function PATCH(
 // DELETE user (soft delete)
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
-    const userId = params.userId;
+    const { userId } = await params;
 
     // Soft delete by marking status
     await supabaseAdmin.auth.admin.updateUserById(userId, {
