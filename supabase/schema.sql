@@ -263,11 +263,15 @@ ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users can view all profiles" ON user_profiles FOR SELECT USING (true);
 CREATE POLICY "Users can update their own profile" ON user_profiles FOR UPDATE USING (auth.uid() = id);
 CREATE POLICY "Users can insert their own profile" ON user_profiles FOR INSERT WITH CHECK (auth.uid() = id);
+-- Allow service_role and postgres to insert (for triggers)
+CREATE POLICY "Service role can insert profiles" ON user_profiles FOR INSERT WITH CHECK (auth.role() IN ('service_role', 'postgres'));
 
 -- USER PREFERENCES RLS
 CREATE POLICY "Users can view their own preferences" ON user_preferences FOR SELECT USING (auth.uid() = user_id);
 CREATE POLICY "Users can update their own preferences" ON user_preferences FOR UPDATE USING (auth.uid() = user_id);
 CREATE POLICY "Users can insert their own preferences" ON user_preferences FOR INSERT WITH CHECK (auth.uid() = user_id);
+-- Allow service_role and postgres to insert (for triggers)
+CREATE POLICY "Service role can insert preferences" ON user_preferences FOR INSERT WITH CHECK (auth.role() IN ('service_role', 'postgres'));
 
 -- DISCUSSION THREADS RLS
 CREATE POLICY "Anyone can view threads" ON discussion_threads FOR SELECT USING (true);

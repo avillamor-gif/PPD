@@ -39,6 +39,7 @@ export async function POST(req: NextRequest) {
       
       let user, authError;
       try {
+        console.log('🔐 [SIGNUP] About to call createUser with:', { email, passwordLength: password.length });
         const result = await supabaseAdmin.auth.admin.createUser({
           email,
           password,
@@ -49,9 +50,18 @@ export async function POST(req: NextRequest) {
         });
         user = result.data?.user;
         authError = result.error;
-        console.log('🔐 [SIGNUP] Result from createUser:', { user: !!user, error: authError });
+        console.log('🔐 [SIGNUP] Result from createUser:', { 
+          userCreated: !!user, 
+          userId: user?.id,
+          errorExists: !!authError,
+          errorMessage: authError?.message,
+        });
       } catch (createError) {
-        console.error('🔐 [SIGNUP] Exception during createUser:', createError);
+        console.error('🔐 [SIGNUP] Exception during createUser:', {
+          error: createError,
+          message: createError instanceof Error ? createError.message : String(createError),
+          stack: createError instanceof Error ? createError.stack : 'N/A',
+        });
         const errorMsg = createError instanceof Error ? createError.message : String(createError);
         return NextResponse.json(
           { error: `Failed to create user: ${errorMsg}` },
