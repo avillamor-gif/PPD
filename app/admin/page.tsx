@@ -34,7 +34,6 @@ export default function AdminDashboard() {
     checkAuth();
   }, [router]);
 
-export default function AdminDashboard() {
   // Analytics data
   const totalPolicies = POLICIES.length;
   const policyByStatus = useMemo(() => {
