@@ -97,6 +97,35 @@ export async function POST(req: NextRequest) {
 
       console.log('🔐 [SIGNUP] User successfully created:', user.id);
 
+      // Manually create user_profiles and user_preferences since trigger may be blocked
+      console.log('🔐 [SIGNUP] Creating user_profiles...');
+      const { error: profileError } = await supabaseAdmin
+        .from('user_profiles')
+        .insert({
+          id: user.id,
+          display_name: displayName,
+          email_verified: false,
+        });
+
+      if (profileError) {
+        console.error('🔐 [SIGNUP] Profile creation error:', profileError);
+      } else {
+        console.log('🔐 [SIGNUP] User profile created successfully');
+      }
+
+      console.log('🔐 [SIGNUP] Creating user_preferences...');
+      const { error: prefsError } = await supabaseAdmin
+        .from('user_preferences')
+        .insert({
+          user_id: user.id,
+        });
+
+      if (prefsError) {
+        console.error('🔐 [SIGNUP] Preferences creation error:', prefsError);
+      } else {
+        console.log('🔐 [SIGNUP] User preferences created successfully');
+      }
+
       return NextResponse.json({
         success: true,
         user: {
