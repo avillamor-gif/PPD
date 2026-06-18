@@ -249,7 +249,7 @@ export default function EditProfilePage() {
                       <img
                         src={avatarUrl}
                         alt="Avatar"
-                        className="w-16 h-16 rounded-lg object-cover border border-ink/20"
+                        className="w-16 h-16 rounded-full object-cover border border-ink/20"
                       />
                     ) : (
                       <div className="w-16 h-16 rounded-full bg-sand border border-ink/20 flex items-center justify-center">

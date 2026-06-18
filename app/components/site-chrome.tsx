@@ -55,10 +55,21 @@ export function SiteHeader() {
     }
   }, [dropdownOpen]);
 
+  const getRoleName = (roleId: number) => {
+    const roles: { [key: number]: string } = {
+      1: 'admin',
+      2: 'moderator',
+      3: 'expert',
+      4: 'user',
+      5: 'guest'
+    };
+    return roles[roleId] || 'user';
+  };
+
   const loadProfile = async (userId: string) => {
     const { data: profile } = await supabase
       .from('user_profiles')
-      .select('display_name, avatar_url, role_id, role:roles(name)')
+      .select('display_name, avatar_url, role_id')
       .eq('id', userId)
       .single();
     if (profile) setUserProfile(profile);
@@ -148,10 +159,10 @@ export function SiteHeader() {
                         )}
                         <div>
                           <p className="text-sm font-medium text-ink">{userProfile?.display_name || user.email}</p>
-                          <p className="text-xs text-ink/60">{userProfile?.role?.name || 'user'}</p>
+                          <p className="text-xs text-ink/60">{getRoleName(userProfile?.role_id)}</p>
                         </div>
                       </div>
-                      {userProfile?.role?.name === 'admin' && (
+                      {userProfile?.role_id === 1 && (
                         <Link
                           href="/admin"
                           className="block px-4 py-2 text-sm text-coral hover:bg-sand transition flex items-center gap-2 border-b border-rule font-medium"
@@ -238,7 +249,7 @@ export function SiteHeader() {
                   >
                     Edit Profile
                   </Link>
-                  {userProfile?.role?.name === 'admin' && (
+                  {userProfile?.role_id === 1 && (
                     <Link
                       href="/admin"
                       className="block px-4 py-2 rounded-lg hover:bg-sand transition text-ink text-center"
