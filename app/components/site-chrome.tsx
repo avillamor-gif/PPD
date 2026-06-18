@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { Menu, X, LogIn, LogOut, User, Settings, LayoutDashboard } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Button from './Button';
 import { NavLink } from './ui/nav-link';
@@ -15,6 +15,7 @@ export function SiteHeader() {
   const [user, setUser] = useState<any>(null);
   const [userProfile, setUserProfile] = useState<any>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -37,6 +38,22 @@ export function SiteHeader() {
       subscription?.unsubscribe();
     };
   }, []);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setDropdownOpen(false);
+      }
+    };
+
+    if (dropdownOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }
+  }, [dropdownOpen]);
 
   const loadProfile = async (userId: string) => {
     const { data: profile } = await supabase
@@ -102,7 +119,7 @@ export function SiteHeader() {
               </Button>
               {user ? (
                 // User logged in - show dropdown menu
-                <div className="relative">
+                <div className="relative" ref={dropdownRef}>
                   <button
                     onClick={() => setDropdownOpen(!dropdownOpen)}
                     className="p-2 hover:bg-ink/5 rounded-full transition text-ink flex items-center justify-center font-medium"
