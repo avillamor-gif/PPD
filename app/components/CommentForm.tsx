@@ -7,10 +7,12 @@ import { supabase } from '@/lib/supabase';
 import { Send, AlertCircle, Check } from 'lucide-react';
 
 export function CommentForm({
+  threadId,
   policyId,
   onCommentAdded,
 }: {
-  policyId: string;
+  threadId?: string;
+  policyId?: string;
   onCommentAdded?: () => void;
 }) {
   const [content, setContent] = useState('');
@@ -46,34 +48,43 @@ export function CommentForm({
       if (!content.trim()) throw new Error('Comment cannot be empty');
       if (content.length < 3) throw new Error('Comment must be at least 3 characters');
 
-      // Get or create discussion thread for this policy
-      let { data: thread } = await supabase
-        .from('discussion_threads')
-        .select('id')
-        .eq('policy_id', policyId)
-        .single();
+      let commentThreadId = threadId;
 
-      if (!thread) {
-        const { data: newThread, error: threadError } = await supabase
+      // If threadId not provided, get or create discussion thread for this policy
+      if (!commentThreadId && policyId) {
+        let { data: thread } = await supabase
           .from('discussion_threads')
-          .insert({
-            policy_id: policyId,
-            title: `Discussion on Policy`,
-            author_id: currentUser.id,
-            status: 'open',
-          })
-          .select()
+          .select('id')
+          .eq('policy_id', policyId)
           .single();
 
-        if (threadError) throw threadError;
-        thread = newThread;
+        if (!thread) {
+          const { data: newThread, error: threadError } = await supabase
+            .from('discussion_threads')
+            .insert({
+              policy_id: policyId,
+              title: `Discussion on Policy`,
+              author_id: currentUser.id,
+              status: 'open',
+            })
+            .select()
+            .single();
+
+          if (threadError) throw threadError;
+          thread = newThread;
+        }
+        commentThreadId = thread.id;
+      }
+
+      if (!commentThreadId) {
+        throw new Error('No thread or policy provided');
       }
 
       // Insert comment
       const { error: commentError } = await supabase
         .from('comments')
         .insert({
-          thread_id: thread.id,
+          thread_id: commentThreadId,
           policy_id: policyId,
           author_id: currentUser.id,
           content: content.trim(),

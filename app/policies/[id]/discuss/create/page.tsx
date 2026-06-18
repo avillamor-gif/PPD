@@ -10,7 +10,7 @@ import { MessageSquare, ArrowLeft, AlertCircle } from 'lucide-react';
 export default function CreateThreadPage({
   params,
 }: {
-  params: { policyId: string };
+  params: { id: string };
 }) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -50,7 +50,7 @@ export default function CreateThreadPage({
       const { data, error: insertError } = await supabase
         .from('discussion_threads')
         .insert({
-          policy_id: params.policyId,
+          policy_id: params.id,
           title: title.trim(),
           description: description.trim() || null,
           author_id: user.id,
@@ -72,7 +72,7 @@ export default function CreateThreadPage({
         });
 
       router.push(
-        `/policies/${params.policyId}/discuss/${data.id}`
+        `/policies/${params.id}/discuss/${data.id}`
       );
     } catch (err) {
       setError(
@@ -87,7 +87,7 @@ export default function CreateThreadPage({
     <div className="max-w-2xl mx-auto space-y-8">
       {/* Back link */}
       <Link
-        href={`/policies/${params.policyId}/discuss`}
+        href={`/policies/${params.id}/discuss`}
         className="inline-flex items-center gap-2 text-ocean hover:text-ocean-deep transition"
       >
         <ArrowLeft className="w-4 h-4" />
@@ -158,7 +158,7 @@ export default function CreateThreadPage({
             )}
           </button>
           <Link
-            href={`/policies/${params.policyId}/discuss`}
+            href={`/policies/${params.id}/discuss`}
             className="px-6 py-3 rounded-lg border border-ink/20 text-ink hover:bg-sand/30 transition font-medium"
           >
             Cancel

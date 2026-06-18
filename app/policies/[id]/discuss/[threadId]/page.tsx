@@ -107,7 +107,7 @@ export default function ThreadPage({
       <div className="space-y-6 py-12">
         <h1 className="text-4xl font-bold text-ink">Thread not found</h1>
         <Link
-          href={`/policies/${params.policyId}/discuss`}
+          href={`/policies/${params.id}/discuss`}
           className="inline-flex items-center gap-2 text-ocean hover:text-ocean-deep"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -121,7 +121,7 @@ export default function ThreadPage({
     <div className="space-y-8 max-w-3xl mx-auto">
       {/* Back link */}
       <Link
-        href={`/policies/${params.policyId}/discuss`}
+        href={`/policies/${params.id}/discuss`}
         className="inline-flex items-center gap-2 text-ocean hover:text-ocean-deep transition"
       >
         <ArrowLeft className="w-4 h-4" />
