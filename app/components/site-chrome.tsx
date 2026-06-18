@@ -41,10 +41,13 @@ export function SiteHeader() {
   const loadProfile = async (userId: string) => {
     const { data: profile } = await supabase
       .from('user_profiles')
-      .select('display_name, avatar_url, role:roles(name)')
+      .select('display_name, avatar_url, role_id, role:roles(name)')
       .eq('id', userId)
       .single();
-    if (profile) setUserProfile(profile);
+    if (profile) {
+      console.log('Loaded profile:', profile); // Debug log
+      setUserProfile(profile);
+    }
   };
 
   const checkUser = async () => {
@@ -141,7 +144,7 @@ export function SiteHeader() {
                           onClick={() => setDropdownOpen(false)}
                         >
                           <LayoutDashboard className="w-4 h-4" />
-                          Admin Dashboard
+                          Dashboard
                         </Link>
                       )}
                       <Link
