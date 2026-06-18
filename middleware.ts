@@ -6,7 +6,9 @@ export async function middleware(request: NextRequest) {
 
   // Check if this is an admin route that needs protection
   if (requestUrl.pathname.startsWith('/admin')) {
-    // Create Supabase client
+    // Create Supabase client with simple cookie handling
+    let response = NextResponse.next();
+    
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -25,11 +27,9 @@ export async function middleware(request: NextRequest) {
             return cookies;
           },
           setAll(cookiesToSet) {
-            const response = NextResponse.next();
-            cookiesToSet.forEach(({ name, value, options }) =>
-              response.cookies.set(name, value, options)
-            );
-            return response;
+            cookiesToSet.forEach(({ name, value, options }) => {
+              response.cookies.set(name, value, options as any);
+            });
           },
         },
       }

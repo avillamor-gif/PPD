@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Check, AlertCircle, Loader2 } from 'lucide-react';
 
-export default function VerifyPage() {
+function VerifyContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const token = searchParams.get('token');
@@ -106,5 +106,24 @@ export default function VerifyPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function VerifyPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="w-full min-h-screen flex items-center justify-center bg-paper">
+          <div className="max-w-md w-full mx-auto px-6 py-12 text-center space-y-6">
+            <div className="w-16 h-16 rounded-full bg-ocean/10 flex items-center justify-center mx-auto">
+              <Loader2 className="w-8 h-8 text-ocean animate-spin" />
+            </div>
+            <p className="text-ink/60">Loading...</p>
+          </div>
+        </div>
+      }
+    >
+      <VerifyContent />
+    </Suspense>
   );
 }

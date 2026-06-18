@@ -11,7 +11,7 @@ export async function getDiscussionStats(policyId: string) {
     if (error) throw error;
 
     const threadCount = data?.length || 0;
-    const commentCount = data?.reduce((sum, t) => sum + (t.comment_count || 0), 0) || 0;
+    const commentCount = data?.reduce((sum: number, t: any) => sum + (t.comment_count || 0), 0) || 0;
 
     return {
       threadCount,
