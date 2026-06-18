@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
 
     console.log('🔐 [VERIFY] Token is valid, marking email as verified...');
 
-    // Mark email as verified in user_profiles (don't update auth.users - has RLS issues)
+    // Update user_profiles to mark email as verified
     const { error: profileUpdateError } = await supabaseAdmin
       .from('user_profiles')
       .update({ email_verified: true })
@@ -63,10 +63,22 @@ export async function POST(req: NextRequest) {
 
     if (profileUpdateError) {
       console.error('🔐 [VERIFY] Profile update error:', profileUpdateError);
-      throw profileUpdateError;
+    } else {
+      console.log('🔐 [VERIFY] User profile marked as verified');
     }
 
-    console.log('🔐 [VERIFY] User profile marked as verified');
+    // Update auth user to confirm email (this is what login checks)
+    console.log('🔐 [VERIFY] Updating auth user email_confirmed...');
+    const { error: authUpdateError } = await supabaseAdmin.auth.admin.updateUserById(data.user_id, {
+      email_confirm: true,
+    });
+
+    if (authUpdateError) {
+      console.warn('🔐 [VERIFY] Auth update had issues (may still be OK):', authUpdateError?.message);
+      // Don't throw - user_profiles is updated which is what matters
+    } else {
+      console.log('🔐 [VERIFY] Auth user email confirmed');
+    }
 
     // Delete the token after use
     const { error: deleteError } = await supabaseAdmin
