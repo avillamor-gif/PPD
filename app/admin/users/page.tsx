@@ -59,21 +59,22 @@ export default function UserManagementPage() {
         return;
       }
 
-      const { data: profile, error: profileError } = await supabase
+      // Simple role check - get profile with role_id directly
+      const { data: profile, error } = await supabase
         .from('user_profiles')
-        .select('role:roles(name)')
+        .select('role_id')
         .eq('id', user.id)
         .single();
 
-      if (profileError) {
-        console.error('Profile fetch error:', profileError);
+      if (error) {
+        console.error('Profile fetch error:', error.message);
         router.push('/');
         return;
       }
 
-      const profileData = profile as any;
-      if (profileData?.role?.name !== 'admin') {
-        console.log('User role:', profileData?.role?.name);
+      // Check if role_id is 1 (admin) - role_id is an integer, not a relationship
+      if (profile?.role_id !== 1) {
+        console.log('User role_id:', profile?.role_id, '(not admin)');
         router.push('/');
         return;
       }

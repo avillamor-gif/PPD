@@ -66,12 +66,13 @@ export default function ForumModerationPage() {
 
       const { data: profile } = await supabase
         .from('user_profiles')
-        .select('role:roles(name)')
+        .select('role_id')
         .eq('id', user.id)
         .single();
 
-      const profileData = profile as any;
-      if (profileData?.role?.name !== 'admin' && profileData?.role?.name !== 'moderator') {
+      // Check if role_id is 1 (admin) or 2 (moderator)
+      if (profile?.role_id !== 1 && profile?.role_id !== 2) {
+        console.log('User role_id:', profile?.role_id, '(not admin/moderator)');
         router.push('/');
         return;
       }
