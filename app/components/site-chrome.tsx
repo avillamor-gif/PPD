@@ -1,15 +1,47 @@
 'use client';
 
 import Link from 'next/link';
-import { Menu, X, LogIn } from 'lucide-react';
-import { useState } from 'react';
+import { Menu, X, LogIn, LogOut, User, Settings } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Button from './Button';
 import { NavLink } from './ui/nav-link';
 import { useIsMobile } from '@/lib/hooks';
+import { supabase } from '@/lib/supabase';
 
 export function SiteHeader() {
   const isMobile = useIsMobile();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const [userProfile, setUserProfile] = useState<any>(null);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    checkUser();
+  }, []);
+
+  const checkUser = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session?.user) {
+      setUser(session.user);
+      // Get profile
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('display_name, role:roles(name)')
+        .eq('id', session.user.id)
+        .single();
+      if (profile) setUserProfile(profile);
+    }
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setUser(null);
+    setUserProfile(null);
+    setDropdownOpen(false);
+    router.push('/');
+  };
 
   return (
     <header className="sticky top-0 z-50 bg-paper border-b border-rule">
@@ -45,13 +77,60 @@ export function SiteHeader() {
               <Button href="/search" className="whitespace-nowrap shrink-0">
                 Browse 25+ Policies →
               </Button>
-              <Link
-                href="/auth/login"
-                className="p-2 hover:bg-ink/5 rounded-lg transition text-ink"
-                title="Login"
-              >
-                <LogIn className="w-5 h-5" />
-              </Link>
+              {user ? (
+                // User logged in - show dropdown menu
+                <div className="relative">
+                  <button
+                    onClick={() => setDropdownOpen(!dropdownOpen)}
+                    className="p-2 hover:bg-ink/5 rounded-lg transition text-ink flex items-center gap-2 font-medium"
+                  >
+                    <User className="w-5 h-5" />
+                    <span className="text-sm max-w-[100px] truncate">{userProfile?.display_name || user.email}</span>
+                  </button>
+                  
+                  {dropdownOpen && (
+                    <div className="absolute right-0 mt-2 w-48 bg-paper border border-rule rounded-lg shadow-lg z-50">
+                      <div className="p-3 border-b border-rule">
+                        <p className="text-sm font-medium text-ink">{userProfile?.display_name || user.email}</p>
+                        <p className="text-xs text-ink/60">{userProfile?.role?.name || 'user'}</p>
+                      </div>
+                      <Link
+                        href={`/profile/edit`}
+                        className="block px-4 py-2 text-sm text-ink hover:bg-sand transition flex items-center gap-2"
+                        onClick={() => setDropdownOpen(false)}
+                      >
+                        <Settings className="w-4 h-4" />
+                        Edit Profile
+                      </Link>
+                      {userProfile?.role?.name === 'admin' && (
+                        <Link
+                          href="/admin"
+                          className="block px-4 py-2 text-sm text-ink hover:bg-sand transition"
+                          onClick={() => setDropdownOpen(false)}
+                        >
+                          Admin Dashboard
+                        </Link>
+                      )}
+                      <button
+                        onClick={handleLogout}
+                        className="w-full text-left px-4 py-2 text-sm text-ink hover:bg-sand transition flex items-center gap-2 border-t border-rule"
+                      >
+                        <LogOut className="w-4 h-4" />
+                        Logout
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                // User not logged in - show login button
+                <Link
+                  href="/auth/login"
+                  className="p-2 hover:bg-ink/5 rounded-lg transition text-ink"
+                  title="Login"
+                >
+                  <LogIn className="w-5 h-5" />
+                </Link>
+              )}
             </>
           )}
 
@@ -88,18 +167,49 @@ export function SiteHeader() {
             <Link href="/about" className="block px-4 py-2 rounded-lg hover:bg-sand transition text-ink font-fraunces text-lg" onClick={() => setMobileMenuOpen(false)}>
               About
             </Link>
-            <div className="pt-2 border-t border-rule flex gap-3">
+            <div className="pt-2 border-t border-rule flex flex-col gap-2">
               <Button href="/search" className="flex-1 justify-center" onClick={() => setMobileMenuOpen(false)}>
                 Browse 25+ Policies →
               </Button>
-              <Link
-                href="/auth/login"
-                className="p-3 hover:bg-ink/5 rounded-lg transition text-ink shrink-0 flex items-center justify-center"
-                title="Login"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                <LogIn className="w-5 h-5" />
-              </Link>
+              {user ? (
+                <>
+                  <Link
+                    href="/profile/edit"
+                    className="block px-4 py-2 rounded-lg hover:bg-sand transition text-ink text-center"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    Edit Profile
+                  </Link>
+                  {userProfile?.role?.name === 'admin' && (
+                    <Link
+                      href="/admin"
+                      className="block px-4 py-2 rounded-lg hover:bg-sand transition text-ink text-center"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Admin Dashboard
+                    </Link>
+                  )}
+                  <button
+                    onClick={() => {
+                      handleLogout();
+                      setMobileMenuOpen(false);
+                    }}
+                    className="block px-4 py-2 rounded-lg hover:bg-sand transition text-ink text-center flex items-center justify-center gap-2"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <Link
+                  href="/auth/login"
+                  className="p-3 hover:bg-ink/5 rounded-lg transition text-ink flex items-center justify-center gap-2"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <LogIn className="w-5 h-5" />
+                  Login
+                </Link>
+              )}
             </div>
           </div>
         </div>
