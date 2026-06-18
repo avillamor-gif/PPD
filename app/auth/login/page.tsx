@@ -98,11 +98,27 @@ function LoginContent() {
       setEmail('');
       setPassword('');
 
-      // Redirect to admin after brief delay to ensure session is set
-      setTimeout(() => {
-        setRedirected(true);
-        router.push('/admin');
-      }, 300);
+      // Redirect to admin after verifying session is available
+      setTimeout(async () => {
+        // Verify the session is actually available
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          setRedirected(true);
+          router.push('/admin');
+        } else {
+          // If session not available yet, try again after a longer delay
+          setTimeout(async () => {
+            const { data: { session: retrySession } } = await supabase.auth.getSession();
+            if (retrySession?.user) {
+              setRedirected(true);
+              router.push('/admin');
+            } else {
+              setError('Session not established. Please try logging in again.');
+              setSubmitted(false);
+            }
+          }, 500);
+        }
+      }, 200);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred during login');
     } finally {
