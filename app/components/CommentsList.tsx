@@ -6,15 +6,25 @@ import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { MessageCircle, User, ThumbsUp } from 'lucide-react';
 
-export function CommentsList({ policyId }: { policyId: string }) {
-  const [comments, setComments] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+export function CommentsList({ 
+  comments: initialComments, 
+  threadId,
+  policyId 
+}: { 
+  comments?: any[];
+  threadId?: string;
+  policyId?: string;
+}) {
+  const [comments, setComments] = useState<any[]>(initialComments || []);
+  const [loading, setLoading] = useState(!initialComments);
   const [currentUser, setCurrentUser] = useState<any>(null);
 
   useEffect(() => {
-    loadComments();
+    if (!initialComments) {
+      loadComments();
+    }
     getCurrentUser();
-  }, [policyId]);
+  }, [policyId, threadId]);
 
   const getCurrentUser = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -23,17 +33,26 @@ export function CommentsList({ policyId }: { policyId: string }) {
 
   const loadComments = async () => {
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('comments')
         .select(`
           *,
           author:user_profiles(id, display_name, avatar_url),
           thread:discussion_threads(title)
         `)
-        .eq('policy_id', policyId)
         .is('parent_comment_id', null)
         .order('vote_count', { ascending: false })
         .order('created_at', { ascending: false });
+
+      if (threadId) {
+        query = query.eq('thread_id', threadId);
+      } else if (policyId) {
+        query = query.eq('policy_id', policyId);
+      } else {
+        throw new Error('Either threadId or policyId is required');
+      }
+
+      const { data, error } = await query;
 
       if (error) throw error;
       setComments(data || []);
