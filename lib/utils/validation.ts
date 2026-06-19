@@ -34,8 +34,8 @@ export function validatePolicy(data: Partial<Policy>): ValidationError[] {
 
   // Year validation
   if (data.year) {
-    if (data.year < 2000) {
-      errors.push({ field: 'year', message: 'Year must be 2000 or later' });
+    if (data.year < 1950) {
+      errors.push({ field: 'year', message: 'Year must be 1950 or later' });
     } else if (data.year > new Date().getFullYear() + 1) {
       errors.push({ field: 'year', message: 'Year cannot be in the future' });
     }
