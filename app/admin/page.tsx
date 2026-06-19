@@ -2,7 +2,8 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { POLICIES, COUNTRIES, THEMES, STATUSES } from '@/lib/constants';
+import { COUNTRIES, THEMES, STATUSES } from '@/lib/constants';
+import { POLICIES } from '@/app/data/policies';
 import type { Policy, PolicyStatus } from '@/lib/types';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
@@ -43,16 +44,20 @@ export default function AdminDashboard() {
       'Phased': 0,
       'Repealed': 0,
     };
-    POLICIES.forEach((p) => {
-      counts[p.status as PolicyStatus]++;
+    POLICIES.forEach((p: any) => {
+      if (p?.status && counts.hasOwnProperty(p.status)) {
+        counts[p.status as PolicyStatus]++;
+      }
     });
     return counts;
   }, []);
 
   const policyByCountry = useMemo(() => {
     const counts: Record<string, number> = {};
-    POLICIES.forEach((p) => {
-      counts[p.country] = (counts[p.country] || 0) + 1;
+    POLICIES.forEach((p: any) => {
+      if (p?.country) {
+        counts[p.country] = (counts[p.country] || 0) + 1;
+      }
     });
     return Object.entries(counts)
       .map(([code, count]) => {
@@ -64,8 +69,10 @@ export default function AdminDashboard() {
 
   const policyByTheme = useMemo(() => {
     const counts: Record<string, number> = {};
-    POLICIES.forEach((p) => {
-      counts[p.category] = (counts[p.category] || 0) + 1;
+    POLICIES.forEach((p: any) => {
+      if (p?.category) {
+        counts[p.category] = (counts[p.category] || 0) + 1;
+      }
     });
     return Object.entries(counts)
       .map(([theme, count]) => ({ theme, count }))
@@ -73,12 +80,12 @@ export default function AdminDashboard() {
   }, []);
 
   const yearRange = useMemo(() => {
-    const years = POLICIES.map((p) => p.year);
+    const years = POLICIES.map((p: any) => p?.year || 0).filter((y) => y > 0);
     return { min: Math.min(...years), max: Math.max(...years) };
   }, []);
 
   const recentPolicies = useMemo(
-    () => [...POLICIES].sort((a, b) => b.year - a.year).slice(0, 5),
+    () => [...POLICIES].sort((a: any, b: any) => (b?.year || 0) - (a?.year || 0)).slice(0, 5),
     []
   );
 
