@@ -289,7 +289,7 @@ export default function AdminDashboard() {
               {recentPolicies.map((policy: any) => (
                 <a
                   key={policy.id}
-                  href={`/policies/${policy.slug}`}
+                  href={`/policies/${policy.id}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="block p-2 border border-ink/10 rounded-lg hover:bg-sand/30 transition cursor-pointer"
