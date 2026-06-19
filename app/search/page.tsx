@@ -154,7 +154,7 @@ export default function SearchPage() {
           : true,
       )
       .sort((a, b) => b.year - a.year);
-  }, [q, region, country, theme, status]);
+  }, [POLICIES, q, region, country, theme, status]);
 
   return (
     <div className="w-full">
