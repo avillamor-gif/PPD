@@ -40,11 +40,22 @@ export default async function PolicyPage({ params }: { params: Promise<{ id: str
       return notFound();
     }
 
+    // Fetch all policies for related policies section
+    const { data: allPolicies = [] } = await supabaseAdmin
+      .from('policies')
+      .select()
+      .eq('country', policy.country);
+
     const country = COUNTRIES.find((c) => c.code === policy?.country);
 
     if (!policy || !country) {
       return notFound();
     }
+
+    // Filter related policies
+    const relatedPolicies = (allPolicies || [])
+      .filter((p: any) => p.id !== policy.id)
+      .slice(0, 3);
 
     return (
       <div className="w-full">
@@ -238,10 +249,10 @@ export default async function PolicyPage({ params }: { params: Promise<{ id: str
         <div className="mx-auto max-w-350 px-6 py-12 lg:px-10">
           <h2 className="text-2xl font-bold text-ink mb-8">Related Policies</h2>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {POLICIES.filter((p: any) => p?.country === policy?.country && p?.slug !== policy?.slug).slice(0, 3).map((relatedPolicy: any) => (
+            {relatedPolicies.map((relatedPolicy: any) => (
               <Link 
-                key={relatedPolicy?.slug}
-                href={`/policies/${relatedPolicy?.slug}`}
+                key={relatedPolicy?.id}
+                href={`/policies/${relatedPolicy?.id}`}
                 className="group rounded-xl border border-ink/10 bg-white p-6 hover:border-coral hover:shadow-lg transition space-y-3"
               >
                 <div className="flex items-start justify-between">

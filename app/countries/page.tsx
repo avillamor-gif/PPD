@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { COUNTRIES, REGIONS } from '@/lib/constants';
 import { supabaseAdmin } from '@/lib/supabase-admin';
+import type { Policy } from '@/lib/types/policy';
 
 export const metadata = {
   title: "Countries — Plastic Policy Database",
@@ -16,7 +17,7 @@ export default async function CountriesPage() {
   const { data: POLICIES = [], error } = await supabaseAdmin
     .from('policies')
     .select('*')
-    .order('year', { ascending: false });
+    .order('year', { ascending: false }) as { data: Policy[], error: any };
 
   if (error) {
     console.error('Error fetching policies:', error);
@@ -56,8 +57,8 @@ export default async function CountriesPage() {
                 </div>
                 <div className="grid gap-px overflow-hidden rounded-2xl border border-rule bg-rule md:grid-cols-2 lg:grid-cols-3">
                   {list.map((c) => {
-                    const count = POLICIES.filter((p: any) => p?.country === c.code).length;
-                    const inForce = POLICIES.filter((p: any) => p?.country === c.code && p?.status === "In Force").length;
+                    const count = POLICIES.filter((p: Policy) => p?.country === c.code).length;
+                    const inForce = POLICIES.filter((p: Policy) => p?.country === c.code && p?.status === "In Force").length;
                     
                     const content = (
                       <div>
