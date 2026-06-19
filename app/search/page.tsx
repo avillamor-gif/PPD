@@ -237,7 +237,7 @@ export default function SearchPage() {
                     <div className="text-xs text-ink/60 mt-1">{p.countryCode}</div>
                   </div>
                   <div>
-                    <Link href={`/policies/${p.slug}`} className="block group/title">
+                    <Link href={`/policies/${p.id}`} className="block group/title">
                       <div className="font-fraunces text-lg font-medium leading-snug text-ink group-hover/title:text-coral transition-colors">
                         {p.title}
                       </div>
