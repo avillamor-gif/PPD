@@ -4,17 +4,7 @@ import { useState, useEffect } from 'react';
 import { COUNTRIES } from '@/lib/constants';
 import Link from 'next/link';
 import { Trash2, ExternalLink, Pencil, Loader } from 'lucide-react';
-
-interface Policy {
-  id: string;
-  title: string;
-  summary: string;
-  country: string;
-  category: string;
-  status: string;
-  year: number;
-  link: string;
-}
+import type { Policy } from '@/lib/types/policy';
 
 export default function AdminManagePage() {
   const [policies, setPolicies] = useState<Policy[]>([]);
@@ -45,8 +35,9 @@ export default function AdminManagePage() {
         setLoading(true);
         const res = await fetch('/api/policies');
         if (!res.ok) throw new Error('Failed to fetch policies');
-        const data = await res.json();
-        setPolicies(data);
+        const response = await res.json();
+        const policiesData = response.data || response;
+        setPolicies(Array.isArray(policiesData) ? policiesData : []);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load policies');
         console.error('Error fetching policies:', err);

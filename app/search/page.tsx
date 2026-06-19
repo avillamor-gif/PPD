@@ -100,8 +100,9 @@ export default function SearchPage() {
       try {
         const res = await fetch('/api/policies');
         if (res.ok) {
-          const policies = await res.json();
-          setRawPolicies(transformPolicies(policies));
+          const response = await res.json();
+          const policiesData = response.data || response;
+          setRawPolicies(transformPolicies(Array.isArray(policiesData) ? policiesData : []));
         }
       } catch (err) {
         console.error('Error fetching policies:', err);
