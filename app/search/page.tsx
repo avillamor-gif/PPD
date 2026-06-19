@@ -218,7 +218,7 @@ export default function SearchPage() {
                         {p.title}
                       </div>
                     </Link>
-                    <p className="mt-1 max-w-3xl text-sm text-ink/60">{p.summary}</p>
+                    <p className="mt-1 max-w-3xl text-sm text-ink/60 line-clamp-2">{p.summary}</p>
                     <div className="mt-2 flex flex-wrap items-center gap-2">
                       <ThemeTag theme={p.category} />
                       <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink/50">

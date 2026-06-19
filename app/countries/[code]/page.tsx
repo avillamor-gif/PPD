@@ -89,7 +89,7 @@ export default async function CountryPage({ params }: { params: Promise<{ code: 
                         {p?.title}
                       </Link>
                     </div>
-                    <p className="mt-3 max-w-3xl text-pretty text-base text-ink/75">{p?.summary}</p>
+                    <p className="mt-3 max-w-3xl text-pretty text-base text-ink/75 line-clamp-2">{p?.summary}</p>
                     <div className="mt-4 flex flex-wrap items-center gap-2">
                       <span className={`inline-block rounded-full px-3 py-1 font-mono text-[10px] uppercase tracking-[0.14em] font-semibold ${themeColors[p?.category] || 'bg-sand text-ink'}`}>
                         {p?.category}
