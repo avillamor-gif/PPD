@@ -5,21 +5,7 @@ import { useEffect, useState } from 'react';
 import { PolicyForm } from '@/app/components/PolicyForm';
 import { supabase } from '@/lib/supabase';
 import { Loader } from 'lucide-react';
-
-interface Policy {
-  id: string;
-  title: string;
-  summary: string;
-  country: string;
-  category: string;
-  status: string;
-  year: number;
-  link: string;
-  level?: string;
-  instrument?: string;
-  authority?: string;
-  language?: string;
-}
+import type { Policy } from '@/lib/types/policy';
 
 export default function EditPolicyPage() {
   const router = useRouter();
@@ -40,7 +26,7 @@ export default function EditPolicyPage() {
         if (!res.ok) {
           throw new Error('Policy not found');
         }
-        const data = await res.json();
+        const data = await res.json() as Policy;
         setPolicy(data);
 
         // Check if user is admin
