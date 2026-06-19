@@ -33,14 +33,14 @@ CREATE INDEX IF NOT EXISTS idx_policies_level ON policies(level);
 ALTER TABLE policies ENABLE ROW LEVEL SECURITY;
 
 -- RLS Policies for policies table
-CREATE POLICY "Anyone can view policies" ON policies FOR SELECT USING (true);
-CREATE POLICY "Authenticated users can create policies" ON policies FOR INSERT WITH CHECK (auth.role() = 'authenticated');
-CREATE POLICY "Admins can update policies" ON policies FOR UPDATE USING (
+CREATE POLICY IF NOT EXISTS "Anyone can view policies" ON policies FOR SELECT USING (true);
+CREATE POLICY IF NOT EXISTS "Authenticated users can create policies" ON policies FOR INSERT WITH CHECK (auth.role() = 'authenticated');
+CREATE POLICY IF NOT EXISTS "Admins can update policies" ON policies FOR UPDATE USING (
   EXISTS (
     SELECT 1 FROM user_profiles WHERE id = auth.uid() AND role_id = (SELECT id FROM roles WHERE name = 'admin')
   )
 );
-CREATE POLICY "Admins can delete policies" ON policies FOR DELETE USING (
+CREATE POLICY IF NOT EXISTS "Admins can delete policies" ON policies FOR DELETE USING (
   EXISTS (
     SELECT 1 FROM user_profiles WHERE id = auth.uid() AND role_id = (SELECT id FROM roles WHERE name = 'admin')
   )
