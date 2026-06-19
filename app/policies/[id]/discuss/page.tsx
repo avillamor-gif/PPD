@@ -42,10 +42,14 @@ export default function PolicyDiscussionsPage({
   };
 
   const loadPolicy = async () => {
-    // Using local constants for now
-    const found = POLICIES.find((p) => p.id === params.id);
-    if (found) {
-      setPolicy(found);
+    try {
+      const res = await fetch(`/api/policies/${params.id}`);
+      if (res.ok) {
+        const data = await res.json();
+        setPolicy(data);
+      }
+    } catch (error) {
+      console.error('Error loading policy:', error);
     }
   };
 
