@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { COUNTRIES, POLICIES } from '@/lib/constants';
+import { COUNTRIES, REGIONS } from '@/lib/constants';
+import { POLICIES } from '@/app/data/policies';
 
 export const metadata = {
   title: "Countries — Plastic Policy Database",
@@ -45,8 +46,8 @@ export default function CountriesPage() {
                 </div>
                 <div className="grid gap-px overflow-hidden rounded-2xl border border-rule bg-rule md:grid-cols-2 lg:grid-cols-3">
                   {list.map((c) => {
-                    const count = POLICIES.filter((p) => p.country === c.code).length;
-                    const inForce = POLICIES.filter((p) => p.country === c.code && p.status === "In Force").length;
+                    const count = POLICIES.filter((p: any) => p?.country === c.code).length;
+                    const inForce = POLICIES.filter((p: any) => p?.country === c.code && p?.status === "In Force").length;
                     return (
                       <Link
                         key={c.code}
