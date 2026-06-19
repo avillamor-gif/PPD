@@ -33,20 +33,25 @@ export default function EditPolicyPage() {
         const { data: { user } } = await supabase.auth.getUser();
         
         if (user) {
-          const { data: profile } = await supabase
+          const { data: profile, error: profileError } = await supabase
             .from('user_profiles')
             .select('role_id')
             .eq('id', user.id)
             .single();
           
+          console.log('User profile:', profile, 'Error:', profileError);
+          
           if (profile) {
-            const { data: role } = await supabase
+            const { data: role, error: roleError } = await supabase
               .from('roles')
               .select('name')
               .eq('id', profile.role_id)
               .single();
             
+            console.log('User role:', role, 'Error:', roleError);
             setIsAdmin(role?.name === 'admin');
+          } else {
+            console.log('No user profile found for:', user.id);
           }
         }
       } catch (err) {
