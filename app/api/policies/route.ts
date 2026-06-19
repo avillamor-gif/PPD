@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { validatePolicy, generatePolicyId } from '@/lib/utils/validation';
+import { supabaseAdmin } from '@/lib/supabase-admin';
 
 /**
  * POST /api/policies
  * 
  * Handles policy submission.
- * Ready for Supabase integration.
+ * Saves to Supabase database.
  * 
  * Expected body:
  * {
@@ -46,33 +47,29 @@ export async function POST(request: NextRequest) {
       updated_at: new Date().toISOString(),
     };
 
-    // TODO: When Supabase is connected
-    // const { data, error } = await supabase
-    //   .from('policies')
-    //   .insert([policyData]);
-    //
-    // if (error) throw error;
-    //
-    // return NextResponse.json(
-    //   { success: true, data },
-    //   { status: 201 }
-    // );
+    // Save to Supabase
+    const { data, error } = await supabaseAdmin
+      .from('policies')
+      .insert([policyData])
+      .select();
 
-    // For now, just log
-    console.log('Policy submission:', policyData);
+    if (error) {
+      console.error('Supabase error:', error);
+      throw new Error(error.message || 'Failed to save policy to database');
+    }
 
     return NextResponse.json(
       {
         success: true,
-        message: 'Policy submitted successfully (Supabase integration pending)',
-        data: policyData,
+        message: 'Policy submitted successfully',
+        data: data?.[0] || policyData,
       },
       { status: 201 }
     );
   } catch (error) {
     console.error('API error:', error);
     return NextResponse.json(
-      { success: false, error: 'Internal server error' },
+      { success: false, error: error instanceof Error ? error.message : 'Internal server error' },
       { status: 500 }
     );
   }
@@ -80,24 +77,22 @@ export async function POST(request: NextRequest) {
 
 export async function GET() {
   try {
-    // TODO: When Supabase is connected
-    // const { data, error } = await supabase
-    //   .from('policies')
-    //   .select('*')
-    //   .order('year', { ascending: false });
-    //
-    // if (error) throw error;
-    //
-    // return NextResponse.json({ success: true, data });
+    // Fetch policies from Supabase
+    const { data, error } = await supabaseAdmin
+      .from('policies')
+      .select('*')
+      .order('year', { ascending: false });
 
-    return NextResponse.json(
-      { success: true, message: 'Supabase integration pending' },
-      { status: 200 }
-    );
+    if (error) {
+      console.error('Supabase error:', error);
+      throw new Error(error.message || 'Failed to fetch policies');
+    }
+
+    return NextResponse.json({ success: true, data });
   } catch (error) {
     console.error('API error:', error);
     return NextResponse.json(
-      { success: false, error: 'Internal server error' },
+      { success: false, error: error instanceof Error ? error.message : 'Internal server error' },
       { status: 500 }
     );
   }

@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { validatePolicy } from '@/lib/utils/validation';
+import { supabaseAdmin } from '@/lib/supabase-admin';
 
 /**
  * PUT /api/policies/[id]
  * 
- * Updates a policy entry.
- * Ready for Supabase integration.
+ * Updates a policy entry in Supabase.
  */
 export async function PUT(
   request: NextRequest,
@@ -30,33 +30,30 @@ export async function PUT(
       updated_at: new Date().toISOString(),
     };
 
-    // TODO: When Supabase is connected
-    // const { data, error } = await supabase
-    //   .from('policies')
-    //   .update(policyData)
-    //   .eq('id', id);
-    //
-    // if (error) throw error;
-    //
-    // return NextResponse.json(
-    //   { success: true, message: 'Policy updated successfully', data },
-    //   { status: 200 }
-    // );
+    // Update in Supabase
+    const { data, error } = await supabaseAdmin
+      .from('policies')
+      .update(policyData)
+      .eq('id', id)
+      .select();
 
-    console.log('Policy update:', id, policyData);
+    if (error) {
+      console.error('Supabase error:', error);
+      throw new Error(error.message || 'Failed to update policy');
+    }
 
     return NextResponse.json(
       {
         success: true,
-        message: 'Policy updated successfully (Supabase integration pending)',
-        data: policyData,
+        message: 'Policy updated successfully',
+        data: data?.[0],
       },
       { status: 200 }
     );
   } catch (error) {
     console.error('API error:', error);
     return NextResponse.json(
-      { success: false, error: 'Internal server error' },
+      { success: false, error: error instanceof Error ? error.message : 'Internal server error' },
       { status: 500 }
     );
   }
@@ -65,8 +62,7 @@ export async function PUT(
 /**
  * DELETE /api/policies/[id]
  * 
- * Deletes a policy entry.
- * Ready for Supabase integration.
+ * Deletes a policy entry from Supabase.
  */
 export async function DELETE(
   request: NextRequest,
@@ -75,32 +71,28 @@ export async function DELETE(
   try {
     const { id } = await params;
     
-    // TODO: When Supabase is connected
-    // const { error } = await supabase
-    //   .from('policies')
-    //   .delete()
-    //   .eq('id', id);
-    //
-    // if (error) throw error;
-    //
-    // return NextResponse.json(
-    //   { success: true, message: 'Policy deleted successfully' },
-    //   { status: 200 }
-    // );
+    // Delete from Supabase
+    const { error } = await supabaseAdmin
+      .from('policies')
+      .delete()
+      .eq('id', id);
 
-    console.log('Policy delete:', id);
+    if (error) {
+      console.error('Supabase error:', error);
+      throw new Error(error.message || 'Failed to delete policy');
+    }
 
     return NextResponse.json(
       {
         success: true,
-        message: 'Policy deleted successfully (Supabase integration pending)',
+        message: 'Policy deleted successfully',
       },
       { status: 200 }
     );
   } catch (error) {
     console.error('API error:', error);
     return NextResponse.json(
-      { success: false, error: 'Internal server error' },
+      { success: false, error: error instanceof Error ? error.message : 'Internal server error' },
       { status: 500 }
     );
   }
