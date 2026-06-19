@@ -23,21 +23,21 @@ export function AdminEditButton({ policyId }: AdminEditButtonProps) {
             .from('user_profiles')
             .select('role_id')
             .eq('id', user.id)
-            .single();
+            .maybeSingle();
           
           console.log('AdminEditButton - User profile:', profile, 'Error:', profileError);
           
-          if (profile) {
+          if (profile && profile.role_id) {
             const { data: role, error: roleError } = await supabase
               .from('roles')
               .select('name')
               .eq('id', profile.role_id)
-              .single();
+              .maybeSingle();
             
             console.log('AdminEditButton - User role:', role, 'Error:', roleError);
             setIsAdmin(role?.name === 'admin');
           } else {
-            console.log('AdminEditButton - No user profile found for:', user.id);
+            console.log('AdminEditButton - No user profile or role_id found for:', user.id);
           }
         }
       } catch (err) {
