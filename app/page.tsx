@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { COUNTRIES, THEMES } from '@/lib/constants';
 import { supabaseAdmin } from '@/lib/supabase-admin';
+import type { Policy } from '@/lib/types/policy';
 
 export const metadata = {
   title: "Plastic Policy Database — Asia Pacific",
@@ -14,24 +15,24 @@ export default async function Home() {
   const { data: POLICIES = [], error } = await supabaseAdmin
     .from('policies')
     .select('*')
-    .order('year', { ascending: false });
+    .order('year', { ascending: false }) as { data: Policy[], error: any };
 
   if (error) {
     console.error('Error fetching policies:', error);
   }
 
   const total = POLICIES.length;
-  const inForce = POLICIES.filter((p: any) => p.status === "In Force").length;
-  const proposed = POLICIES.filter((p: any) => p.status === "Proposed").length;
-  const earliest = POLICIES.length > 0 ? Math.min(...POLICIES.map((p) => p.year || new Date().getFullYear())) : new Date().getFullYear();
-  const earliestPolicy = POLICIES.length > 0 ? [...POLICIES].filter((p) => p.year === earliest).sort((a, b) => a.year - b.year)[0] : null;
-  const countriesCovered = new Set(POLICIES.map((p) => p.country)).size;
+  const inForce = POLICIES.filter((p: Policy) => p.status === "In Force").length;
+  const proposed = POLICIES.filter((p: Policy) => p.status === "Proposed").length;
+  const earliest = POLICIES.length > 0 ? Math.min(...POLICIES.map((p: Policy) => p.year || new Date().getFullYear())) : new Date().getFullYear();
+  const earliestPolicy = POLICIES.length > 0 ? [...POLICIES].filter((p: Policy) => p.year === earliest).sort((a, b) => a.year - b.year)[0] : null;
+  const countriesCovered = new Set(POLICIES.map((p: Policy) => p.country)).size;
   const recent = POLICIES.slice(0, 6);
 
   // theme counts for the bar
   const themeCounts = THEMES.map((c) => ({
     name: c,
-    count: POLICIES.filter((p) => p.category === c).length,
+    count: POLICIES.filter((p: Policy) => p.category === c).length,
   })).sort((a, b) => b.count - a.count);
   const maxCat = Math.max(...themeCounts.map((c) => c.count), 1);
 
