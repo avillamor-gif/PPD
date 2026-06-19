@@ -1,21 +1,20 @@
 const { createClient } = require('@supabase/supabase-js');
-require('dotenv').config({ path: '.env.local' });
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-);
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 (async () => {
-  // Check threads in database
-  const { data: threads, error } = await supabase
+  const { data, error } = await supabase
     .from('discussion_threads')
-    .select('*')
-    .eq('policy_id', 'thai-2022-01')
-    .is('deleted_at', null);
-  
-  console.log('Threads for thai-2022-01:');
-  console.log('Error:', error?.message || 'None');
-  console.log('Data:', threads);
-  console.log('Count:', threads?.length || 0);
+    .select('id, title, policy_id')
+    .eq('policy_id', 'viet-2023-01');
+
+  if (error) {
+    console.error('Error:', error);
+  } else {
+    console.log('Threads for viet-2023-01:');
+    console.log(JSON.stringify(data, null, 2));
+  }
 })();

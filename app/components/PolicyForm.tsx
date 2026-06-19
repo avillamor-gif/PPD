@@ -66,7 +66,7 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
 
     try {
       // Validation
-      if (!formData.title.trim()) throw new Error('Policy title is required');
+      if (!formData.title.trim()) throw new Error('Legislation/Regulation is required');
       if (!formData.country) throw new Error('Country is required');
       if (!formData.category) throw new Error('Themes is required');
       if (!formData.authority.trim()) throw new Error('Authority is required');
@@ -160,7 +160,7 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
 
         <div className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-ink mb-2">Policy Title *</label>
+            <label className="block text-sm font-medium text-ink mb-2">Legislation/Regulation *</label>
             <input
               type="text"
               name="title"
@@ -172,7 +172,7 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-ink mb-2">Summary</label>
+            <label className="block text-sm font-medium text-ink mb-2">Description</label>
             <textarea
               name="summary"
               value={formData.summary}
