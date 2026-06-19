@@ -30,30 +30,21 @@ export default function EditPolicyPage() {
         setPolicy(data);
 
         // Check if user is admin
-        const { data: { user } } = await supabase.auth.getUser();
+        const { data: { session } } = await supabase.auth.getSession();
         
-        if (user) {
-          const { data: profile, error: profileError } = await supabase
-            .from('user_profiles')
-            .select('role_id')
-            .eq('id', user.id)
-            .maybeSingle();
-          
-          console.log('User profile:', profile, 'Error:', profileError);
-          
-          if (profile && profile.role_id) {
-            const { data: role, error: roleError } = await supabase
-              .from('roles')
-              .select('name')
-              .eq('id', profile.role_id)
-              .maybeSingle();
-            
-            console.log('User role:', role, 'Error:', roleError);
-            setIsAdmin(role?.name === 'admin');
-          } else {
-            console.log('No user profile or role_id found for:', user.id);
-          }
+        if (!session?.access_token) {
+          throw new Error('Not authenticated');
         }
+
+        const res = await fetch('/api/auth/check-admin', {
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`
+          }
+        });
+
+        const authData = await res.json();
+        console.log('Admin check result:', authData);
+        setIsAdmin(authData.isAdmin === true);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load policy');
         console.error('Error fetching policy:', err);

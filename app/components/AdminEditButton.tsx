@@ -16,30 +16,22 @@ export function AdminEditButton({ policyId }: AdminEditButtonProps) {
   useEffect(() => {
     const checkAdminStatus = async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
+        const { data: { session } } = await supabase.auth.getSession();
         
-        if (user) {
-          const { data: profile, error: profileError } = await supabase
-            .from('user_profiles')
-            .select('role_id')
-            .eq('id', user.id)
-            .maybeSingle();
-          
-          console.log('AdminEditButton - User profile:', profile, 'Error:', profileError);
-          
-          if (profile && profile.role_id) {
-            const { data: role, error: roleError } = await supabase
-              .from('roles')
-              .select('name')
-              .eq('id', profile.role_id)
-              .maybeSingle();
-            
-            console.log('AdminEditButton - User role:', role, 'Error:', roleError);
-            setIsAdmin(role?.name === 'admin');
-          } else {
-            console.log('AdminEditButton - No user profile or role_id found for:', user.id);
-          }
+        if (!session?.access_token) {
+          setChecking(false);
+          return;
         }
+
+        const res = await fetch('/api/auth/check-admin', {
+          headers: {
+            'Authorization': `Bearer ${session.access_token}`
+          }
+        });
+
+        const data = await res.json();
+        console.log('AdminEditButton - Admin check:', data);
+        setIsAdmin(data.isAdmin === true);
       } catch (err) {
         console.error('Error checking admin status:', err);
       } finally {
