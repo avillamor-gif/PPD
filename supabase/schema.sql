@@ -29,6 +29,38 @@ INSERT INTO roles (name, description) VALUES
 ON CONFLICT (name) DO NOTHING;
 
 -- ============================================
+-- 1.5. POLICIES (Plastic Policy Database)
+-- ============================================
+
+CREATE TABLE IF NOT EXISTS policies (
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  summary TEXT,
+  year INTEGER,
+  country VARCHAR(2) NOT NULL,
+  level VARCHAR(50), -- National, Sub-national, Regional, International
+  category TEXT NOT NULL, -- Themes
+  keywords TEXT,
+  status VARCHAR(50) DEFAULT 'Proposed', -- Proposed, Enacted, Repealed, etc
+  instrument VARCHAR(100), -- Act, Bill, Regulation, Directive, etc
+  authority TEXT NOT NULL, -- Competent authority
+  link TEXT NOT NULL, -- Official policy link
+  other_links TEXT, -- Additional references
+  language VARCHAR(10), -- Language of the policy
+  created_by UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Create indexes for policies
+CREATE INDEX IF NOT EXISTS idx_policies_country ON policies(country);
+CREATE INDEX IF NOT EXISTS idx_policies_year ON policies(year DESC);
+CREATE INDEX IF NOT EXISTS idx_policies_category ON policies(category);
+CREATE INDEX IF NOT EXISTS idx_policies_status ON policies(status);
+CREATE INDEX IF NOT EXISTS idx_policies_created_at ON policies(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_policies_level ON policies(level);
+
+-- ============================================
 -- 2. USER PROFILES (extends auth.users)
 -- ============================================
 
