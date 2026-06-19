@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Pencil } from 'lucide-react';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase';
 
 interface AdminEditButtonProps {
   policyId: string;
@@ -16,7 +16,6 @@ export function AdminEditButton({ policyId }: AdminEditButtonProps) {
   useEffect(() => {
     const checkAdminStatus = async () => {
       try {
-        const supabase = createClient();
         const { data: { user } } = await supabase.auth.getUser();
         
         if (user) {

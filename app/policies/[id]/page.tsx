@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { COUNTRIES, POLICIES, THEMES } from '@/app/data/policies';
+import { COUNTRIES } from '@/lib/constants';
 import { notFound } from 'next/navigation';
 import { ArrowLeft, MapPin, Calendar, Building2, Globe, MessageCircle, ThumbsUp, Eye } from 'lucide-react';
 import { PolicyForumSection } from '@/app/components/PolicyForumSection';
@@ -27,22 +27,20 @@ export const metadata = {
 export default async function PolicyPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   
-  // Find policy by slug
-  const policy = POLICIES.find((p: any) => p?.slug === id);
-  const country = policy ? COUNTRIES.find((c) => c.code === policy?.country) : null;
+  // Fetch policy from API
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/policies/${id}`, {
+      cache: 'no-store',
+    });
+    if (!res.ok) {
+      return notFound();
+    }
+    const policy = await res.json();
+    const country = COUNTRIES.find((c) => c.code === policy?.country);
 
-  if (!policy || !country) {
-    return (
-      <div className="w-full">
-        <div className="mx-auto max-w-350 px-6 py-20 lg:px-10 text-center">
-          <h1 className="text-2xl font-bold text-ink">Policy not found</h1>
-          <Link href="/search" className="mt-4 inline-block text-coral hover:underline">
-            ← Back to search
-          </Link>
-        </div>
-      </div>
-    );
-  }
+    if (!policy || !country) {
+      return notFound();
+    }
 
   return (
     <div className="w-full">

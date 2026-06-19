@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { COUNTRIES, POLICIES, THEMES } from '@/app/data/policies';
+import { COUNTRIES } from '@/lib/constants';
 import { notFound } from 'next/navigation';
 
 export const metadata = {
@@ -15,7 +15,23 @@ export default async function CountryPage({ params }: { params: Promise<{ code: 
     notFound();
   }
 
-  const policies = POLICIES.filter((p: any) => p?.country === country.code).sort((a: any, b: any) => b.year - a.year);
+  // Fetch all policies and filter by country
+  let policies = [];
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/policies`, {
+      cache: 'no-store',
+    });
+    if (res.ok) {
+      const allPolicies = await res.json();
+      policies = allPolicies
+        .filter((p: any) => p?.country === country.code)
+        .sort((a: any, b: any) => b.year - a.year);
+    }
+  } catch (err) {
+    console.error('Error fetching policies:', err);
+  }
+
+  const THEMES = ['Plastic Ban', 'EPR', 'Waste Management', 'Circular Economy'];
   const byTheme = THEMES.map((c) => ({
     name: c,
     count: policies.filter((p: any) => p?.category === c).length,

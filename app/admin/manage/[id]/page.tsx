@@ -3,7 +3,7 @@
 import { useRouter, useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { PolicyForm } from '@/app/components/PolicyForm';
-import { createClient } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase';
 import { Loader } from 'lucide-react';
 
 interface Policy {
@@ -44,7 +44,6 @@ export default function EditPolicyPage() {
         setPolicy(data);
 
         // Check if user is admin
-        const supabase = createClient();
         const { data: { user } } = await supabase.auth.getUser();
         
         if (user) {

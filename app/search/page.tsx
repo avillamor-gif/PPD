@@ -1,20 +1,21 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Search, ChevronDown } from 'lucide-react';
 import { COUNTRIES, REGIONS as ALL_REGIONS } from '@/lib/constants';
-import { POLICIES as RAW_POLICIES } from '@/app/data/policies';
 
 // Transform policies to include country names for display
-const POLICIES = RAW_POLICIES.map((p: any) => {
-  const countryData = COUNTRIES.find((c) => c.code === p.country);
-  return {
-    ...p,
-    countryCode: p.country,
-    country: countryData?.name || p.country,
-  };
-});
+const transformPolicies = (policies: any[]) => {
+  return policies.map((p: any) => {
+    const countryData = COUNTRIES.find((c) => c.code === p.country);
+    return {
+      ...p,
+      countryCode: p.country,
+      country: countryData?.name || p.country,
+    };
+  });
+};
 
 const THEMES = [
   "All themes",
@@ -85,11 +86,33 @@ function Select({
 }
 
 export default function SearchPage() {
+  const [rawPolicies, setRawPolicies] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
   const [q, setQ] = useState("");
   const [region, setRegion] = useState("All regions");
   const [country, setCountry] = useState("all");
   const [theme, setTheme] = useState("All themes");
   const [status, setStatus] = useState("Any status");
+
+  // Fetch policies from API
+  useEffect(() => {
+    const fetchPolicies = async () => {
+      try {
+        const res = await fetch('/api/policies');
+        if (res.ok) {
+          const policies = await res.json();
+          setRawPolicies(transformPolicies(policies));
+        }
+      } catch (err) {
+        console.error('Error fetching policies:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPolicies();
+  }, []);
+
+  const POLICIES = rawPolicies;
 
   // Filter countries by selected region - same logic as PolicyForm
   const filteredCountries = useMemo(() => {

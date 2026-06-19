@@ -5,7 +5,6 @@ import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { MessageSquare, Heart, Eye, Plus, ArrowLeft } from 'lucide-react';
-import { POLICIES, COUNTRIES } from '@/lib/constants';
 
 interface Thread {
   id: string;
