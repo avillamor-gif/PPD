@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { POLICIES, COUNTRIES, THEMES } from '@/lib/constants';
+import { COUNTRIES, THEMES } from '@/lib/constants';
+import { POLICIES } from '@/app/data/policies';
 
 export const metadata = {
   title: "Plastic Policy Database — Asia Pacific",
@@ -10,9 +11,11 @@ export const revalidate = 60; // ISR: revalidate every 60 seconds on Vercel
 
 export default function Home() {
   const total = POLICIES.length;
-  const inForce = POLICIES.filter((p) => p.status === "In Force").length;
-  const proposed = POLICIES.filter((p) => p.status === "Proposed").length;
+  const inForce = POLICIES.filter((p: any) => p.status === "In Force").length;
+  const proposed = POLICIES.filter((p: any) => p.status === "Proposed").length;
   const earliest = Math.min(...POLICIES.map((p) => p.year));
+  const earliestPolicy = [...POLICIES].filter((p) => p.year === earliest).sort((a, b) => a.year - b.year)[0];
+  const countriesCovered = new Set(POLICIES.map((p) => p.country)).size;
   const recent = [...POLICIES].sort((a, b) => b.year - a.year).slice(0, 6);
 
   // theme counts for the bar
@@ -78,7 +81,7 @@ export default function Home() {
               </div>
               <div className="mt-6 grid grid-cols-2 gap-y-8 gap-x-4">
                 <Stat n={total.toString()} label="Policies indexed" />
-                <Stat n="12" label="Countries covered" />
+                <Stat n={countriesCovered.toString()} label="Countries covered" />
                 <Stat n={inForce.toString()} label="In force" accent />
                 <Stat n={proposed.toString()} label="Proposed / in draft" />
               </div>
@@ -88,7 +91,7 @@ export default function Home() {
                 </div>
                 <div className="mt-1 font-display text-2xl font-semibold">{earliest}</div>
                 <div className="text-sm text-muted-foreground">
-                  Philippines · Ecological Solid Waste Management Act
+                  {COUNTRIES.find((c) => c.code === earliestPolicy?.country)?.name} · {earliestPolicy?.title}
                 </div>
               </div>
             </div>
