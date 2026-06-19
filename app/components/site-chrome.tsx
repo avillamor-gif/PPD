@@ -8,6 +8,7 @@ import Button from './Button';
 import { NavLink } from './ui/nav-link';
 import { useIsMobile } from '@/lib/hooks';
 import { supabase } from '@/lib/supabase';
+import { POLICIES } from '@/app/data/policies';
 
 export function SiteHeader() {
   const isMobile = useIsMobile();
@@ -123,7 +124,7 @@ export function SiteHeader() {
           {!isMobile && (
             <>
               <Button href="/search" className="whitespace-nowrap shrink-0">
-                Browse 25+ Policies →
+                Browse {POLICIES.length} Policies →
               </Button>
               {user ? (
                 // User logged in - show dropdown menu
@@ -238,7 +239,7 @@ export function SiteHeader() {
             </Link>
             <div className="pt-2 border-t border-rule flex flex-col gap-2">
               <Button href="/search" className="flex-1 justify-center" onClick={() => setMobileMenuOpen(false)}>
-                Browse 25+ Policies →
+                Browse {POLICIES.length} Policies →
               </Button>
               {user ? (
                 <>
