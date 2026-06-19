@@ -105,11 +105,11 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="mx-auto max-w-7xl px-4 md:px-6 lg:px-10 py-8 space-y-4 md:space-y-6 lg:space-y-8">
       {/* Header */}
       <div>
-        <h1 className="font-display text-4xl font-bold text-ink">Analytics Dashboard</h1>
-        <p className="mt-2 text-ink/60">Overview of all policies in the database</p>
+        <h1 className="font-display text-2xl md:text-3xl lg:text-4xl font-bold text-ink">Analytics Dashboard</h1>
+        <p className="mt-2 text-sm md:text-base text-ink/60">Overview of all policies in the database</p>
       </div>
 
       {/* Admin Tools */}
@@ -152,7 +152,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Key Metrics */}
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-3 md:gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-2xl border border-ink/10 bg-card p-6">
           <div className="text-sm font-mono uppercase tracking-[0.22em] text-ink/60">Total Policies</div>
           <div className="mt-3 font-display text-5xl font-bold text-ink">{totalPolicies}</div>
@@ -243,10 +243,10 @@ export default function AdminDashboard() {
       </div>
 
       {/* Top Countries & Recently Added - Side by Side */}
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3 md:gap-4 lg:grid-cols-2">
         {/* Top Countries */}
-        <div className="rounded-2xl border border-ink/10 bg-card p-6">
-          <h2 className="font-display text-xl font-bold text-ink">Top Countries</h2>
+        <div className="rounded-2xl border border-ink/10 bg-card p-4 md:p-6">
+          <h2 className="font-display text-lg md:text-xl font-bold text-ink">Top Countries</h2>
           <div className="mt-4">
             <div className="space-y-2 max-h-64 overflow-y-auto">
               {policyByCountry.map(({ code, name, count }) => (
@@ -271,8 +271,8 @@ export default function AdminDashboard() {
         </div>
 
         {/* Recent Policies */}
-        <div className="rounded-2xl border border-ink/10 bg-card p-6">
-          <h2 className="font-display text-xl font-bold text-ink">Recently Added</h2>
+        <div className="rounded-2xl border border-ink/10 bg-card p-4 md:p-6">
+          <h2 className="font-display text-lg md:text-xl font-bold text-ink">Recently Added</h2>
           <div className="mt-4">
             <div className="space-y-2 max-h-64 overflow-y-auto">
               {recentPolicies.map((policy: any) => (
@@ -318,16 +318,16 @@ export default function AdminDashboard() {
       </div>
 
       {/* Action Links */}
-      <div className="flex gap-3 pt-4">
+      <div className="flex flex-wrap gap-2 md:gap-3 pt-4">
         <Link
           href="/admin/submit"
-          className="inline-flex items-center gap-2 rounded-full bg-ink px-6 py-3 font-mono text-xs uppercase tracking-[0.18em] text-paper transition hover:bg-ocean-deep"
+          className="inline-flex items-center gap-2 rounded-full bg-ink px-4 md:px-6 py-2 md:py-3 font-mono text-[10px] md:text-xs uppercase tracking-[0.18em] text-paper transition hover:bg-ocean-deep"
         >
           Add New Policy →
         </Link>
         <Link
           href="/search"
-          className="inline-flex items-center gap-2 rounded-full border border-ink/30 px-6 py-3 font-mono text-xs uppercase tracking-[0.18em] text-ink transition hover:bg-ink/5"
+          className="inline-flex items-center gap-2 rounded-full border border-ink/30 px-4 md:px-6 py-2 md:py-3 font-mono text-[10px] md:text-xs uppercase tracking-[0.18em] text-ink transition hover:bg-ink/5"
         >
           View Database
         </Link>

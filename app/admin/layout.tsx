@@ -9,15 +9,15 @@ export default function AdminLayout({
     <div className="min-h-screen bg-paper">
       {/* Admin Header */}
       <div className="border-b border-rule bg-paper">
-        <div className="mx-auto max-w-7xl px-6 py-6 lg:px-10">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="font-display text-3xl font-bold text-ink">Admin Panel</h1>
-              <p className="mt-1 text-sm text-ink/60">Manage policies and view analytics</p>
+        <div className="mx-auto max-w-7xl px-4 py-4 md:px-6 md:py-6 lg:px-10">
+          <div className="flex flex-row items-start justify-between gap-4">
+            <div className="flex-1">
+              <h1 className="font-display text-2xl md:text-3xl font-bold text-ink">Admin Panel</h1>
+              <p className="mt-1 text-xs md:text-sm text-ink/60">Manage policies and view analytics</p>
             </div>
             <Link
               href="/"
-              className="font-mono text-sm uppercase tracking-widest text-ocean hover:text-ocean-deep transition"
+              className="font-mono text-xs md:text-sm uppercase tracking-widest text-ocean hover:text-ocean-deep transition whitespace-nowrap mt-1 md:mt-0 shrink-0"
             >
               ← Back to Site
             </Link>
@@ -27,11 +27,11 @@ export default function AdminLayout({
 
       {/* Admin Navigation */}
       <div className="border-b border-rule bg-paper sticky top-0 z-40 overflow-x-auto">
-        <div className="mx-auto max-w-7xl px-6 lg:px-10">
-          <nav className="flex gap-8 min-w-min">
+        <div className="mx-auto max-w-7xl px-4 md:px-6 lg:px-10">
+          <nav className="flex gap-4 md:gap-8 min-w-min">
             <Link
               href="/admin"
-              className="py-4 border-b-2 border-transparent hover:border-ocean transition font-mono text-sm uppercase tracking-widest text-ink/60 hover:text-ink whitespace-nowrap"
+              className="py-3 md:py-4 border-b-2 border-transparent hover:border-ocean transition font-mono text-xs md:text-sm uppercase tracking-widest text-ink/60 hover:text-ink whitespace-nowrap"
             >
               Dashboard
             </Link>
