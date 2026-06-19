@@ -242,62 +242,77 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      {/* Top Countries */}
-      <div className="rounded-2xl border border-ink/10 bg-card p-8">
-        <h2 className="font-display text-2xl font-bold text-ink">Top Countries by Policy Count</h2>
-        <div className="mt-6">
-          <div className="space-y-3">
-            {policyByCountry.map(({ code, name, count }) => (
-              <div key={code} className="flex items-center justify-between p-3 rounded-lg hover:bg-sand/50 transition">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-linear-to-br from-ocean to-ocean-deep flex items-center justify-center text-white text-xs font-bold">
-                    {code}
+      {/* Top Countries & Recently Added - Side by Side */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        {/* Top Countries */}
+        <div className="rounded-2xl border border-ink/10 bg-card p-6">
+          <h2 className="font-display text-xl font-bold text-ink">Top Countries</h2>
+          <div className="mt-4">
+            <div className="space-y-2 max-h-64 overflow-y-auto">
+              {policyByCountry.map(({ code, name, count }) => (
+                <a
+                  key={code}
+                  href={`/countries/${code.toLowerCase()}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between p-2 rounded-lg hover:bg-sand/50 transition cursor-pointer"
+                >
+                  <div className="flex items-center gap-2 flex-1 min-w-0">
+                    <div className="w-8 h-8 rounded-full bg-linear-to-br from-ocean to-ocean-deep flex items-center justify-center text-white text-xs font-bold shrink-0">
+                      {code}
+                    </div>
+                    <span className="font-medium text-ink truncate">{name}</span>
                   </div>
-                  <span className="font-medium text-ink">{name}</span>
-                </div>
-                <span className="font-display text-2xl font-semibold text-ocean">{count}</span>
-              </div>
-            ))}
+                  <span className="font-display text-lg font-semibold text-ocean ml-2 shrink-0">{count}</span>
+                </a>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Recent Policies */}
-      <div className="rounded-2xl border border-ink/10 bg-card p-8">
-        <h2 className="font-display text-2xl font-bold text-ink">Recently Added Policies</h2>
-        <div className="mt-6">
-          <div className="space-y-3">
-            {recentPolicies.map((policy) => (
-              <div key={policy.id} className="p-4 border border-ink/10 rounded-lg hover:bg-sand/30 transition">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <h3 className="font-fraunces text-lg font-medium text-ink">{policy.title}</h3>
-                    <div className="mt-2 flex flex-wrap items-center gap-2">
-                      <span className="inline-block px-2 py-1 text-xs font-mono uppercase tracking-widest rounded bg-sand text-ink">
-                        {policy.category}
-                      </span>
-                      <span className="inline-block px-2 py-1 text-xs font-mono text-ink/60">
-                        {COUNTRIES.find((c) => c.code === policy.country)?.name}
-                      </span>
-                      <span className="inline-block px-2 py-1 text-xs font-mono text-ink/60">{policy.year}</span>
+        {/* Recent Policies */}
+        <div className="rounded-2xl border border-ink/10 bg-card p-6">
+          <h2 className="font-display text-xl font-bold text-ink">Recently Added</h2>
+          <div className="mt-4">
+            <div className="space-y-2 max-h-64 overflow-y-auto">
+              {recentPolicies.map((policy: any) => (
+                <a
+                  key={policy.id}
+                  href={`/policies/${policy.slug}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block p-2 border border-ink/10 rounded-lg hover:bg-sand/30 transition cursor-pointer"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-fraunces text-sm font-medium text-ink truncate">{policy.title}</h3>
+                      <div className="mt-1 flex flex-wrap items-center gap-1">
+                        <span className="inline-block px-1.5 py-0.5 text-[10px] font-mono uppercase rounded bg-sand text-ink">
+                          {policy.category}
+                        </span>
+                        <span className="inline-block px-1.5 py-0.5 text-[10px] font-mono text-ink/60">
+                          {COUNTRIES.find((c: any) => c.code === policy.country)?.name}
+                        </span>
+                        <span className="inline-block px-1.5 py-0.5 text-[10px] font-mono text-ink/60">{policy.year}</span>
+                      </div>
+                    </div>
+                    <div
+                      className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-mono font-semibold shrink-0 ${
+                        policy.status === 'In Force'
+                          ? 'bg-ocean text-white'
+                          : policy.status === 'Proposed'
+                            ? 'bg-coral text-white'
+                            : policy.status === 'Phased'
+                              ? 'bg-sand text-ink'
+                              : 'bg-ink/10 text-ink/60'
+                      }`}
+                    >
+                      {policy.status}
                     </div>
                   </div>
-                  <div
-                    className={`inline-block px-2 py-1 rounded text-xs font-mono font-semibold ${
-                      policy.status === 'In Force'
-                        ? 'bg-ocean text-white'
-                        : policy.status === 'Proposed'
-                          ? 'bg-coral text-white'
-                          : policy.status === 'Phased'
-                            ? 'bg-sand text-ink'
-                            : 'bg-ink/10 text-ink/60'
-                    }`}
-                  >
-                    {policy.status}
-                  </div>
-                </div>
-              </div>
-            ))}
+                </a>
+              ))}
+            </div>
           </div>
         </div>
       </div>
