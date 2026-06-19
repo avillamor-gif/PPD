@@ -1,5 +1,6 @@
 export const COUNTRIES = [
   // Southeast Asia
+  { code: "KH", name: "Cambodia", region: "Southeast Asia" },
   { code: "ID", name: "Indonesia", region: "Southeast Asia" },
   { code: "PH", name: "Philippines", region: "Southeast Asia" },
   { code: "VN", name: "Vietnam", region: "Southeast Asia" },
