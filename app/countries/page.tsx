@@ -48,19 +48,36 @@ export default function CountriesPage() {
                   {list.map((c) => {
                     const count = POLICIES.filter((p: any) => p?.country === c.code).length;
                     const inForce = POLICIES.filter((p: any) => p?.country === c.code && p?.status === "In Force").length;
+                    
+                    const content = (
+                      <div>
+                        <div className="font-mono text-[11px] uppercase tracking-[0.22em] text-coral">{c.code}</div>
+                        <div className="mt-2 font-fraunces text-3xl font-semibold leading-tight">{c.name}</div>
+                        <div className="mt-3 font-mono text-[11px] uppercase tracking-[0.18em] text-ink/60">
+                          {count} {count === 1 ? 'policy' : 'policies'} · {inForce} in force
+                        </div>
+                      </div>
+                    );
+
+                    if (count === 0) {
+                      return (
+                        <div
+                          key={c.code}
+                          className="flex flex-col items-start justify-between gap-4 bg-paper p-7 opacity-50 cursor-not-allowed"
+                        >
+                          <div className="flex-1">{content}</div>
+                          <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink/40">No entries</div>
+                        </div>
+                      );
+                    }
+
                     return (
                       <Link
                         key={c.code}
                         href={`/countries/${c.code.toLowerCase()}`}
                         className="group flex items-center justify-between gap-6 bg-paper p-7 transition hover:bg-sand"
                       >
-                        <div>
-                          <div className="font-mono text-[11px] uppercase tracking-[0.22em] text-coral">{c.code}</div>
-                          <div className="mt-2 font-fraunces text-3xl font-semibold leading-tight">{c.name}</div>
-                          <div className="mt-3 font-mono text-[11px] uppercase tracking-[0.18em] text-ink/60">
-                            {count} {count === 1 ? 'policy' : 'policies'} · {inForce} in force
-                          </div>
-                        </div>
+                        {content}
                         <span className="font-fraunces text-3xl text-ink/30 transition group-hover:translate-x-1 group-hover:text-coral">→</span>
                       </Link>
                     );
