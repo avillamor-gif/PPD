@@ -27,8 +27,8 @@ export default async function PolicyPage({ params }: { params: Promise<{ id: str
   const { id } = await params;
   
   // Find policy
-  const policy = POLICIES.find((p) => p.id === id);
-  const country = policy ? COUNTRIES.find((c) => c.code === policy.country) : null;
+  const policy = POLICIES.find((p: any) => p?.id === id);
+  const country = policy ? COUNTRIES.find((c) => c.code === policy?.country) : null;
 
   if (!policy || !country) {
     return (
@@ -232,22 +232,22 @@ export default async function PolicyPage({ params }: { params: Promise<{ id: str
         <div className="mx-auto max-w-350 px-6 py-12 lg:px-10">
           <h2 className="text-2xl font-bold text-ink mb-8">Related Policies</h2>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {POLICIES.filter((p) => p.country === policy.country && p.id !== policy.id).slice(0, 3).map((relatedPolicy) => (
+            {POLICIES.filter((p: any) => p?.country === policy?.country && p?.id !== policy?.id).slice(0, 3).map((relatedPolicy: any) => (
               <Link 
-                key={relatedPolicy.id}
-                href={`/policies/${relatedPolicy.id}`}
+                key={relatedPolicy?.id}
+                href={`/policies/${relatedPolicy?.id}`}
                 className="group rounded-xl border border-ink/10 bg-white p-6 hover:border-coral hover:shadow-lg transition space-y-3"
               >
                 <div className="flex items-start justify-between">
-                  <span className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold border ${themeColors[relatedPolicy.category]}`}>
-                    {relatedPolicy.category}
+                  <span className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold border ${themeColors[relatedPolicy?.category]}`}>
+                    {relatedPolicy?.category}
                   </span>
-                  <span className="text-xs font-bold text-ink/40 group-hover:text-coral transition">{relatedPolicy.year}</span>
+                  <span className="text-xs font-bold text-ink/40 group-hover:text-coral transition">{relatedPolicy?.year}</span>
                 </div>
                 <h3 className="font-bold text-ink group-hover:text-coral transition line-clamp-2">
-                  {relatedPolicy.title}
+                  {relatedPolicy?.title}
                 </h3>
-                <p className="text-sm text-ink/60 line-clamp-2">{relatedPolicy.summary}</p>
+                <p className="text-sm text-ink/60 line-clamp-2">{relatedPolicy?.summary}</p>
               </Link>
             ))}
           </div>

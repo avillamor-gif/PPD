@@ -15,10 +15,10 @@ export default async function CountryPage({ params }: { params: Promise<{ code: 
     notFound();
   }
 
-  const policies = POLICIES.filter((p) => p.country === country.code).sort((a, b) => b.year - a.year);
+  const policies = POLICIES.filter((p: any) => p?.country === country.code).sort((a: any, b: any) => b.year - a.year);
   const byTheme = THEMES.map((c) => ({
     name: c,
-    count: policies.filter((p) => p.category === c).length,
+    count: policies.filter((p: any) => p?.category === c).length,
   })).filter((c) => c.count > 0);
 
   const themeColors: Record<string, string> = {
@@ -55,7 +55,7 @@ export default async function CountryPage({ params }: { params: Promise<{ code: 
             </div>
             <div className="grid grid-cols-3 gap-6 border-t border-ink/15 pt-6">
               <Mini n={policies.length} label="Indexed" />
-              <Mini n={policies.filter((p) => p.status === "In Force").length} label="In force" />
+              <Mini n={policies.filter((p: any) => p?.status === "In Force").length} label="In force" />
               <Mini n={byTheme.length} label="Themes" />
             </div>
           </div>
@@ -79,23 +79,23 @@ export default async function CountryPage({ params }: { params: Promise<{ code: 
             <p className="text-ink/60">No policies indexed for this country yet.</p>
           ) : (
             <ol className="overflow-hidden rounded-2xl border border-rule bg-rule">
-              {policies.map((p, i) => (
-                <li key={p.id} className="grid gap-3 bg-paper p-8 md:grid-cols-[60px_1fr_auto] md:items-start md:gap-8">
+              {policies.map((p: any, i: number) => (
+                <li key={p?.id} className="grid gap-3 bg-paper p-8 md:grid-cols-[60px_1fr_auto] md:items-start md:gap-8">
                   <div className="font-mono text-sm tabular-nums text-ink/40">{String(i + 1).padStart(2, "0")}</div>
                   <div>
                     <div className="flex flex-wrap items-baseline gap-3">
-                      <span className="font-mono text-sm tabular-nums text-coral">{p.year}</span>
-                      <Link href={`/policies/${p.id}`} className="font-fraunces text-2xl font-medium leading-snug text-ink hover:text-coral transition">
-                        {p.title}
+                      <span className="font-mono text-sm tabular-nums text-coral">{p?.year}</span>
+                      <Link href={`/policies/${p?.id}`} className="font-fraunces text-2xl font-medium leading-snug text-ink hover:text-coral transition">
+                        {p?.title}
                       </Link>
                     </div>
-                    <p className="mt-3 max-w-3xl text-pretty text-base text-ink/75">{p.summary}</p>
+                    <p className="mt-3 max-w-3xl text-pretty text-base text-ink/75">{p?.summary}</p>
                     <div className="mt-4 flex flex-wrap items-center gap-2">
-                      <span className={`inline-block rounded-full px-3 py-1 font-mono text-[10px] uppercase tracking-[0.14em] font-semibold ${themeColors[p.category] || 'bg-sand text-ink'}`}>
-                        {p.category}
+                      <span className={`inline-block rounded-full px-3 py-1 font-mono text-[10px] uppercase tracking-[0.14em] font-semibold ${themeColors[p?.category] || 'bg-sand text-ink'}`}>
+                        {p?.category}
                       </span>
                       <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink/50">
-                        {p.instrument} · {p.level}
+                        {p?.instrument} · {p?.level}
                       </span>
                     </div>
                   </div>
