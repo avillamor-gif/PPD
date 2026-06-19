@@ -16,6 +16,7 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
   const [formData, setFormData] = useState({
     title: initialData?.title || '',
@@ -62,6 +63,7 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setFieldErrors({});
     setLoading(true);
 
     try {
@@ -98,6 +100,22 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
 
       if (!response.ok) {
         const data = await response.json();
+        
+        // Handle validation errors from API
+        if (data.errors && Array.isArray(data.errors)) {
+          const errorMap: Record<string, string> = {};
+          const errorMessages: string[] = [];
+          
+          data.errors.forEach((err: { field: string; message: string }) => {
+            errorMap[err.field] = err.message;
+            errorMessages.push(err.message);
+          });
+          
+          setFieldErrors(errorMap);
+          throw new Error(errorMessages.join('; '));
+        }
+        
+        // Handle generic error response
         throw new Error(data.error || 'Failed to submit policy');
       }
 
@@ -151,6 +169,13 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
       {error && (
         <div className="rounded-lg border border-coral/30 bg-coral/5 p-4">
           <p className="font-medium text-coral">✗ {error}</p>
+          {Object.keys(fieldErrors).length > 0 && (
+            <ul className="mt-2 text-sm text-coral/80 space-y-1">
+              {Object.entries(fieldErrors).map(([field, message]) => (
+                <li key={field}>• {message}</li>
+              ))}
+            </ul>
+          )}
         </div>
       )}
 
