@@ -200,7 +200,6 @@ export const POLICIES = [
     link: "https://www.mfe.govt.nz/",
     language: "English",
   },
-,
   {
     id: "kh-1996-01",
     year: 1996,
