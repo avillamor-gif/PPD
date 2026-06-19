@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
     // Check user role
     const { data: profile, error: profileError } = await supabaseAdmin
       .from('user_profiles')
-      .select('role_id, roles(name)')
+      .select('role_id, role:roles(name)')
       .eq('id', user.id)
       .maybeSingle();
 
@@ -48,7 +48,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ isAdmin: false });
     }
 
-    const isAdmin = profile.roles?.name === 'admin';
+    const isAdmin = (profile.role as any)?.name === 'admin';
     return NextResponse.json({ isAdmin });
   } catch (error) {
     console.error('Error checking admin status:', error);

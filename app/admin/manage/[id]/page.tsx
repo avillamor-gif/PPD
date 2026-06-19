@@ -36,13 +36,13 @@ export default function EditPolicyPage() {
           throw new Error('Not authenticated');
         }
 
-        const res = await fetch('/api/auth/check-admin', {
+        const adminRes = await fetch('/api/auth/check-admin', {
           headers: {
             'Authorization': `Bearer ${session.access_token}`
           }
         });
 
-        const authData = await res.json();
+        const authData = await adminRes.json();
         console.log('Admin check result:', authData);
         setIsAdmin(authData.isAdmin === true);
       } catch (err) {
