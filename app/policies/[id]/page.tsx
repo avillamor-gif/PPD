@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { ArrowLeft, MapPin, Calendar, Building2, Globe, MessageCircle, ThumbsUp, Eye } from 'lucide-react';
 import { PolicyForumSection } from '@/app/components/PolicyForumSection';
 import { AdminEditButton } from '@/app/components/AdminEditButton';
+import { supabaseAdmin } from '@/lib/supabase-admin';
 
 const themeColors: Record<string, string> = {
   "Plastic Ban": "bg-coral/20 text-coral border-coral/30",
@@ -27,35 +28,38 @@ export const metadata = {
 export default async function PolicyPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   
-  // Fetch policy from API
+  // Fetch policy from Supabase using admin client
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/policies/${id}`, {
-      cache: 'no-store',
-    });
-    if (!res.ok) {
+    const { data: policy, error } = await supabaseAdmin
+      .from('policies')
+      .select()
+      .eq('id', id)
+      .single();
+
+    if (error || !policy) {
       return notFound();
     }
-    const policy = await res.json();
+
     const country = COUNTRIES.find((c) => c.code === policy?.country);
 
     if (!policy || !country) {
       return notFound();
     }
 
-  return (
-    <div className="w-full">
-      {/* Header Navigation */}
-      <div className="border-b border-rule bg-paper">
-        <div className="mx-auto max-w-350 px-6 py-4 lg:px-10">
-          <Link 
-            href="/search" 
-            className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em] text-ink/60 hover:text-coral transition"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back to search
-          </Link>
+    return (
+      <div className="w-full">
+        {/* Header Navigation */}
+        <div className="border-b border-rule bg-paper">
+          <div className="mx-auto max-w-350 px-6 py-4 lg:px-10">
+            <Link 
+              href="/search" 
+              className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em] text-ink/60 hover:text-coral transition"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              Back to search
+            </Link>
+          </div>
         </div>
-      </div>
 
       {/* Hero Section */}
       <section className={`border-b border-rule ${statusColors[policy.status].bg}`}>
@@ -257,4 +261,8 @@ export default async function PolicyPage({ params }: { params: Promise<{ id: str
       </section>
     </div>
   );
+  } catch (err) {
+    console.error('Error fetching policy:', err);
+    return notFound();
+  }
 }

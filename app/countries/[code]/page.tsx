@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { COUNTRIES } from '@/lib/constants';
 import { notFound } from 'next/navigation';
+import { supabaseAdmin } from '@/lib/supabase-admin';
 
 export const metadata = {
   title: "Country — Plastic Policy Database",
@@ -15,17 +16,17 @@ export default async function CountryPage({ params }: { params: Promise<{ code: 
     notFound();
   }
 
-  // Fetch all policies and filter by country
+  // Fetch all policies from Supabase and filter by country
   let policies = [];
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/policies`, {
-      cache: 'no-store',
-    });
-    if (res.ok) {
-      const allPolicies = await res.json();
-      policies = allPolicies
-        .filter((p: any) => p?.country === country.code)
-        .sort((a: any, b: any) => b.year - a.year);
+    const { data: allPolicies, error } = await supabaseAdmin
+      .from('policies')
+      .select()
+      .eq('country', country.code)
+      .order('year', { ascending: false });
+    
+    if (!error && allPolicies) {
+      policies = allPolicies;
     }
   } catch (err) {
     console.error('Error fetching policies:', err);
