@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState, useMemo } from 'react';
 import { Search, ChevronDown } from 'lucide-react';
+import { COUNTRIES, REGIONS as ALL_REGIONS } from '@/lib/constants';
 
 const POLICIES = [
   {
@@ -187,22 +188,6 @@ const POLICIES = [
   },
 ];
 
-const COUNTRIES = [
-  { code: "all", name: "All countries" },
-  { code: "PH", name: "Philippines" },
-  { code: "JP", name: "Japan" },
-  { code: "VN", name: "Vietnam" },
-  { code: "SG", name: "Singapore" },
-  { code: "ID", name: "Indonesia" },
-  { code: "IN", name: "India" },
-  { code: "TH", name: "Thailand" },
-  { code: "CN", name: "China" },
-  { code: "AU", name: "Australia" },
-  { code: "KR", name: "South Korea" },
-  { code: "MY", name: "Malaysia" },
-  { code: "NZ", name: "New Zealand" },
-];
-
 const THEMES = [
   "All themes",
   "Plastic Ban",
@@ -218,6 +203,8 @@ const STATUSES = [
   "Phased",
   "Repealed",
 ];
+
+const REGIONS = ["All regions", ...ALL_REGIONS];
 
 function StatusPill({ status }: { status: string }) {
   const colors: Record<string, string> = {
@@ -271,13 +258,39 @@ function Select({
 
 export default function SearchPage() {
   const [q, setQ] = useState("");
+  const [region, setRegion] = useState("All regions");
   const [country, setCountry] = useState("all");
   const [theme, setTheme] = useState("All themes");
   const [status, setStatus] = useState("Any status");
 
+  // Filter countries by selected region - same logic as PolicyForm
+  const filteredCountries = useMemo(() => {
+    if (region === "All regions") {
+      return [{ code: "all", name: "All countries" }, ...COUNTRIES];
+    }
+    return [
+      { code: "all", name: "All countries" },
+      ...COUNTRIES.filter((c) => c.region === region)
+    ];
+  }, [region]);
+
+  // Update country selection when region changes
+  const handleRegionChange = (newRegion: string) => {
+    setRegion(newRegion);
+    // Reset country when region changes (like the form behavior)
+    setCountry("all");
+  };
+
   const rows = useMemo(() => {
     const s = q.trim().toLowerCase();
     return POLICIES
+      .filter((p) => {
+        // Filter by region
+        if (region === "All regions") return true;
+        // Find the country in COUNTRIES to get its region
+        const countryData = COUNTRIES.find((c) => c.code === p.countryCode);
+        return countryData?.region === region;
+      })
       .filter((p) => (country === "all" ? true : p.countryCode === country))
       .filter((p) => (theme === "All themes" ? true : p.category === theme))
       .filter((p) => (status === "Any status" ? true : p.status === status))
@@ -289,7 +302,7 @@ export default function SearchPage() {
           : true,
       )
       .sort((a, b) => b.year - a.year);
-  }, [q, country, theme, status]);
+  }, [q, region, country, theme, status]);
 
   return (
     <div className="w-full">
@@ -322,10 +335,16 @@ export default function SearchPage() {
             <Search className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-ink/40" />
           </div>
           <Select 
+            label="Region" 
+            value={region} 
+            onChange={handleRegionChange} 
+            options={REGIONS.map((r) => [r, r] as [string, string])} 
+          />
+          <Select 
             label="Country" 
             value={country} 
             onChange={setCountry} 
-            options={COUNTRIES.map((c) => [c.code, c.name] as [string, string])} 
+            options={filteredCountries.map((c) => [c.code, c.code === "all" ? c.name : `${c.name} (${c.code})`] as [string, string])} 
           />
           <Select 
             label="Theme" 
