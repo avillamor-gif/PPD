@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS policies (
   authority TEXT NOT NULL, -- Competent authority
   link TEXT NOT NULL, -- Official policy link
   other_links TEXT, -- Additional references
-  language VARCHAR(10), -- Language of the policy
+  language VARCHAR(50), -- Language of the policy
   created_by UUID REFERENCES auth.users(id) ON DELETE SET NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
