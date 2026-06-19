@@ -34,6 +34,7 @@ export const STATUSES = [
 export const POLICIES = [
   {
     id: "kh-1996-01",
+    slug: "law-on-environmental-protection-and-natural-resource-management-1996",
     year: 1996,
     country: "KH",
     title: "Law on Environmental Protection and Natural Resource Management (1996)",
@@ -48,6 +49,7 @@ export const POLICIES = [
   },
   {
     id: "kh-2015-02",
+    slug: "sub-decree-113-on-urban-garbage-and-solid-waste-management-2015",
     year: 2015,
     country: "KH",
     title: "Sub-Decree No. 113 on Urban Garbage and Solid Waste Management (2015)",
@@ -62,6 +64,7 @@ export const POLICIES = [
   },
   {
     id: "kh-1999-03",
+    slug: "sub-decree-36-on-solid-waste-management",
     year: 1999,
     country: "KH",
     title: "Sub-Decree No. 36 on Solid Waste Management",
@@ -76,6 +79,7 @@ export const POLICIES = [
   },
   {
     id: "id-2019-01",
+    slug: "regulation-p75-2019-on-waste-reduction-roadmap-by-producers",
     year: 2019,
     country: "ID",
     title: "NOMOR P.75/MENLHK/SETJEN/KUM.1/10/2019 or Regulation P.75/2019 on Waste Reduction Roadmap by Producers",
@@ -90,6 +94,7 @@ export const POLICIES = [
   },
   {
     id: "ph-2001-01",
+    slug: "ecological-solid-waste-management-act-of-2000-republic-act-9003",
     year: 2001,
     country: "PH",
     title: "Ecological Solid Waste Management Act of 2000 (Republic Act 9003)",
@@ -104,6 +109,7 @@ export const POLICIES = [
   },
   {
     id: "ph-2022-02",
+    slug: "extended-producer-responsibility-act-republic-act-11898",
     year: 2022,
     country: "PH",
     title: "Extended Producer Responsibility Act (Republic Act 11898)",
@@ -118,6 +124,7 @@ export const POLICIES = [
   },
   {
     id: "th-2025-01",
+    slug: "plastic-scrap-import-control-policy",
     year: 2025,
     country: "TH",
     title: "Plastic Scrap Import Control Policy",
@@ -132,6 +139,7 @@ export const POLICIES = [
   },
   {
     id: "th-2026-02",
+    slug: "draft-sustainable-packaging-management-act",
     year: 2026,
     country: "TH",
     title: "Draft Sustainable Packaging Management Act",
@@ -146,6 +154,7 @@ export const POLICIES = [
   },
   {
     id: "my-2008-01",
+    slug: "solid-waste-and-public-cleansing-management-act-2007-act-672",
     year: 2008,
     country: "MY",
     title: "Solid Waste and Public Cleansing Management Act 2007 (Act 672)",
@@ -160,6 +169,7 @@ export const POLICIES = [
   },
   {
     id: "vn-2022-01",
+    slug: "law-on-environmental-protection-lep-no-72-2020-qh14",
     year: 2022,
     country: "VN",
     title: "Law on Environmental\nProtection (LEP) NO. 72/2020/QH14",
@@ -174,6 +184,7 @@ export const POLICIES = [
   },
   {
     id: "vn-2022-02",
+    slug: "decree-no-08-2022-nd-cp-elaboration-of-law-on-environmental-protection-2022",
     year: 2022,
     country: "VN",
     title: "Decree No. 08/2022/ND-CP or Elaboration of Several Articles of the Law on Environmental Protection (2022)",

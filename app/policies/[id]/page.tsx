@@ -26,8 +26,8 @@ export const metadata = {
 export default async function PolicyPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   
-  // Find policy
-  const policy = POLICIES.find((p: any) => p?.id === id);
+  // Find policy by slug
+  const policy = POLICIES.find((p: any) => p?.slug === id);
   const country = policy ? COUNTRIES.find((c) => c.code === policy?.country) : null;
 
   if (!policy || !country) {
@@ -179,7 +179,7 @@ export default async function PolicyPage({ params }: { params: Promise<{ id: str
             </div>
 
             {/* Community Discussion */}
-            <PolicyForumSection policyId={policy.id} />
+            <PolicyForumSection policyId={policy.slug} />
           </div>
 
           {/* Right Sidebar */}
@@ -232,10 +232,10 @@ export default async function PolicyPage({ params }: { params: Promise<{ id: str
         <div className="mx-auto max-w-350 px-6 py-12 lg:px-10">
           <h2 className="text-2xl font-bold text-ink mb-8">Related Policies</h2>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {POLICIES.filter((p: any) => p?.country === policy?.country && p?.id !== policy?.id).slice(0, 3).map((relatedPolicy: any) => (
+            {POLICIES.filter((p: any) => p?.country === policy?.country && p?.slug !== policy?.slug).slice(0, 3).map((relatedPolicy: any) => (
               <Link 
-                key={relatedPolicy?.id}
-                href={`/policies/${relatedPolicy?.id}`}
+                key={relatedPolicy?.slug}
+                href={`/policies/${relatedPolicy?.slug}`}
                 className="group rounded-xl border border-ink/10 bg-white p-6 hover:border-coral hover:shadow-lg transition space-y-3"
               >
                 <div className="flex items-start justify-between">
