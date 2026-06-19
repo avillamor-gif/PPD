@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { COUNTRIES, THEMES } from '@/lib/constants';
-import { POLICIES } from '@/app/data/policies';
+import { supabaseAdmin } from '@/lib/supabase-admin';
 
 export const metadata = {
   title: "Plastic Policy Database — Asia Pacific",
@@ -9,14 +9,24 @@ export const metadata = {
 
 export const revalidate = 60; // ISR: revalidate every 60 seconds on Vercel
 
-export default function Home() {
+export default async function Home() {
+  // Fetch policies from Supabase
+  const { data: POLICIES = [], error } = await supabaseAdmin
+    .from('policies')
+    .select('*')
+    .order('year', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching policies:', error);
+  }
+
   const total = POLICIES.length;
   const inForce = POLICIES.filter((p: any) => p.status === "In Force").length;
   const proposed = POLICIES.filter((p: any) => p.status === "Proposed").length;
-  const earliest = Math.min(...POLICIES.map((p) => p.year));
-  const earliestPolicy = [...POLICIES].filter((p) => p.year === earliest).sort((a, b) => a.year - b.year)[0];
+  const earliest = POLICIES.length > 0 ? Math.min(...POLICIES.map((p) => p.year || new Date().getFullYear())) : new Date().getFullYear();
+  const earliestPolicy = POLICIES.length > 0 ? [...POLICIES].filter((p) => p.year === earliest).sort((a, b) => a.year - b.year)[0] : null;
   const countriesCovered = new Set(POLICIES.map((p) => p.country)).size;
-  const recent = [...POLICIES].sort((a, b) => b.year - a.year).slice(0, 6);
+  const recent = POLICIES.slice(0, 6);
 
   // theme counts for the bar
   const themeCounts = THEMES.map((c) => ({

@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { COUNTRIES, REGIONS } from '@/lib/constants';
-import { POLICIES } from '@/app/data/policies';
+import { supabaseAdmin } from '@/lib/supabase-admin';
 
 export const metadata = {
   title: "Countries — Plastic Policy Database",
@@ -9,8 +9,18 @@ export const metadata = {
 
 export const revalidate = 60; // ISR: revalidate every 60 seconds on Vercel
 
-export default function CountriesPage() {
+export default async function CountriesPage() {
   const regions = ["Southeast Asia", "South Asia", "East Asia", "Oceania"] as const;
+
+  // Fetch policies from Supabase
+  const { data: POLICIES = [], error } = await supabaseAdmin
+    .from('policies')
+    .select('*')
+    .order('year', { ascending: false });
+
+  if (error) {
+    console.error('Error fetching policies:', error);
+  }
 
   return (
     <div className="w-full">

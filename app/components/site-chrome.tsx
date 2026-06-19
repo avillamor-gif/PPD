@@ -8,7 +8,6 @@ import Button from './Button';
 import { NavLink } from './ui/nav-link';
 import { useIsMobile } from '@/lib/hooks';
 import { supabase } from '@/lib/supabase';
-import { POLICIES } from '@/app/data/policies';
 
 export function SiteHeader() {
   const isMobile = useIsMobile();
@@ -16,11 +15,13 @@ export function SiteHeader() {
   const [user, setUser] = useState<any>(null);
   const [userProfile, setUserProfile] = useState<any>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [policiesCount, setPoliciesCount] = useState(0);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
   useEffect(() => {
     checkUser();
+    fetchPoliciesCount();
 
     // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -39,6 +40,18 @@ export function SiteHeader() {
       subscription?.unsubscribe();
     };
   }, []);
+
+  const fetchPoliciesCount = async () => {
+    try {
+      const response = await fetch('/api/policies');
+      if (response.ok) {
+        const data = await response.json();
+        setPoliciesCount(data.data?.length || 0);
+      }
+    } catch (err) {
+      console.error('Error fetching policies count:', err);
+    }
+  };
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -124,7 +137,7 @@ export function SiteHeader() {
           {!isMobile && (
             <>
               <Button href="/search" className="whitespace-nowrap shrink-0">
-                Browse {POLICIES.length} Policies →
+                Browse {policiesCount} Policies →
               </Button>
               {user ? (
                 // User logged in - show dropdown menu
@@ -239,7 +252,7 @@ export function SiteHeader() {
             </Link>
             <div className="pt-2 border-t border-rule flex flex-col gap-2">
               <Button href="/search" className="flex-1 justify-center" onClick={() => setMobileMenuOpen(false)}>
-                Browse {POLICIES.length} Policies →
+                Browse {policiesCount} Policies →
               </Button>
               {user ? (
                 <>

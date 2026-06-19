@@ -3,7 +3,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { COUNTRIES, THEMES, STATUSES } from '@/lib/constants';
-import { POLICIES } from '@/app/data/policies';
 import type { Policy, PolicyStatus } from '@/lib/types';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
@@ -12,30 +11,42 @@ export default function AdminDashboard() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [policies, setPolicies] = useState<Policy[]>([]);
 
-  // Check authentication on mount
+  // Check authentication and fetch policies on mount
   useEffect(() => {
-    const checkAuth = async () => {
+    const initializeDashboard = async () => {
       try {
+        // Check authentication
         const { data: { session } } = await supabase.auth.getSession();
         if (!session?.user) {
-          // Redirect to login if not authenticated
           router.push('/auth/login');
           return;
         }
         setIsAuthenticated(true);
+
+        // Fetch policies from API
+        const response = await fetch('/api/policies');
+        if (response.ok) {
+          const data = await response.json();
+          setPolicies(data.data || []);
+        } else {
+          console.error('Failed to fetch policies');
+          setPolicies([]);
+        }
       } catch (err) {
-        console.error('Auth check error:', err);
+        console.error('Error initializing dashboard:', err);
         router.push('/auth/login');
       } finally {
         setIsLoading(false);
       }
     };
 
-    checkAuth();
+    initializeDashboard();
   }, [router]);
 
   // Analytics data
+  const POLICIES = policies;
   const totalPolicies = POLICIES.length;
   const policyByStatus = useMemo(() => {
     const counts: Record<PolicyStatus, number> = {
