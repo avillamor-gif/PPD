@@ -3,6 +3,7 @@ import { COUNTRIES, POLICIES, THEMES } from '@/app/data/policies';
 import { notFound } from 'next/navigation';
 import { ArrowLeft, MapPin, Calendar, Building2, Globe, MessageCircle, ThumbsUp, Eye } from 'lucide-react';
 import { PolicyForumSection } from '@/app/components/PolicyForumSection';
+import { AdminEditButton } from '@/app/components/AdminEditButton';
 
 const themeColors: Record<string, string> = {
   "Plastic Ban": "bg-coral/20 text-coral border-coral/30",
@@ -141,17 +142,20 @@ export default async function PolicyPage({ params }: { params: Promise<{ id: str
               <div>
                 <p className="text-base text-ink font-semibold">{policy.authority}</p>
               </div>
-              {policy.link && (
-                <a 
-                  href={policy.link} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-ocean/10 text-ocean hover:bg-ocean/20 transition font-medium text-sm"
-                >
-                  <Globe className="w-4 h-4" />
-                  Official Website
-                </a>
-              )}
+              <div className="space-y-2">
+                {policy.link && (
+                  <a 
+                    href={policy.link} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-ocean/10 text-ocean hover:bg-ocean/20 transition font-medium text-sm"
+                  >
+                    <Globe className="w-4 h-4" />
+                    Official Website
+                  </a>
+                )}
+                {policy.id && <AdminEditButton policyId={policy.id} />}
+              </div>
             </div>
 
             {/* Implementation Timeline Card */}
