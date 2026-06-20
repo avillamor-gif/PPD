@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { COUNTRIES, REGIONS, THEMES, STATUSES } from '@/lib/constants';
 import type { Policy, PolicyLevel, PolicyStatus } from '@/lib/types';
+import { generateSlugFromTitle } from '@/lib/utils/validation';
 
 const LEVELS: PolicyLevel[] = ['National', 'Sub-national', 'Regional', 'International'];
 

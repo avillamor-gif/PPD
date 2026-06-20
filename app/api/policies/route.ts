@@ -38,11 +38,11 @@ export async function POST(request: NextRequest) {
 
     // Generate ID from slug (based on title)
     const slug = generateSlugFromTitle(body.title);
-    const id = slug;
 
     // Prepare data for Supabase
     const policyData = {
-      id,
+      id: slug,
+      slug,
       ...body,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),

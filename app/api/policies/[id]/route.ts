@@ -14,12 +14,23 @@ export async function GET(
   try {
     const { id } = await params;
 
-    // Fetch from Supabase
-    const { data, error } = await supabaseAdmin
+    // Try to fetch by slug first, then by id
+    let { data, error } = await supabaseAdmin
       .from('policies')
       .select()
-      .eq('id', id)
+      .eq('slug', id)
       .single();
+
+    // If not found by slug, try by id
+    if (error || !data) {
+      const result = await supabaseAdmin
+        .from('policies')
+        .select()
+        .eq('id', id)
+        .single();
+      data = result.data;
+      error = result.error;
+    }
 
     if (error || !data) {
       return NextResponse.json(
@@ -66,23 +77,32 @@ export async function PUT(
       updated_at: new Date().toISOString(),
     };
 
-    // Update in Supabase
-    const { data, error } = await supabaseAdmin
+    // Update in Supabase - try by slug first, then by id
+    let result = await supabaseAdmin
       .from('policies')
       .update(policyData)
-      .eq('id', id)
+      .eq('slug', id)
       .select();
 
-    if (error) {
-      console.error('Supabase error:', error);
-      throw new Error(error.message || 'Failed to update policy');
+    // If not found by slug, try by id
+    if ((!result.data || result.data.length === 0) && result.error?.code === 'PGRST116') {
+      result = await supabaseAdmin
+        .from('policies')
+        .update(policyData)
+        .eq('id', id)
+        .select();
+    }
+
+    if (result.error) {
+      console.error('Supabase error:', result.error);
+      throw new Error(result.error.message || 'Failed to update policy');
     }
 
     return NextResponse.json(
       {
         success: true,
         message: 'Policy updated successfully',
-        data: data?.[0],
+        data: result.data?.[0],
       },
       { status: 200 }
     );
@@ -107,15 +127,23 @@ export async function DELETE(
   try {
     const { id } = await params;
     
-    // Delete from Supabase
-    const { error } = await supabaseAdmin
+    // Delete from Supabase - try by slug first, then by id
+    let result = await supabaseAdmin
       .from('policies')
       .delete()
-      .eq('id', id);
+      .eq('slug', id);
 
-    if (error) {
-      console.error('Supabase error:', error);
-      throw new Error(error.message || 'Failed to delete policy');
+    // If not found by slug, try by id
+    if (result.error?.code === 'PGRST116') {
+      result = await supabaseAdmin
+        .from('policies')
+        .delete()
+        .eq('id', id);
+    }
+
+    if (result.error) {
+      console.error('Supabase error:', result.error);
+      throw new Error(result.error.message || 'Failed to delete policy');
     }
 
     return NextResponse.json(
