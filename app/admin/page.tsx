@@ -6,6 +6,7 @@ import { COUNTRIES, THEMES, STATUSES } from '@/lib/constants';
 import type { Policy, PolicyStatus } from '@/lib/types';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
+import { Loader } from 'lucide-react';
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -104,7 +105,7 @@ export default function AdminDashboard() {
     return (
       <div className="min-h-screen bg-paper flex items-center justify-center">
         <div className="text-center">
-          <div className="inline-block w-8 h-8 border-4 border-ocean/20 border-t-ocean rounded-full animate-spin"></div>
+          <Loader className="w-6 h-6 animate-spin text-ocean mx-auto" />
           <p className="mt-4 text-ink/60">Loading...</p>
         </div>
       </div>
