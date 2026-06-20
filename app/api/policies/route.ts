@@ -3,6 +3,57 @@ import { validatePolicy, generatePolicyId, generateSlugFromTitle } from '@/lib/u
 import { supabaseAdmin } from '@/lib/supabase-admin';
 
 /**
+ * Generates a unique slug by checking for duplicates and appending a counter if needed
+ */
+async function generateUniqueSlug(baseSlug: string, excludeId?: string): Promise<string> {
+  // Check if base slug exists
+  let query = supabaseAdmin
+    .from('policies')
+    .select('id', { count: 'exact', head: true })
+    .eq('slug', baseSlug);
+  
+  if (excludeId) {
+    query = query.neq('id', excludeId);
+  }
+
+  const { count, error } = await query;
+
+  if (error) {
+    console.error('Error checking slug uniqueness:', error);
+    return baseSlug;
+  }
+
+  // If no duplicates, return base slug
+  if (!count || count === 0) {
+    return baseSlug;
+  }
+
+  // Append counter until unique
+  let counter = 1;
+  let uniqueSlug = `${baseSlug}-${counter}`;
+  
+  while (true) {
+    let checkQuery = supabaseAdmin
+      .from('policies')
+      .select('id', { count: 'exact', head: true })
+      .eq('slug', uniqueSlug);
+    
+    if (excludeId) {
+      checkQuery = checkQuery.neq('id', excludeId);
+    }
+
+    const { count: duplicateCount } = await checkQuery;
+    
+    if (!duplicateCount || duplicateCount === 0) {
+      return uniqueSlug;
+    }
+    
+    counter++;
+    uniqueSlug = `${baseSlug}-${counter}`;
+  }
+}
+
+/**
  * POST /api/policies
  * 
  * Handles policy submission.
@@ -36,13 +87,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Generate ID from slug (based on title)
-    const slug = generateSlugFromTitle(body.title);
+    // Generate ID from slug (based on title) with deduplication
+    const baseSlug = generateSlugFromTitle(body.title);
+    const uniqueSlug = await generateUniqueSlug(baseSlug);
 
     // Prepare data for Supabase
     const policyData = {
-      id: slug,
-      slug,
+      id: uniqueSlug,
+      slug: uniqueSlug,
       ...body,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),

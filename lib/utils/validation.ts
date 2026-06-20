@@ -78,7 +78,7 @@ export function generateSlugFromTitle(title: string): string {
     .replace(/[^a-z0-9\s-]/g, '') // Remove special characters except hyphens
     .replace(/\s+/g, '-') // Replace spaces with hyphens
     .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
-    .slice(0, 100); // Limit to 100 characters
+    .slice(0, 80); // Limit to 80 characters (leave room for suffix)
 }
 
 export function sanitizeInput(input: string): string {
