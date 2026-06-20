@@ -167,7 +167,6 @@ export default async function PolicyPage({ params }: { params: Promise<{ id: str
                     Official Website
                   </a>
                 )}
-                {policy.id && <AdminEditButton policyId={policy.id} />}
               </div>
             </div>
 
@@ -240,6 +239,13 @@ export default async function PolicyPage({ params }: { params: Promise<{ id: str
                 </div>
               </div>
             </div>
+
+            {/* Edit Policy Button */}
+            {policy.id && (
+              <div className="rounded-xl border border-ink/10 bg-white p-6">
+                <AdminEditButton policyId={policy.id} />
+              </div>
+            )}
           </div>
         </div>
       </section>
