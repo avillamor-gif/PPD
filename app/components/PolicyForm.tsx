@@ -21,7 +21,7 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
   const [formData, setFormData] = useState({
     title: initialData?.title || '',
     summary: initialData?.summary || '',
-    enactmentDate: initialData?.year ? `${initialData.year}-01-01` : new Date().toISOString().split('T')[0],
+    year: initialData?.year || new Date().getFullYear(),
     region: '',
     country: initialData?.country || '',
     level: (initialData?.level || 'National') as PolicyLevel,
@@ -85,11 +85,9 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
       const method = isEditing ? 'PUT' : 'POST';
       const url = isEditing ? `/api/policies/${initialData?.id}` : '/api/policies';
       
-      // Extract year from enactmentDate for API compatibility
-      const year = parseInt(formData.enactmentDate.split('-')[0], 10);
       const apiData = {
         ...formData,
-        year,
+        year: parseInt(String(formData.year), 10),
       };
       
       const response = await fetch(url, {
@@ -126,7 +124,7 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
         setFormData({
           title: '',
           summary: '',
-          enactmentDate: new Date().toISOString().split('T')[0],
+          year: new Date().getFullYear(),
           region: '',
           country: '',
           level: 'National',
@@ -250,12 +248,14 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-ink mb-2">Date of Enactment or Commencement</label>
+            <label className="block text-sm font-medium text-ink mb-2">Year of Enactment or Commencement</label>
             <input
-              type="date"
-              name="enactmentDate"
-              value={formData.enactmentDate}
+              type="number"
+              name="year"
+              value={formData.year}
               onChange={handleChange}
+              min="1950"
+              max={new Date().getFullYear() + 1}
               className="w-full rounded-lg border border-ink/20 bg-paper px-4 py-2 text-ink focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20"
             />
           </div>
@@ -403,7 +403,7 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
           <button
             type="reset"
             onClick={() => setFormData({
-              title: '', summary: '', enactmentDate: new Date().toISOString().split('T')[0],
+              title: '', summary: '', year: new Date().getFullYear(),
               region: '', country: '', level: 'National', category: '', keywords: '', status: 'Proposed',
               instrument: '', authority: '', link: '', otherLinks: '', language: '',
             })}

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { validatePolicy, generatePolicyId } from '@/lib/utils/validation';
+import { validatePolicy, generatePolicyId, generateSlugFromTitle } from '@/lib/utils/validation';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 
 /**
@@ -36,8 +36,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Generate ID
-    const id = generatePolicyId(body.country, body.year);
+    // Generate ID from slug (based on title)
+    const slug = generateSlugFromTitle(body.title);
+    const id = slug;
 
     // Prepare data for Supabase
     const policyData = {

@@ -71,6 +71,16 @@ export function generatePolicyId(country: string, year: number, sequence: number
   return `${country.toLowerCase()}-${year}-${String(sequence).padStart(2, '0')}`;
 }
 
+export function generateSlugFromTitle(title: string): string {
+  return title
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, '') // Remove special characters except hyphens
+    .replace(/\s+/g, '-') // Replace spaces with hyphens
+    .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
+    .slice(0, 100); // Limit to 100 characters
+}
+
 export function sanitizeInput(input: string): string {
   return input.trim().replace(/\s+/g, ' ');
 }
