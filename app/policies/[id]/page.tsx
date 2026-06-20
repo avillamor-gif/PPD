@@ -29,12 +29,24 @@ export default async function PolicyPage({ params }: { params: Promise<{ id: str
   const { id } = await params;
   
   // Fetch policy from Supabase using admin client
+  // Try to find by slug first, then by id (for backwards compatibility)
   try {
-    const { data: policy, error } = await supabaseAdmin
+    let { data: policy, error } = await supabaseAdmin
       .from('policies')
       .select()
-      .eq('id', id)
+      .eq('slug', id)
       .single();
+
+    // If not found by slug, try by id
+    if (error || !policy) {
+      const result = await supabaseAdmin
+        .from('policies')
+        .select()
+        .eq('id', id)
+        .single();
+      policy = result.data;
+      error = result.error;
+    }
 
     if (error || !policy) {
       return notFound();
