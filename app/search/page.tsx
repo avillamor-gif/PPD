@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState, useMemo, useEffect } from 'react';
-import { Search, ChevronDown } from 'lucide-react';
+import { Search, ChevronDown, Loader } from 'lucide-react';
 import { COUNTRIES, REGIONS as ALL_REGIONS } from '@/lib/constants';
 
 // Transform policies to include country names for display
@@ -219,7 +219,11 @@ export default function SearchPage() {
       {/* Results Table */}
       <section>
         <div className="mx-auto max-w-350 px-6 py-10 lg:px-10">
-          {rows.length === 0 ? (
+          {loading ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader className="w-6 h-6 animate-spin text-ocean" />
+            </div>
+          ) : rows.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-ink/20 p-16 text-center">
               <div className="font-fraunces text-2xl font-semibold">No matches</div>
               <p className="mt-2 text-sm text-ink/60">Try widening your filters or clearing the search.</p>
