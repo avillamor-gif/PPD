@@ -270,7 +270,7 @@ export default async function PolicyPage({ params }: { params: Promise<{ id: str
             {relatedPolicies.map((relatedPolicy: any) => (
               <Link 
                 key={relatedPolicy?.id}
-                href={`/policies/${relatedPolicy?.id}`}
+                href={`/policies/${relatedPolicy?.slug}`}
                 className="group rounded-xl border border-ink/10 bg-white p-6 hover:border-coral hover:shadow-lg transition space-y-3"
               >
                 <div className="flex items-start justify-between">
