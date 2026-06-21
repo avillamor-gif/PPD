@@ -1,8 +1,6 @@
 import { supabaseAdmin } from '@/lib/supabase-admin';
-import { sendVerificationEmail } from '@/lib/email';
 import config from '@/lib/config';
 import { NextRequest, NextResponse } from 'next/server';
-import crypto from 'crypto';
 
 export async function POST(req: NextRequest) {
   try {
@@ -126,40 +124,11 @@ export async function POST(req: NextRequest) {
         console.log('🔐 [SIGNUP] User preferences created successfully');
       }
 
-      // Generate and send verification email
-      // Only send verification email if required
+      // Supabase automatically sends confirmation email if email_confirm is false
       if (config.features.emailVerificationRequired) {
-        console.log('🔐 [SIGNUP] Generating verification token...');
-        const verificationToken = crypto.randomBytes(32).toString('hex');
-        const expiresAt = new Date(Date.now() + config.auth.emailVerificationExpiryHours * 60 * 60 * 1000);
-
-        // Store token in database
-        const { error: tokenError } = await supabaseAdmin
-          .from('email_verification_tokens')
-          .insert({
-            user_id: user.id,
-            token: verificationToken,
-            email: user.email,
-            expires_at: expiresAt.toISOString(),
-          });
-
-        if (tokenError) {
-          console.error('🔐 [SIGNUP] Token storage error:', tokenError);
-        } else {
-          console.log('🔐 [SIGNUP] Verification token stored');
-        }
-
-        // Send verification email
-        console.log('🔐 [SIGNUP] Sending verification email...');
-        const { error: emailError } = await sendVerificationEmail(user.email, verificationToken);
-
-        if (emailError) {
-          console.error('🔐 [SIGNUP] Email send error:', emailError);
-        } else {
-          console.log('🔐 [SIGNUP] Verification email sent successfully');
-        }
+        console.log('🔐 [SIGNUP] Supabase will send confirmation email to:', user.email);
       } else {
-        console.log('🔐 [SIGNUP] Email verification not required - user can login immediately');
+        console.log('🔐 [SIGNUP] Email already confirmed - user can login immediately');
       }
 
       return NextResponse.json({
@@ -168,7 +137,9 @@ export async function POST(req: NextRequest) {
           id: user.id,
           email: user.email,
         },
-        message: 'Signup successful. Please verify your email.',
+        message: config.features.emailVerificationRequired 
+          ? 'Signup successful. Please verify your email.'
+          : 'Signup successful. You can now login.',
       });
     } catch (innerError) {
       console.error('🔐 [SIGNUP] Outer inner catch:', {
