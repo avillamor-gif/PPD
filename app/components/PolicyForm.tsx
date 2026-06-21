@@ -93,9 +93,13 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
       const method = isEditing ? 'PUT' : 'POST';
       const url = isEditing ? `/api/policies/${initialData?.id}` : '/api/policies';
       
+      // Extract only the fields that should be sent to the API
+      // Remove 'region' since it's only for UI filtering, not stored in database
+      const { region, ...dataToSend } = formData;
+      
       const apiData = {
-        ...formData,
-        year: parseInt(String(formData.year), 10),
+        ...dataToSend,
+        year: parseInt(String(dataToSend.year), 10),
       };
       
       const response = await fetch(url, {
