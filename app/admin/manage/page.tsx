@@ -11,7 +11,7 @@ export default function AdminManagePage() {
   const [filteredPolicies, setFilteredPolicies] = useState<Policy[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; slug?: string } | null>(null);
   
   // Filter states
   const [searchQuery, setSearchQuery] = useState('');
@@ -79,11 +79,12 @@ export default function AdminManagePage() {
     setFilteredPolicies(filtered);
   }, [policies, searchQuery, filterCountry, filterCategory, filterStatus, filterYear]);
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (policyId: string, slug?: string) => {
     try {
-      const res = await fetch(`/api/policies/${id}`, { method: 'DELETE' });
+      const identifier = slug || policyId;
+      const res = await fetch(`/api/policies/${identifier}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('Failed to delete policy');
-      setPolicies(policies.filter(p => p.id !== id));
+      setPolicies(policies.filter(p => p.id !== policyId));
       setDeleteConfirm(null);
     } catch (err) {
       console.error('Error deleting policy:', err);
@@ -251,14 +252,14 @@ export default function AdminManagePage() {
                             <ExternalLink className="w-4 h-4" />
                           </a>
                           <Link
-                            href={`/admin/manage/${policy.id}`}
+                            href={`/admin/manage/${policy.slug || policy.id}`}
                             className="p-2 hover:bg-ocean/10 rounded transition text-ocean"
                             title="Edit policy"
                           >
                             <Pencil className="w-4 h-4" />
                           </Link>
                           <button
-                            onClick={() => setDeleteConfirm(policy.id)}
+                            onClick={() => setDeleteConfirm({ id: policy.id, slug: policy.slug })}
                             className="p-2 hover:bg-coral/10 rounded transition text-coral"
                             title="Delete policy"
                           >
@@ -267,14 +268,14 @@ export default function AdminManagePage() {
                         </div>
 
                         {/* Delete Confirmation */}
-                        {deleteConfirm === policy.id && (
+                        {deleteConfirm?.id === policy.id && (
                           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
                             <div className="bg-paper rounded-2xl max-w-sm w-full p-6 border border-ink/20">
                               <h3 className="font-display text-lg font-bold text-ink">Delete Policy?</h3>
                               <p className="mt-2 text-sm text-ink/60">This action cannot be undone.</p>
                               <div className="mt-6 flex gap-3">
                                 <button
-                                  onClick={() => handleDelete(policy.id)}
+                                  onClick={() => handleDelete(deleteConfirm.id, deleteConfirm.slug)}
                                   className="flex-1 rounded-lg bg-coral px-4 py-2 font-mono text-xs uppercase tracking-widest text-white hover:bg-coral/90 transition"
                                 >
                                   Delete

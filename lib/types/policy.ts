@@ -4,6 +4,7 @@ export type PolicyLevel = "National" | "Sub-national" | "Regional" | "Internatio
 
 export interface Policy {
   id: string;
+  slug?: string;
   year: number;
   country: string;
   title: string;
