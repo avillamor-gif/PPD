@@ -158,7 +158,7 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
         } else {
           setSubmitted(false);
         }
-      }, 2000);
+      }, 3500);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -170,8 +170,9 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
     <form onSubmit={handleSubmit} className="space-y-8">
       {/* Success Message */}
       {submitted && (
-        <div className="rounded-lg border border-ocean/30 bg-ocean/5 p-4">
-          <p className="font-medium text-ocean">✓ Policy {isEditing ? 'updated' : 'submitted'} successfully!</p>
+        <div className="sticky top-0 z-50 rounded-lg border border-ocean/30 bg-ocean/5 p-6 shadow-lg">
+          <p className="font-display text-lg font-bold text-ocean">✓ Policy {isEditing ? 'updated' : 'submitted'} successfully!</p>
+          <p className="text-sm text-ocean/70 mt-1">Redirecting in a moment...</p>
         </div>
       )}
 
@@ -406,10 +407,10 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
       <div className="flex gap-3">
         <button
           type="submit"
-          disabled={loading}
+          disabled={loading || submitted}
           className="inline-flex items-center gap-2 rounded-full bg-ink px-8 py-3 font-mono text-sm uppercase tracking-[0.18em] text-paper transition hover:bg-ocean-deep disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {loading ? (isEditing ? 'Updating...' : 'Submitting...') : (isEditing ? 'Update Policy' : 'Submit Policy')} →
+          {loading ? (isEditing ? 'Updating...' : 'Submitting...') : submitted ? (isEditing ? 'Updated ✓' : 'Submitted ✓') : (isEditing ? 'Update Policy' : 'Submit Policy')} →
         </button>
         {!isEditing && (
           <button

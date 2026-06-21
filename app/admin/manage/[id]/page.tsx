@@ -111,7 +111,10 @@ export default function EditPolicyPage() {
         initialData={policy}
         isEditing={true}
         onSuccess={() => {
-          router.push('/admin/manage');
+          // Show success and wait before redirecting
+          setTimeout(() => {
+            router.push('/admin/manage');
+          }, 3000);
         }}
       />
     </div>
