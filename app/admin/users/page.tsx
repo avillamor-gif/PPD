@@ -171,18 +171,33 @@ export default function UserManagementPage() {
 
     setActionInProgress(true);
     try {
+      const session = await supabase.auth.getSession();
+      const token = session.data.session?.access_token;
+      
+      if (!token) {
+        alert('Session expired. Please refresh and try again.');
+        return;
+      }
+
       const response = await fetch(`/api/admin/users/${userId}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+          'Authorization': `Bearer ${token}`,
         },
       });
 
-      if (response.ok) {
-        loadUsers();
+      const data = await response.json();
+
+      if (!response.ok) {
+        alert(`Error: ${data.error || 'Failed to delete user'}`);
+        return;
       }
+
+      loadUsers();
+      alert('User deleted successfully');
     } catch (error) {
       console.error('Delete user error:', error);
+      alert(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setActionInProgress(false);
     }

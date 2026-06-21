@@ -1,12 +1,53 @@
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { NextRequest, NextResponse } from 'next/server';
 
+// Helper to check admin authorization
+async function checkAdminAuth(req: NextRequest) {
+  const authHeader = req.headers.get('Authorization');
+  if (!authHeader?.startsWith('Bearer ')) {
+    return { authorized: false, error: 'Missing authorization token' };
+  }
+
+  const token = authHeader.substring(7);
+  
+  try {
+    const { data: { user }, error } = await supabaseAdmin.auth.getUser(token);
+    if (error || !user) {
+      return { authorized: false, error: 'Invalid token' };
+    }
+
+    // Check if user has admin role
+    const { data: profile, error: profileError } = await supabaseAdmin
+      .from('user_profiles')
+      .select('role_id')
+      .eq('id', user.id)
+      .single();
+
+    if (profileError || profile?.role_id !== 1) {
+      return { authorized: false, error: 'Not authorized' };
+    }
+
+    return { authorized: true, user };
+  } catch (error) {
+    return { authorized: false, error: 'Auth check failed' };
+  }
+}
+
 // PATCH update user role or status
 export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
+    // Check admin authorization
+    const auth = await checkAdminAuth(req);
+    if (!auth.authorized) {
+      return NextResponse.json(
+        { error: auth.error },
+        { status: 401 }
+      );
+    }
+
     const { role, status } = await req.json();
     const { userId } = await params;
 
@@ -85,6 +126,15 @@ export async function DELETE(
   { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
+    // Check admin authorization
+    const auth = await checkAdminAuth(req);
+    if (!auth.authorized) {
+      return NextResponse.json(
+        { error: auth.error },
+        { status: 401 }
+      );
+    }
+
     const { userId } = await params;
 
     // Soft delete by marking status
