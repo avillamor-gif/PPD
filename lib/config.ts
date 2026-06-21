@@ -30,7 +30,7 @@ const config = {
 
   // Feature Flags
   features: {
-    emailVerificationRequired: process.env.FEATURE_EMAIL_VERIFICATION_REQUIRED === 'true',
+    emailVerificationRequired: process.env.FEATURE_EMAIL_VERIFICATION_REQUIRED !== 'false', // Enabled by default
     allowPublicSignup: process.env.FEATURE_ALLOW_PUBLIC_SIGNUP !== 'false',
   },
 };

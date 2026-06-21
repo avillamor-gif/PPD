@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
         const result = await supabaseAdmin.auth.admin.createUser({
           email,
           password,
-          email_confirm: false,
+          email_confirm: !config.features.emailVerificationRequired,
           user_metadata: {
             full_name: displayName,
           },
@@ -127,34 +127,39 @@ export async function POST(req: NextRequest) {
       }
 
       // Generate and send verification email
-      console.log('🔐 [SIGNUP] Generating verification token...');
-      const verificationToken = crypto.randomBytes(32).toString('hex');
-      const expiresAt = new Date(Date.now() + config.auth.emailVerificationExpiryHours * 60 * 60 * 1000);
+      // Only send verification email if required
+      if (config.features.emailVerificationRequired) {
+        console.log('🔐 [SIGNUP] Generating verification token...');
+        const verificationToken = crypto.randomBytes(32).toString('hex');
+        const expiresAt = new Date(Date.now() + config.auth.emailVerificationExpiryHours * 60 * 60 * 1000);
 
-      // Store token in database
-      const { error: tokenError } = await supabaseAdmin
-        .from('email_verification_tokens')
-        .insert({
-          user_id: user.id,
-          token: verificationToken,
-          email: user.email,
-          expires_at: expiresAt.toISOString(),
-        });
+        // Store token in database
+        const { error: tokenError } = await supabaseAdmin
+          .from('email_verification_tokens')
+          .insert({
+            user_id: user.id,
+            token: verificationToken,
+            email: user.email,
+            expires_at: expiresAt.toISOString(),
+          });
 
-      if (tokenError) {
-        console.error('🔐 [SIGNUP] Token storage error:', tokenError);
+        if (tokenError) {
+          console.error('🔐 [SIGNUP] Token storage error:', tokenError);
+        } else {
+          console.log('🔐 [SIGNUP] Verification token stored');
+        }
+
+        // Send verification email
+        console.log('🔐 [SIGNUP] Sending verification email...');
+        const { error: emailError } = await sendVerificationEmail(user.email, verificationToken);
+
+        if (emailError) {
+          console.error('🔐 [SIGNUP] Email send error:', emailError);
+        } else {
+          console.log('🔐 [SIGNUP] Verification email sent successfully');
+        }
       } else {
-        console.log('🔐 [SIGNUP] Verification token stored');
-      }
-
-      // Send verification email
-      console.log('🔐 [SIGNUP] Sending verification email...');
-      const { error: emailError } = await sendVerificationEmail(user.email, verificationToken);
-
-      if (emailError) {
-        console.error('🔐 [SIGNUP] Email send error:', emailError);
-      } else {
-        console.log('🔐 [SIGNUP] Verification email sent successfully');
+        console.log('🔐 [SIGNUP] Email verification not required - user can login immediately');
       }
 
       return NextResponse.json({

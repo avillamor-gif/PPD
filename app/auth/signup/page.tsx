@@ -101,9 +101,14 @@ export default function SignupPage() {
       setPassword('');
       setConfirmPassword('');
 
-      // Redirect to verification page after brief delay
+      // If email verification not required, redirect to login
+      // Otherwise redirect to verification pending page
       setTimeout(() => {
-        router.push(`/auth/verify-pending?email=${encodeURIComponent(email)}`);
+        if (!config.features.emailVerificationRequired) {
+          router.push('/auth/login');
+        } else {
+          router.push(`/auth/verify-pending?email=${encodeURIComponent(email)}`);
+        }
       }, 300);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
