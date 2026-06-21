@@ -3,6 +3,24 @@ import { validatePolicy } from '@/lib/utils/validation';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 
 /**
+ * Converts camelCase form fields to snake_case for database storage
+ */
+function convertFormDataToDbFormat(data: Record<string, any>) {
+  const converted: Record<string, any> = {};
+  
+  for (const [key, value] of Object.entries(data)) {
+    // Map form field names to database column names
+    if (key === 'otherLinks') {
+      converted['other_links'] = value;
+    } else {
+      converted[key] = value;
+    }
+  }
+  
+  return converted;
+}
+
+/**
  * GET /api/policies/[id]
  * 
  * Fetches a single policy entry from Supabase.
@@ -71,9 +89,12 @@ export async function PUT(
       );
     }
 
+    // Convert form data to database format (camelCase → snake_case)
+    const convertedData = convertFormDataToDbFormat(body);
+
     // Prepare data for Supabase
     const policyData = {
-      ...body,
+      ...convertedData,
       updated_at: new Date().toISOString(),
     };
 

@@ -3,6 +3,24 @@ import { validatePolicy, generatePolicyId, generateSlugFromTitle } from '@/lib/u
 import { supabaseAdmin } from '@/lib/supabase-admin';
 
 /**
+ * Converts camelCase form fields to snake_case for database storage
+ */
+function convertFormDataToDbFormat(data: Record<string, any>) {
+  const converted: Record<string, any> = {};
+  
+  for (const [key, value] of Object.entries(data)) {
+    // Map form field names to database column names
+    if (key === 'otherLinks') {
+      converted['other_links'] = value;
+    } else {
+      converted[key] = value;
+    }
+  }
+  
+  return converted;
+}
+
+/**
  * Generates a unique slug by checking for duplicates and appending a counter if needed
  */
 async function generateUniqueSlug(baseSlug: string, excludeId?: string): Promise<string> {
@@ -91,11 +109,14 @@ export async function POST(request: NextRequest) {
     const baseSlug = generateSlugFromTitle(body.title);
     const uniqueSlug = await generateUniqueSlug(baseSlug);
 
+    // Convert form data to database format (camelCase → snake_case)
+    const convertedData = convertFormDataToDbFormat(body);
+
     // Prepare data for Supabase
     const policyData = {
       id: uniqueSlug,
       slug: uniqueSlug,
-      ...body,
+      ...convertedData,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };
