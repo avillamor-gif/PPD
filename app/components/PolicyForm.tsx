@@ -19,6 +19,13 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
   const [error, setError] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
 
+  // Convert snake_case from database to camelCase for form
+  const getOtherLinks = () => {
+    if (!initialData) return '';
+    // Handle both camelCase (from form submission) and snake_case (from database)
+    return (initialData as any).otherLinks || (initialData as any).other_links || '';
+  };
+
   const [formData, setFormData] = useState({
     title: initialData?.title || '',
     summary: initialData?.summary || '',
@@ -32,7 +39,7 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
     instrument: initialData?.instrument || '',
     authority: initialData?.authority || '',
     link: initialData?.link || '',
-    otherLinks: '',
+    otherLinks: getOtherLinks(),
     language: initialData?.language || '',
   });
 
