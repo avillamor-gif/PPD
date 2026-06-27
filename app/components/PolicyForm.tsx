@@ -269,7 +269,7 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
               onChange={handleChange}
               min="1950-01-01"
               max={`${new Date().getFullYear() + 1}-12-31`}
-              className="w-full rounded-lg border border-ink/20 bg-paper px-4 py-2 text-ink focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20"
+              className="w-full rounded-lg border border-ocean/30 bg-paper px-4 py-2 text-ink hover:border-ocean/50 focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20 scheme-light [&::-webkit-calendar-picker-indicator]:cursor-pointer [&::-webkit-calendar-picker-indicator]:rounded-md [&::-webkit-calendar-picker-indicator]:bg-ocean/10 [&::-webkit-calendar-picker-indicator]:p-1"
             />
           </div>
 
