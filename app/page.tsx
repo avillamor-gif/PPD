@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { COUNTRIES, THEMES } from '@/lib/constants';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import type { Policy } from '@/lib/types/policy';
+import { CountryGridRealtime } from '@/app/components/CountryGridRealtime';
 
 export const metadata = {
   title: "Plastic Policy Database — Asia Pacific",
@@ -28,6 +29,14 @@ export default async function Home() {
   const earliestPolicy = POLICIES.length > 0 ? [...POLICIES].filter((p: Policy) => p.year === earliest).sort((a, b) => a.year - b.year)[0] : null;
   const countriesCovered = new Set(POLICIES.map((p: Policy) => p.country)).size;
   const recent = POLICIES.slice(0, 6);
+  const initialCountryCounts = COUNTRIES.reduce<Record<string, { total: number; inForce: number }>>((acc, country) => {
+    const countryPolicies = POLICIES.filter((p: Policy) => p.country === country.code);
+    acc[country.code] = {
+      total: countryPolicies.length,
+      inForce: countryPolicies.filter((p: Policy) => p.status === 'In Force').length,
+    };
+    return acc;
+  }, {});
 
   // theme counts for the bar
   const themeCounts = THEMES.map((c) => ({
@@ -150,34 +159,7 @@ export default async function Home() {
             lists the full text of indexed regulations, their status, and instrument type.
           </SectionHeading>
 
-          <div className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-rule bg-rule md:grid-cols-3 lg:grid-cols-4">
-            {COUNTRIES.map((c) => {
-              const count = POLICIES.filter((p) => p.country === c.code).length;
-              return (
-                <Link
-                  key={c.code}
-                  href={`/countries/${c.code.toLowerCase()}`}
-                  className="group relative flex flex-col justify-between bg-paper p-6 transition hover:bg-sand"
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-ink/60">
-                      {c.region}
-                    </div>
-                    <span className="font-mono text-[11px] tabular-nums text-ink/50">
-                      {String(count).padStart(2, "0")}
-                    </span>
-                  </div>
-                  <div className="mt-12">
-                    <div className="font-mono text-[11px] tracking-[0.2em] text-coral">{c.code}</div>
-                    <div className="mt-1 font-fraunces text-2xl font-semibold leading-tight">{c.name}</div>
-                  </div>
-                  <span className="mt-6 inline-flex items-center gap-1 font-mono text-[11px] uppercase tracking-[0.16em] text-ink/60 transition group-hover:text-coral">
-                    View policies <span className="transition group-hover:translate-x-1">→</span>
-                  </span>
-                </Link>
-              );
-            })}
-          </div>
+          <CountryGridRealtime variant="home" initialCounts={initialCountryCounts} />
         </div>
       </section>
 

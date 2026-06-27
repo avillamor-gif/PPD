@@ -1,7 +1,7 @@
-import Link from 'next/link';
-import { COUNTRIES, REGIONS } from '@/lib/constants';
+import { COUNTRIES } from '@/lib/constants';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import type { Policy } from '@/lib/types/policy';
+import { CountryGridRealtime } from '@/app/components/CountryGridRealtime';
 
 export const metadata = {
   title: "Countries — Plastic Policy Database",
@@ -11,8 +11,6 @@ export const metadata = {
 export const revalidate = 60; // ISR: revalidate every 60 seconds on Vercel
 
 export default async function CountriesPage() {
-  const regions = ["Southeast Asia", "South Asia", "East Asia", "Oceania"] as const;
-
   // Fetch policies from Supabase
   const { data: POLICIES = [], error } = await supabaseAdmin
     .from('policies')
@@ -22,6 +20,15 @@ export default async function CountriesPage() {
   if (error) {
     console.error('Error fetching policies:', error);
   }
+
+  const initialCountryCounts = COUNTRIES.reduce<Record<string, { total: number; inForce: number }>>((acc, country) => {
+    const countryPolicies = POLICIES.filter((p: Policy) => p.country === country.code);
+    acc[country.code] = {
+      total: countryPolicies.length,
+      inForce: countryPolicies.filter((p: Policy) => p.status === 'In Force').length,
+    };
+    return acc;
+  }, {});
 
   return (
     <div className="w-full">
@@ -44,59 +51,7 @@ export default async function CountriesPage() {
       {/* Regions Grid */}
       <section>
         <div className="mx-auto max-w-350 px-6 py-16 lg:px-10">
-          {regions.map((region) => {
-            const list = COUNTRIES.filter((c) => c.region === region);
-            return (
-              <div key={region} className="mb-16">
-                <div className="mb-6 flex items-center gap-3">
-                  <span className="font-mono text-[11px] uppercase tracking-[0.22em] text-coral">
-                    {region}
-                  </span>
-                  <span className="h-px flex-1 bg-rule" />
-                  <span className="font-mono text-[11px] text-ink/40">{list.length}</span>
-                </div>
-                <div className="grid gap-px overflow-hidden rounded-2xl border border-rule bg-rule md:grid-cols-2 lg:grid-cols-3">
-                  {list.map((c) => {
-                    const count = POLICIES.filter((p: Policy) => p?.country === c.code).length;
-                    const inForce = POLICIES.filter((p: Policy) => p?.country === c.code && p?.status === "In Force").length;
-                    
-                    const content = (
-                      <div>
-                        <div className="font-mono text-[11px] uppercase tracking-[0.22em] text-coral">{c.code}</div>
-                        <div className="mt-2 font-fraunces text-3xl font-semibold leading-tight">{c.name}</div>
-                        <div className="mt-3 font-mono text-[11px] uppercase tracking-[0.18em] text-ink/60">
-                          {count} {count === 1 ? 'policy' : 'policies'} · {inForce} in force
-                        </div>
-                      </div>
-                    );
-
-                    if (count === 0) {
-                      return (
-                        <div
-                          key={c.code}
-                          className="flex flex-col items-start justify-between gap-4 bg-paper p-7 opacity-50 cursor-not-allowed"
-                        >
-                          <div className="flex-1">{content}</div>
-                          <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink/40">No entries</div>
-                        </div>
-                      );
-                    }
-
-                    return (
-                      <Link
-                        key={c.code}
-                        href={`/countries/${c.code.toLowerCase()}`}
-                        className="group flex items-center justify-between gap-6 bg-paper p-7 transition hover:bg-sand"
-                      >
-                        {content}
-                        <span className="font-fraunces text-3xl text-ink/30 transition group-hover:translate-x-1 group-hover:text-coral">→</span>
-                      </Link>
-                    );
-                  })}
-                </div>
-              </div>
-            );
-          })}
+          <CountryGridRealtime variant="countries" initialCounts={initialCountryCounts} />
         </div>
       </section>
     </div>
