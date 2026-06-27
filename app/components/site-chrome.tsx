@@ -6,11 +6,9 @@ import { useState, useEffect, useRef } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import Button from './Button';
 import { NavLink } from './ui/nav-link';
-import { useIsMobile } from '@/lib/hooks';
 import { supabase } from '@/lib/supabase';
 
 export function SiteHeader() {
-  const isMobile = useIsMobile();
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
@@ -136,133 +134,127 @@ export function SiteHeader() {
             <path d="M6 22C6 22 10 18 16 18C22 18 26 22 26 22" stroke="#E88860" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.3"/>
           </svg>
           <div className="flex flex-col">
-            <div className="font-display font-bold text-lg md:text-2xl text-coral leading-tight whitespace-nowrap">Plastic Policy Database</div>
+            <div className="hidden md:block font-display font-bold text-2xl text-coral leading-tight whitespace-nowrap">Plastic Policy Database</div>
           </div>
         </Link>
 
         {/* Center Navigation - Hidden on mobile */}
-        {!isMobile && (
-          <div className="flex-1 flex items-center justify-center gap-8">
-            {primaryNavLinks.map((link) => (
-              <NavLink key={link.href} href={link.href} className={isActivePath(link.href) ? 'text-coral' : ''}>
-                {link.label}
-              </NavLink>
-            ))}
-          </div>
-        )}
+        <div className="hidden md:flex flex-1 items-center justify-center gap-8">
+          {primaryNavLinks.map((link) => (
+            <NavLink key={link.href} href={link.href} className={isActivePath(link.href) ? 'text-coral' : ''}>
+              {link.label}
+            </NavLink>
+          ))}
+        </div>
 
         {/* Right Section */}
         <div className="flex items-center gap-3 shrink-0">
-          {!isMobile && (
-            <>
-              <Button href="/search" className="whitespace-nowrap shrink-0">
-                Browse {policiesCount} Policies →
-              </Button>
-              {user ? (
-                // User logged in - show dropdown menu
-                <div className="relative" ref={dropdownRef}>
-                  <button
-                    onClick={() => setDropdownOpen(!dropdownOpen)}
-                    className="p-2 hover:bg-ink/5 rounded-full transition text-ink flex items-center justify-center font-medium"
-                  >
-                    {userProfile?.avatar_url ? (
-                      <img
-                        src={userProfile.avatar_url}
-                        alt="Avatar"
-                        className="w-8 h-8 rounded-full object-cover border border-ink/20"
-                      />
-                    ) : (
-                      <User className="w-5 h-5" />
-                    )}
-                  </button>
-                  
-                  {dropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-48 bg-paper border border-rule rounded-lg shadow-lg z-50">
-                      <div className="p-3 border-b border-rule flex items-center gap-3">
-                        {userProfile?.avatar_url ? (
-                          <img
-                            src={userProfile.avatar_url}
-                            alt="Avatar"
-                            className="w-10 h-10 rounded-full object-cover border border-ink/20"
-                          />
-                        ) : (
-                          <div className="w-10 h-10 rounded-full bg-sand border border-ink/20 flex items-center justify-center text-lg">
-                            📷
-                          </div>
-                        )}
-                        <div>
-                          <p className="text-sm font-medium text-ink">{userProfile?.display_name || user.email}</p>
-                          <p className="text-xs text-ink/60">{getRoleName(userProfile?.role_id)}</p>
+          <div className="hidden md:flex items-center gap-3">
+            <Button href="/search" className="whitespace-nowrap shrink-0">
+              Browse {policiesCount} Policies →
+            </Button>
+            {user ? (
+              // User logged in - show dropdown menu
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  onClick={() => setDropdownOpen(!dropdownOpen)}
+                  className="p-2 hover:bg-ink/5 rounded-full transition text-ink flex items-center justify-center font-medium"
+                >
+                  {userProfile?.avatar_url ? (
+                    <img
+                      src={userProfile.avatar_url}
+                      alt="Avatar"
+                      className="w-8 h-8 rounded-full object-cover border border-ink/20"
+                    />
+                  ) : (
+                    <User className="w-5 h-5" />
+                  )}
+                </button>
+                
+                {dropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-paper border border-rule rounded-lg shadow-lg z-50">
+                    <div className="p-3 border-b border-rule flex items-center gap-3">
+                      {userProfile?.avatar_url ? (
+                        <img
+                          src={userProfile.avatar_url}
+                          alt="Avatar"
+                          className="w-10 h-10 rounded-full object-cover border border-ink/20"
+                        />
+                      ) : (
+                        <div className="w-10 h-10 rounded-full bg-sand border border-ink/20 flex items-center justify-center text-lg">
+                          📷
                         </div>
-                      </div>
-                      {userProfile?.role_id === 1 && (
-                        <Link
-                          href="/admin"
-                          className="px-4 py-2 text-sm text-coral hover:bg-sand transition flex items-center gap-2 border-b border-rule font-medium"
-                          onClick={() => setDropdownOpen(false)}
-                        >
-                          <LayoutDashboard className="w-4 h-4" />
-                          Dashboard
-                        </Link>
                       )}
+                      <div>
+                        <p className="text-sm font-medium text-ink">{userProfile?.display_name || user.email}</p>
+                        <p className="text-xs text-ink/60">{getRoleName(userProfile?.role_id)}</p>
+                      </div>
+                    </div>
+                    {userProfile?.role_id === 1 && (
                       <Link
-                        href={`/profile/edit`}
-                        className="px-4 py-2 text-sm text-ink hover:bg-sand transition flex items-center gap-2"
+                        href="/admin"
+                        className="px-4 py-2 text-sm text-coral hover:bg-sand transition flex items-center gap-2 border-b border-rule font-medium"
                         onClick={() => setDropdownOpen(false)}
                       >
-                        <Settings className="w-4 h-4" />
-                        Edit Profile
+                        <LayoutDashboard className="w-4 h-4" />
+                        Dashboard
                       </Link>
-                      <button
-                        onClick={handleLogout}
-                        className="w-full text-left px-4 py-2 text-sm text-ink hover:bg-sand transition flex items-center gap-2 border-t border-rule"
-                      >
-                        <LogOut className="w-4 h-4" />
-                        Logout
-                      </button>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                // User not logged in - show login button
-                <Link
-                  href="/auth/login"
-                  className="p-2 hover:bg-ink/5 rounded-lg transition text-ink"
-                  title="Login"
-                >
-                  <LogIn className="w-5 h-5" />
-                </Link>
-              )}
-            </>
-          )}
+                    )}
+                    <Link
+                      href={`/profile/edit`}
+                      className="px-4 py-2 text-sm text-ink hover:bg-sand transition flex items-center gap-2"
+                      onClick={() => setDropdownOpen(false)}
+                    >
+                      <Settings className="w-4 h-4" />
+                      Edit Profile
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full text-left px-4 py-2 text-sm text-ink hover:bg-sand transition flex items-center gap-2 border-t border-rule"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              // User not logged in - show login button
+              <Link
+                href="/auth/login"
+                className="p-2 hover:bg-ink/5 rounded-lg transition text-ink"
+                title="Login"
+              >
+                <LogIn className="w-5 h-5" />
+              </Link>
+            )}
+          </div>
 
           {/* Mobile Menu Toggle */}
-          {isMobile && (
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="inline-flex items-center gap-2 rounded-full border border-ink/20 px-3 py-2 hover:bg-ink/5 transition shrink-0"
-              aria-label="Toggle menu"
-              aria-expanded={mobileMenuOpen}
-            >
-              {mobileMenuOpen ? (
-                <>
-                  <X className="w-4 h-4 text-ink" />
-                  <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink">Close</span>
-                </>
-              ) : (
-                <>
-                  <Menu className="w-4 h-4 text-ink" />
-                  <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink">Menu</span>
-                </>
-              )}
-            </button>
-          )}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="inline-flex md:hidden items-center gap-2 rounded-full border border-ink/20 px-3 py-2 hover:bg-ink/5 transition shrink-0"
+            aria-label="Toggle menu"
+            aria-expanded={mobileMenuOpen}
+          >
+            {mobileMenuOpen ? (
+              <>
+                <X className="w-4 h-4 text-ink" />
+                <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink">Close</span>
+              </>
+            ) : (
+              <>
+                <Menu className="w-4 h-4 text-ink" />
+                <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink">Menu</span>
+              </>
+            )}
+          </button>
         </div>
       </nav>
 
       {/* Mobile Menu */}
-      {isMobile && mobileMenuOpen && (
-        <div className="border-t border-rule bg-paper/95 backdrop-blur">
+      {mobileMenuOpen && (
+        <div className="md:hidden border-t border-rule bg-paper/95 backdrop-blur">
           <div className="mx-auto max-w-350 px-4 py-4 md:px-6 flex flex-col gap-3">
             <div className="px-2 pb-1 font-mono text-[10px] uppercase tracking-[0.2em] text-ink/50">Navigate</div>
             {primaryNavLinks.map((link) => (
