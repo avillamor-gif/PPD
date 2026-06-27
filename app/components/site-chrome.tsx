@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { Menu, X, LogIn, LogOut, User, Settings, LayoutDashboard } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import Button from './Button';
 import { NavLink } from './ui/nav-link';
 import { useIsMobile } from '@/lib/hooks';
@@ -11,6 +11,7 @@ import { supabase } from '@/lib/supabase';
 
 export function SiteHeader() {
   const isMobile = useIsMobile();
+  const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
   const [userProfile, setUserProfile] = useState<any>(null);
@@ -18,6 +19,19 @@ export function SiteHeader() {
   const [policiesCount, setPoliciesCount] = useState(0);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const primaryNavLinks = [
+    { href: '/', label: 'Overview' },
+    { href: '/search', label: 'Database' },
+    { href: '/countries', label: 'Countries' },
+    { href: '/about', label: 'About' },
+  ];
+
+  const isActivePath = (href: string) => {
+    if (href === '/') {
+      return pathname === '/';
+    }
+    return pathname === href || pathname.startsWith(`${href}/`);
+  };
 
   useEffect(() => {
     checkUser();
@@ -40,6 +54,10 @@ export function SiteHeader() {
       subscription?.unsubscribe();
     };
   }, []);
+
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [pathname]);
 
   const fetchPoliciesCount = async () => {
     try {
@@ -108,7 +126,7 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 bg-paper border-b border-rule">
       {/* Top Navigation Bar - All on one line */}
-      <nav className="mx-auto px-6 py-3 flex items-center justify-between gap-8">
+      <nav className="mx-auto max-w-350 px-4 py-3 md:px-6 flex items-center justify-between gap-4 md:gap-8">
         {/* Logo Section */}
         <Link href="/" className="flex items-center gap-3 shrink-0 group hover:opacity-85 transition-opacity">
           {/* Wave/Ripple Logo */}
@@ -118,17 +136,18 @@ export function SiteHeader() {
             <path d="M6 22C6 22 10 18 16 18C22 18 26 22 26 22" stroke="#E88860" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.3"/>
           </svg>
           <div className="flex flex-col">
-            <div className="font-display font-bold text-2xl text-coral leading-tight whitespace-nowrap">Plastic Policy Database</div>
+            <div className="font-display font-bold text-lg md:text-2xl text-coral leading-tight whitespace-nowrap">Plastic Policy Database</div>
           </div>
         </Link>
 
         {/* Center Navigation - Hidden on mobile */}
         {!isMobile && (
           <div className="flex-1 flex items-center justify-center gap-8">
-            <NavLink href="/">Overview</NavLink>
-            <NavLink href="/search">Database</NavLink>
-            <NavLink href="/countries">Countries</NavLink>
-            <NavLink href="/about">About</NavLink>
+            {primaryNavLinks.map((link) => (
+              <NavLink key={link.href} href={link.href} className={isActivePath(link.href) ? 'text-coral' : ''}>
+                {link.label}
+              </NavLink>
+            ))}
           </div>
         )}
 
@@ -179,7 +198,7 @@ export function SiteHeader() {
                       {userProfile?.role_id === 1 && (
                         <Link
                           href="/admin"
-                          className="block px-4 py-2 text-sm text-coral hover:bg-sand transition flex items-center gap-2 border-b border-rule font-medium"
+                          className="px-4 py-2 text-sm text-coral hover:bg-sand transition flex items-center gap-2 border-b border-rule font-medium"
                           onClick={() => setDropdownOpen(false)}
                         >
                           <LayoutDashboard className="w-4 h-4" />
@@ -188,7 +207,7 @@ export function SiteHeader() {
                       )}
                       <Link
                         href={`/profile/edit`}
-                        className="block px-4 py-2 text-sm text-ink hover:bg-sand transition flex items-center gap-2"
+                        className="px-4 py-2 text-sm text-ink hover:bg-sand transition flex items-center gap-2"
                         onClick={() => setDropdownOpen(false)}
                       >
                         <Settings className="w-4 h-4" />
@@ -221,13 +240,20 @@ export function SiteHeader() {
           {isMobile && (
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2 hover:bg-ink/5 rounded-lg transition shrink-0"
+              className="inline-flex items-center gap-2 rounded-full border border-ink/20 px-3 py-2 hover:bg-ink/5 transition shrink-0"
               aria-label="Toggle menu"
+              aria-expanded={mobileMenuOpen}
             >
               {mobileMenuOpen ? (
-                <X className="w-6 h-6 text-ink" />
+                <>
+                  <X className="w-4 h-4 text-ink" />
+                  <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink">Close</span>
+                </>
               ) : (
-                <Menu className="w-6 h-6 text-ink" />
+                <>
+                  <Menu className="w-4 h-4 text-ink" />
+                  <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-ink">Menu</span>
+                </>
               )}
             </button>
           )}
@@ -237,19 +263,18 @@ export function SiteHeader() {
       {/* Mobile Menu */}
       {isMobile && mobileMenuOpen && (
         <div className="border-t border-rule bg-paper/95 backdrop-blur">
-          <div className="mx-auto px-6 py-4 flex flex-col gap-3">
-            <Link href="/" className="block px-4 py-2 rounded-lg hover:bg-sand transition text-ink font-fraunces text-lg" onClick={() => setMobileMenuOpen(false)}>
-              Overview
-            </Link>
-            <Link href="/search" className="block px-4 py-2 rounded-lg hover:bg-sand transition text-ink font-fraunces text-lg" onClick={() => setMobileMenuOpen(false)}>
-              Database
-            </Link>
-            <Link href="/countries" className="block px-4 py-2 rounded-lg hover:bg-sand transition text-ink font-fraunces text-lg" onClick={() => setMobileMenuOpen(false)}>
-              Countries
-            </Link>
-            <Link href="/about" className="block px-4 py-2 rounded-lg hover:bg-sand transition text-ink font-fraunces text-lg" onClick={() => setMobileMenuOpen(false)}>
-              About
-            </Link>
+          <div className="mx-auto max-w-350 px-4 py-4 md:px-6 flex flex-col gap-3">
+            <div className="px-2 pb-1 font-mono text-[10px] uppercase tracking-[0.2em] text-ink/50">Navigate</div>
+            {primaryNavLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`block rounded-lg px-4 py-2 transition font-fraunces text-lg ${isActivePath(link.href) ? 'bg-sand text-coral' : 'hover:bg-sand text-ink'}`}
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                {link.label}
+              </Link>
+            ))}
             <div className="pt-2 border-t border-rule flex flex-col gap-2">
               <Button href="/search" className="flex-1 justify-center" onClick={() => setMobileMenuOpen(false)}>
                 Browse {policiesCount} Policies →
@@ -277,7 +302,7 @@ export function SiteHeader() {
                       handleLogout();
                       setMobileMenuOpen(false);
                     }}
-                    className="block px-4 py-2 rounded-lg hover:bg-sand transition text-ink text-center flex items-center justify-center gap-2"
+                    className="px-4 py-2 rounded-lg hover:bg-sand transition text-ink text-center flex items-center justify-center gap-2"
                   >
                     <LogOut className="w-4 h-4" />
                     Logout
@@ -305,7 +330,7 @@ export function SiteFooter() {
   return (
     <footer className="bg-primary text-white py-16">
       <div className="max-w-7xl mx-auto px-6">
-        <div className="grid grid-cols-4 gap-8 mb-12">
+        <div className="grid grid-cols-1 gap-8 mb-12 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <h3 className="font-display font-semibold mb-4 text-base">Database</h3>
             <ul className="space-y-2 text-sm text-primary-foreground/80">
