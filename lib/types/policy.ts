@@ -6,6 +6,8 @@ export interface Policy {
   id: string;
   slug?: string;
   year: number;
+  commencementDate?: string | null;
+  commencement_date?: string | null;
   country: string;
   title: string;
   summary: string;

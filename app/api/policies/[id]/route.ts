@@ -2,6 +2,38 @@ import { NextRequest, NextResponse } from 'next/server';
 import { validatePolicy } from '@/lib/utils/validation';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 
+function normalizePolicyDateFields(data: Record<string, any>) {
+  const normalized: Record<string, any> = { ...data };
+
+  const rawDate =
+    typeof data.commencementDate === 'string'
+      ? data.commencementDate
+      : typeof data.commencement_date === 'string'
+        ? data.commencement_date
+        : '';
+
+  if (rawDate) {
+    const datePart = rawDate.slice(0, 10);
+    if (/^\d{4}-\d{2}-\d{2}$/.test(datePart)) {
+      normalized.commencementDate = datePart;
+      normalized.year = parseInt(datePart.slice(0, 4), 10);
+    }
+  }
+
+  if (!normalized.commencementDate && typeof normalized.year === 'number' && Number.isFinite(normalized.year)) {
+    normalized.commencementDate = `${String(normalized.year).padStart(4, '0')}-01-01`;
+  }
+
+  if (typeof normalized.year === 'string' && normalized.year.trim()) {
+    const parsedYear = parseInt(normalized.year, 10);
+    if (!Number.isNaN(parsedYear)) {
+      normalized.year = parsedYear;
+    }
+  }
+
+  return normalized;
+}
+
 /**
  * Converts camelCase form fields to snake_case for database storage
  */
@@ -12,6 +44,8 @@ function convertFormDataToDbFormat(data: Record<string, any>) {
     // Map form field names to database column names
     if (key === 'otherLinks') {
       converted['other_links'] = value;
+    } else if (key === 'commencementDate') {
+      converted['commencement_date'] = value;
     } else {
       converted[key] = value;
     }
@@ -79,9 +113,10 @@ export async function PUT(
   try {
     const { id } = await params;
     const body = await request.json();
+    const normalizedBody = normalizePolicyDateFields(body);
 
     // Validate input
-    const errors = validatePolicy(body);
+    const errors = validatePolicy(normalizedBody);
     if (errors.length > 0) {
       return NextResponse.json(
         { success: false, errors },
@@ -90,7 +125,7 @@ export async function PUT(
     }
 
     // Convert form data to database format (camelCase → snake_case)
-    const convertedData = convertFormDataToDbFormat(body);
+    const convertedData = convertFormDataToDbFormat(normalizedBody);
 
     // Prepare data for Supabase
     const policyData = {

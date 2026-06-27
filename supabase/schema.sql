@@ -37,11 +37,12 @@ CREATE TABLE IF NOT EXISTS policies (
   title TEXT NOT NULL,
   summary TEXT,
   year INTEGER,
+  commencement_date DATE,
   country VARCHAR(2) NOT NULL,
   level VARCHAR(50), -- National, Sub-national, Regional, International
   category TEXT NOT NULL, -- Themes
   keywords TEXT,
-  status VARCHAR(50) DEFAULT 'Proposed', -- Proposed, Enacted, Repealed, etc
+  status VARCHAR(50) DEFAULT 'Unknown', -- Unknown, Proposed, Enacted, Repealed, etc
   instrument VARCHAR(100), -- Act, Bill, Regulation, Directive, etc
   authority TEXT NOT NULL, -- Competent authority
   link TEXT NOT NULL, -- Official policy link

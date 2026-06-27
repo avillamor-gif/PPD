@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { COUNTRIES, REGIONS, THEMES, STATUSES } from '@/lib/constants';
 import type { Policy, PolicyLevel, PolicyStatus } from '@/lib/types';
-import { generateSlugFromTitle } from '@/lib/utils/validation';
 
 const LEVELS: PolicyLevel[] = ['National', 'Sub-national', 'Regional', 'International'];
 
@@ -26,10 +25,27 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
     return (initialData as any).otherLinks || (initialData as any).other_links || '';
   };
 
+  const getCommencementDate = () => {
+    if (!initialData) return '';
+
+    const explicitDate =
+      (initialData as any).commencementDate || (initialData as any).commencement_date;
+
+    if (typeof explicitDate === 'string' && explicitDate) {
+      return explicitDate.slice(0, 10);
+    }
+
+    if (initialData?.year) {
+      return `${initialData.year}-01-01`;
+    }
+
+    return '';
+  };
+
   const [formData, setFormData] = useState({
     title: initialData?.title || '',
     summary: initialData?.summary || '',
-    year: initialData?.year || new Date().getFullYear(),
+    commencementDate: getCommencementDate(),
     region: '',
     country: initialData?.country || '',
     level: (initialData?.level || 'National') as PolicyLevel,
@@ -96,10 +112,14 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
       // Extract only the fields that should be sent to the API
       // Remove 'region' since it's only for UI filtering, not stored in database
       const { region, ...dataToSend } = formData;
+
+      const yearFromDate = dataToSend.commencementDate
+        ? parseInt(dataToSend.commencementDate.slice(0, 4), 10)
+        : undefined;
       
       const apiData = {
         ...dataToSend,
-        year: parseInt(String(dataToSend.year), 10),
+        year: yearFromDate,
       };
       
       const response = await fetch(url, {
@@ -136,7 +156,7 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
         setFormData({
           title: '',
           summary: '',
-          year: new Date().getFullYear(),
+          commencementDate: '',
           region: '',
           country: '',
           level: 'National',
@@ -264,8 +284,8 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
             <label className="block text-sm font-medium text-ink mb-2">Date of Commencement</label>
             <input
               type="date"
-              name="year"
-              value={typeof formData.year === 'number' ? `${formData.year}-01-01` : String(formData.year)}
+              name="commencementDate"
+              value={formData.commencementDate}
               onChange={handleChange}
               min="1950-01-01"
               max={`${new Date().getFullYear() + 1}-12-31`}
@@ -416,7 +436,7 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
           <button
             type="reset"
             onClick={() => setFormData({
-              title: '', summary: '', year: new Date().getFullYear(),
+              title: '', summary: '', commencementDate: '',
               region: '', country: '', level: 'National', category: '', keywords: '', status: 'Unknown',
               instrument: '', authority: '', link: '', otherLinks: '', language: '',
             })}
