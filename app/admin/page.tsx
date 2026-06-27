@@ -51,6 +51,7 @@ export default function AdminDashboard() {
   const totalPolicies = POLICIES.length;
   const policyByStatus = useMemo(() => {
     const counts: Record<PolicyStatus, number> = {
+      'Unknown': 0,
       'In Force': 0,
       'Proposed': 0,
       'Phased': 0,
@@ -202,6 +203,7 @@ export default function AdminDashboard() {
               const total = totalPolicies;
               const percentage = ((count / total) * 100).toFixed(0);
               const colors: Record<string, string> = {
+                'Unknown': 'bg-ink/30',
                 'In Force': 'bg-ocean',
                 'Proposed': 'bg-coral',
                 'Phased': 'bg-sand',
