@@ -35,7 +35,7 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
     level: (initialData?.level || 'National') as PolicyLevel,
     category: initialData?.category || '',
     keywords: '',
-    status: (initialData?.status || 'Proposed') as PolicyStatus,
+    status: (initialData?.status || 'Unknown') as PolicyStatus,
     instrument: initialData?.instrument || '',
     authority: initialData?.authority || '',
     link: initialData?.link || '',
@@ -142,7 +142,7 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
           level: 'National',
           category: '',
           keywords: '',
-          status: 'Proposed',
+          status: 'Unknown',
           instrument: '',
           authority: '',
           link: '',
@@ -261,14 +261,14 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-ink mb-2">Year of Enactment or Commencement</label>
+            <label className="block text-sm font-medium text-ink mb-2">Date of Commencement</label>
             <input
-              type="number"
+              type="date"
               name="year"
-              value={formData.year}
+              value={typeof formData.year === 'number' ? `${formData.year}-01-01` : String(formData.year)}
               onChange={handleChange}
-              min="1950"
-              max={new Date().getFullYear() + 1}
+              min="1950-01-01"
+              max={`${new Date().getFullYear() + 1}-12-31`}
               className="w-full rounded-lg border border-ink/20 bg-paper px-4 py-2 text-ink focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20"
             />
           </div>
@@ -417,7 +417,7 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
             type="reset"
             onClick={() => setFormData({
               title: '', summary: '', year: new Date().getFullYear(),
-              region: '', country: '', level: 'National', category: '', keywords: '', status: 'Proposed',
+              region: '', country: '', level: 'National', category: '', keywords: '', status: 'Unknown',
               instrument: '', authority: '', link: '', otherLinks: '', language: '',
             })}
             className="inline-flex items-center gap-2 rounded-full border border-ink/30 px-8 py-3 font-mono text-sm uppercase tracking-[0.18em] text-ink transition hover:bg-ink/5"

@@ -1,4 +1,4 @@
-export type PolicyStatus = "In Force" | "Proposed" | "Phased" | "Repealed";
+export type PolicyStatus = "Unknown" | "In Force" | "Proposed" | "Phased" | "Repealed";
 export type PolicyCategory = "Plastic Ban" | "EPR" | "Waste Management" | "Circular Economy";
 export type PolicyLevel = "National" | "Sub-national" | "Regional" | "International";
 

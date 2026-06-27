@@ -45,6 +45,7 @@ export const THEMES: PolicyCategory[] = [
 ];
 
 export const STATUSES: PolicyStatus[] = [
+  "Unknown",
   "In Force",
   "Proposed",
   "Phased",
