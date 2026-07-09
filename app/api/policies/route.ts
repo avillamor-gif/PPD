@@ -43,6 +43,7 @@ function convertFormDataToDbFormat(data: Record<string, any>) {
   for (const [key, value] of Object.entries(data)) {
     // Map form field names to database column names
     if (key === 'otherLinks') {
+      console.log('🔄 Converting otherLinks:', value);
       converted['other_links'] = value;
     } else if (key === 'commencementDate') {
       converted['commencement_date'] = value;
@@ -54,6 +55,7 @@ function convertFormDataToDbFormat(data: Record<string, any>) {
     }
   }
   
+  console.log('📤 Converted data:', { other_links: converted.other_links });
   return converted;
 }
 
@@ -132,6 +134,7 @@ async function generateUniqueSlug(baseSlug: string, excludeId?: string): Promise
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
+    console.log('📝 [POST] Incoming form data:', { otherLinks: body.otherLinks, other_links: body.other_links });
     const normalizedBody = normalizePolicyDateFields(body);
 
     // Validate input

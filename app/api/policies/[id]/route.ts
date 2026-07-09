@@ -43,6 +43,7 @@ function convertFormDataToDbFormat(data: Record<string, any>) {
   for (const [key, value] of Object.entries(data)) {
     // Map form field names to database column names
     if (key === 'otherLinks') {
+      console.log('🔄 Converting otherLinks:', value);
       converted['other_links'] = value;
     } else if (key === 'commencementDate') {
       converted['commencement_date'] = value;
@@ -53,6 +54,9 @@ function convertFormDataToDbFormat(data: Record<string, any>) {
       converted[key] = value;
     }
   }
+  
+  console.log('📤 Converted data:', { other_links: converted.other_links });
+  return converted;
   
   return converted;
 }
@@ -116,6 +120,7 @@ export async function PUT(
   try {
     const { id } = await params;
     const body = await request.json();
+    console.log('✏️ [PUT] Incoming form data:', { id, otherLinks: body.otherLinks, other_links: body.other_links });
     const normalizedBody = normalizePolicyDateFields(body);
 
     // Validate input
