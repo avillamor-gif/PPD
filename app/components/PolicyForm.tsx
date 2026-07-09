@@ -49,12 +49,13 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
     return initialData.category.split(',').map((item: string) => item.trim());
   };
 
-  // Parse lifecycle stages from metadata or keywords field
+  // Parse lifecycle stages from comma-separated string
   const getLifecycleStages = (): string[] => {
     if (!initialData) return [];
-    // For now, lifecycle stages are stored in a separate field in the future
-    // or as part of keywords - adjust as needed based on database schema
-    return [];
+    // Load from lifecycle_stage field in database (comma-separated)
+    const lifecycleStr = (initialData as any).lifecycle_stage || '';
+    if (!lifecycleStr) return [];
+    return lifecycleStr.split(',').map((item: string) => item.trim()).filter(Boolean);
   };
 
   const [formData, setFormData] = useState({
