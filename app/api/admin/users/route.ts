@@ -32,8 +32,40 @@ export async function GET(req: NextRequest) {
 
     if (error) throw error;
 
+    // Enhance users with auth status
+    const enhancedUsers = await Promise.all(
+      (users || []).map(async (user: any) => {
+        try {
+          // Get auth user to check email confirmation and account status
+          const { data: { user: authUser }, error: authError } = 
+            await supabaseAdmin.auth.admin.getUserById(user.id);
+          
+          if (authError || !authUser) {
+            return {
+              ...user,
+              email_verified: false,
+              account_status: 'unknown',
+            };
+          }
+
+          return {
+            ...user,
+            email_verified: authUser.email_confirmed_at ? true : false,
+            account_status: authUser.user_metadata?.account_status || 'active',
+          };
+        } catch (err) {
+          console.warn('Error fetching auth status for user:', user.id, err);
+          return {
+            ...user,
+            email_verified: false,
+            account_status: 'unknown',
+          };
+        }
+      })
+    );
+
     return NextResponse.json({
-      users,
+      users: enhancedUsers,
       total: count,
       limit,
       offset,

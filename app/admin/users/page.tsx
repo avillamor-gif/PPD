@@ -25,6 +25,8 @@ interface User {
   comment_count: number;
   last_activity_at: string;
   created_at: string;
+  email_verified: boolean;
+  account_status: 'active' | 'banned' | 'suspended' | 'deleted' | 'unknown';
 }
 
 export default function UserManagementPage() {
@@ -210,6 +212,33 @@ export default function UserManagementPage() {
     }
   };
 
+  const getStatusBadge = (user: User) => {
+    if (user.account_status === 'banned') {
+      return { bg: 'bg-coral/10', text: 'text-coral', icon: AlertCircle, label: 'Banned' };
+    }
+    if (user.account_status === 'suspended') {
+      return { bg: 'bg-yellow-100', text: 'text-yellow-700', icon: AlertCircle, label: 'Suspended' };
+    }
+    if (!user.email_verified) {
+      return { bg: 'bg-blue-100', text: 'text-blue-700', icon: Clock, label: 'Pending Verification' };
+    }
+    if (user.account_status === 'active') {
+      return { bg: 'bg-green-100', text: 'text-green-700', icon: CheckCircle, label: 'Active' };
+    }
+    return { bg: 'bg-gray-100', text: 'text-gray-700', icon: AlertCircle, label: 'Unknown' };
+  };
+
+  const getStatusDisplay = (user: User) => {
+    const status = getStatusBadge(user);
+    const StatusIcon = status.icon;
+    return (
+      <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold ${status.bg} ${status.text}`}>
+        <StatusIcon className="w-3 h-3" />
+        {status.label}
+      </div>
+    );
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -275,6 +304,7 @@ export default function UserManagementPage() {
                 <th className="px-6 py-4 text-left font-semibold text-ink">Email</th>
                 <th className="px-6 py-4 text-left font-semibold text-ink">Name</th>
                 <th className="px-6 py-4 text-left font-semibold text-ink">Role</th>
+                <th className="px-6 py-4 text-left font-semibold text-ink">Status</th>
                 <th className="px-6 py-4 text-center font-semibold text-ink">Activity</th>
                 <th className="px-6 py-4 text-center font-semibold text-ink">Joined</th>
                 <th className="px-6 py-4 text-left font-semibold text-ink">Actions</th>
@@ -294,6 +324,9 @@ export default function UserManagementPage() {
                       <span className="inline-flex px-3 py-1 rounded-full text-xs font-semibold bg-ocean/10 text-ocean">
                         {user.role}
                       </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      {getStatusDisplay(user)}
                     </td>
                     <td className="px-6 py-4 text-center">
                       <div className="text-xs text-ink/60">
@@ -339,7 +372,7 @@ export default function UserManagementPage() {
                 ))
               ) : (
                 <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center text-ink/50">
+                  <td colSpan={7} className="px-6 py-8 text-center text-ink/50">
                     No users found
                   </td>
                 </tr>
