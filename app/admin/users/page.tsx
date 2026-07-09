@@ -40,8 +40,24 @@ export default function UserManagementPage() {
   const [total, setTotal] = useState(0);
   const [offset, setOffset] = useState(0);
   const [actionInProgress, setActionInProgress] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
   const router = useRouter();
   const limit = 25;
+
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => setSuccessMessage(''), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage]);
+
+  useEffect(() => {
+    if (errorMessage) {
+      const timer = setTimeout(() => setErrorMessage(''), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [errorMessage]);
 
   useEffect(() => {
     checkAdminAccess();
@@ -132,12 +148,17 @@ export default function UserManagementPage() {
       });
 
       if (response.ok) {
+        setSuccessMessage('✓ User role updated successfully');
         setShowModal(false);
         setNewRole('');
         loadUsers();
+      } else {
+        const data = await response.json();
+        setErrorMessage(data.error || 'Failed to update user role');
       }
     } catch (error) {
       console.error('Role update error:', error);
+      setErrorMessage(error instanceof Error ? error.message : 'Failed to update user role');
     } finally {
       setActionInProgress(false);
     }
@@ -158,10 +179,15 @@ export default function UserManagementPage() {
       });
 
       if (response.ok) {
+        setSuccessMessage('✓ User banned successfully');
         loadUsers();
+      } else {
+        const data = await response.json();
+        setErrorMessage(data.error || 'Failed to ban user');
       }
     } catch (error) {
       console.error('Ban user error:', error);
+      setErrorMessage(error instanceof Error ? error.message : 'Failed to ban user');
     } finally {
       setActionInProgress(false);
     }
@@ -176,7 +202,7 @@ export default function UserManagementPage() {
       const token = session.data.session?.access_token;
       
       if (!token) {
-        alert('Session expired. Please refresh and try again.');
+        setErrorMessage('Session expired. Please refresh and try again.');
         setActionInProgress(false);
         return;
       }
@@ -196,16 +222,16 @@ export default function UserManagementPage() {
       if (!response.ok) {
         const errorMsg = data.error || data.message || 'Failed to delete user';
         console.error('🗑️ Delete failed:', errorMsg);
-        alert(`Error: ${errorMsg}`);
+        setErrorMessage(`✗ ${errorMsg}`);
         return;
       }
 
       console.log('🗑️ Delete successful, reloading users...');
+      setSuccessMessage('✓ User deleted successfully');
       loadUsers();
-      alert('User deleted successfully');
     } catch (error) {
       console.error('🗑️ Delete user error:', error);
-      alert(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      setErrorMessage(`✗ ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setActionInProgress(false);
     }
@@ -248,6 +274,20 @@ export default function UserManagementPage() {
 
   return (
     <div className="space-y-8">
+      {/* Success Message */}
+      {successMessage && (
+        <div className="sticky top-20 z-40 rounded-lg border border-ocean/30 bg-ocean/5 p-6 shadow-lg">
+          <p className="font-display text-lg font-bold text-ocean">{successMessage}</p>
+        </div>
+      )}
+
+      {/* Error Message */}
+      {errorMessage && (
+        <div className="sticky top-20 z-40 rounded-lg border border-coral/30 bg-coral/5 p-6 shadow-lg">
+          <p className="font-display text-lg font-bold text-coral">{errorMessage}</p>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
