@@ -57,8 +57,6 @@ function convertFormDataToDbFormat(data: Record<string, any>) {
   
   console.log('📤 Converted data:', { other_links: converted.other_links });
   return converted;
-  
-  return converted;
 }
 
 /**

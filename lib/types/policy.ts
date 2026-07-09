@@ -11,11 +11,18 @@ export interface Policy {
   country: string;
   title: string;
   summary: string;
-  category: PolicyCategory;
-  instrument: string;
+  category: string; // Can be comma-separated categories
+  instrument?: string;
   level: PolicyLevel;
   status: PolicyStatus;
   authority: string;
   link: string;
   language: string;
+  otherLinks?: string | null;
+  other_links?: string | null;
+  lifecycle_stage?: string | null;
+  lifecycleStages?: string[] | null;
+  created_at?: string;
+  updated_at?: string;
+  keywords?: string;
 }
