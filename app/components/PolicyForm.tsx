@@ -139,6 +139,13 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
         year: yearFromDate,
       };
       
+      console.log('📤 [FORM] Sending API request:', {
+        endpoint: url,
+        hasOtherLinks: !!apiData.otherLinks,
+        otherLinks: apiData.otherLinks,
+        allFields: Object.keys(apiData)
+      });
+      
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },

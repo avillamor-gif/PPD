@@ -141,6 +141,12 @@ export async function PUT(
       updated_at: new Date().toISOString(),
     };
 
+    console.log('✏️ [PUT] Updating in Supabase:', { 
+      id,
+      other_links: (policyData as any).other_links,
+      allKeys: Object.keys(policyData)
+    });
+
     // Update in Supabase - try by slug first, then by id
     let result = await supabaseAdmin
       .from('policies')

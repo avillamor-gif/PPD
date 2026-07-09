@@ -162,6 +162,12 @@ export async function POST(request: NextRequest) {
       updated_at: new Date().toISOString(),
     };
 
+    console.log('💾 [POST] Saving to Supabase:', { 
+      id: policyData.id,
+      other_links: (policyData as any).other_links,
+      allKeys: Object.keys(policyData)
+    });
+
     // Save to Supabase
     const { data, error } = await supabaseAdmin
       .from('policies')
