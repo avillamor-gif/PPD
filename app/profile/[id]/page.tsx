@@ -37,6 +37,14 @@ export default function ProfilePage() {
       return;
     }
 
+    // Check if profileId looks like a valid UUID (36 characters with hyphens)
+    // If not, it's likely a route like "/profile/edit" which shouldn't be accessed this way
+    const isValidUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(profileId);
+    if (!isValidUUID) {
+      setLoading(false);
+      return;
+    }
+
     const initProfile = async () => {
       try {
         // First, check auth to get current user
