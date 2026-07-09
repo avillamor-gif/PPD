@@ -18,25 +18,33 @@ export async function POST(req: NextRequest) {
     console.log('🔐 [VALIDATE-TOKEN] Validating token...');
 
     // Query all users to find one with matching token (this is slow but works without a separate tokens table)
-    const { data: users, error: queryError } = await supabaseAdmin.auth.admin.listUsers();
+    const { data: responseData, error: queryError } = await supabaseAdmin.auth.admin.listUsers();
 
     console.log('🔐 [VALIDATE-TOKEN] listUsers response:', { 
-      hasError: !!queryError, 
-      errorMessage: queryError?.message,
-      usersLength: users?.length,
-      usersIsArray: Array.isArray(users)
+      hasError: !!queryError,
+      responseDataType: typeof responseData,
+      responseDataKeys: responseData ? Object.keys(responseData) : 'N/A',
+      isUsersProp: responseData?.users ? 'yes' : 'no'
     });
 
     if (queryError) {
-      console.error('🔐 [VALIDATE-TOKEN] Failed to list users:', queryError);
+      console.error('🔐 [VALIDATE-TOKEN] Query error:', queryError.message);
       return NextResponse.json(
         { error: 'Token validation failed', valid: false },
         { status: 500 }
       );
     }
 
+    // Handle the response structure: responseData has a users property
+    const users = responseData?.users || responseData;
+
     if (!users || !Array.isArray(users)) {
-      console.error('🔐 [VALIDATE-TOKEN] Users is not an array:', { users, type: typeof users });
+      console.error('🔐 [VALIDATE-TOKEN] Users is not an array:', { 
+        hasUsers: !!users,
+        isArray: Array.isArray(users),
+        type: typeof users,
+        usersKeys: typeof users === 'object' ? Object.keys(users) : 'N/A'
+      });
       return NextResponse.json(
         { error: 'Token validation failed', valid: false },
         { status: 500 }

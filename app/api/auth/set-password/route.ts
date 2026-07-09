@@ -24,18 +24,30 @@ export async function POST(req: NextRequest) {
     console.log('🔐 [SET-PASSWORD] Setting password with token...');
 
     // Find user with matching token
-    const { data: users, error: queryError } = await supabaseAdmin.auth.admin.listUsers();
+    const { data: responseData, error: queryError } = await supabaseAdmin.auth.admin.listUsers();
+
+    console.log('🔐 [SET-PASSWORD] listUsers response:', { 
+      hasError: !!queryError,
+      responseDataType: typeof responseData
+    });
 
     if (queryError) {
-      console.error('🔐 [SET-PASSWORD] Failed to list users:', queryError);
+      console.error('🔐 [SET-PASSWORD] Query error:', queryError.message);
       return NextResponse.json(
-        { error: 'Failed to set password', valid: false },
+        { error: 'Failed to validate token', valid: false },
         { status: 500 }
       );
     }
 
+    // Handle the response structure: responseData has a users property
+    const users = responseData?.users || responseData;
+
     if (!users || !Array.isArray(users)) {
-      console.error('🔐 [SET-PASSWORD] Users is not an array:', { users, type: typeof users });
+      console.error('🔐 [SET-PASSWORD] Users is not an array:', { 
+        hasUsers: !!users,
+        isArray: Array.isArray(users),
+        type: typeof users
+      });
       return NextResponse.json(
         { error: 'Failed to set password', valid: false },
         { status: 500 }
@@ -66,26 +78,55 @@ export async function POST(req: NextRequest) {
     console.log('🔐 [SET-PASSWORD] Token valid, updating user:', user.id);
 
     // Update user password and mark email as verified
+    console.log('🔐 [SET-PASSWORD] Calling updateUserById with:', {
+      userId: user.id,
+      hasPassword: !!password,
+      email_confirm: true
+    });
+
+    // Update user password
     const { error: updateError } = await supabaseAdmin.auth.admin.updateUserById(user.id, {
       password,
-      email_confirm: true,
-      user_metadata: {
-        ...user.user_metadata,
-        verification_token: null, // Clear the token
-        token_expires_at: null,
-        password_set: true, // Mark password as set
-      },
     });
 
     if (updateError) {
-      console.error('🔐 [SET-PASSWORD] Update error:', updateError);
+      const errorInfo = {
+        name: updateError.name,
+        message: updateError.message,
+        status: (updateError as any).status,
+        constructor: updateError.constructor.name,
+        allKeys: Object.keys(updateError),
+        allProps: Object.getOwnPropertyNames(updateError),
+        stringified: JSON.stringify(updateError, null, 2),
+        toString: updateError.toString(),
+      };
+      
+      console.error('🔐 [SET-PASSWORD] Detailed Update Error:', errorInfo);
+      
       return NextResponse.json(
-        { error: 'Failed to update password', valid: false },
+        { 
+          error: 'Failed to update password: ' + errorInfo.message || errorInfo.name,
+          details: errorInfo,
+          valid: false 
+        },
         { status: 500 }
       );
     }
 
-    console.log('✅ [SET-PASSWORD] Password updated and email verified for user:', user.id);
+    // Now confirm the email by calling an RPC function
+    console.log('🔐 [SET-PASSWORD] Password updated, now confirming email...');
+    
+    const { error: rpcError } = await supabaseAdmin.rpc('update_user_email_confirmed', {
+      user_id: user.id,
+    });
+
+    if (rpcError) {
+      console.warn('⚠️ [SET-PASSWORD] RPC error confirming email (non-critical):', rpcError.message);
+    } else {
+      console.log('✅ [SET-PASSWORD] Email confirmed via RPC for user:', user.id);
+    }
+
+    console.log('✅ [SET-PASSWORD] Password updated for user:', user.id);
 
     // Update user_profiles to mark email as verified
     const { error: profileError } = await supabaseAdmin
