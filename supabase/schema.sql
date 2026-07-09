@@ -40,10 +40,10 @@ CREATE TABLE IF NOT EXISTS policies (
   commencement_date DATE,
   country VARCHAR(2) NOT NULL,
   level VARCHAR(50), -- National, Sub-national, Regional, International
-  category TEXT NOT NULL, -- Themes
+  category TEXT NOT NULL, -- Instrument Types
+  lifecycle_stage TEXT, -- Stage in Plastic Lifecycle (Downstream, Midstream, Upstream)
   keywords TEXT,
   status VARCHAR(50) DEFAULT 'Unknown', -- Unknown, Proposed, Enacted, Repealed, etc
-  instrument VARCHAR(100), -- Act, Bill, Regulation, Directive, etc
   authority TEXT NOT NULL, -- Competent authority
   link TEXT NOT NULL, -- Official policy link
   other_links TEXT, -- Additional references
@@ -57,6 +57,7 @@ CREATE TABLE IF NOT EXISTS policies (
 CREATE INDEX IF NOT EXISTS idx_policies_country ON policies(country);
 CREATE INDEX IF NOT EXISTS idx_policies_year ON policies(year DESC);
 CREATE INDEX IF NOT EXISTS idx_policies_category ON policies(category);
+CREATE INDEX IF NOT EXISTS idx_policies_lifecycle_stage ON policies(lifecycle_stage);
 CREATE INDEX IF NOT EXISTS idx_policies_status ON policies(status);
 CREATE INDEX IF NOT EXISTS idx_policies_created_at ON policies(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_policies_level ON policies(level);

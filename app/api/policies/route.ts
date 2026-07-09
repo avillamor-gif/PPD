@@ -46,6 +46,9 @@ function convertFormDataToDbFormat(data: Record<string, any>) {
       converted['other_links'] = value;
     } else if (key === 'commencementDate') {
       converted['commencement_date'] = value;
+    } else if (key === 'lifecycleStages') {
+      // Convert array to comma-separated string
+      converted['lifecycle_stage'] = Array.isArray(value) ? value.join(', ') : value;
     } else {
       converted[key] = value;
     }

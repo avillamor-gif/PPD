@@ -311,50 +311,6 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
           </div>
 
           <div>
-            <MultiSelectDropdown
-              label="Instrument Type *"
-              options={INSTRUMENT_TYPES}
-              selectedValues={formData.instrumentTypes}
-              onChange={(values) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  instrumentTypes: values,
-                }))
-              }
-              placeholder="Search and select instrument types..."
-              required={true}
-            />
-          </div>
-
-          <div>
-            <MultiSelectDropdown
-              label="Stage in Plastic Lifecycle"
-              options={LIFECYCLE_STAGES}
-              selectedValues={formData.lifecycleStages}
-              onChange={(values) =>
-                setFormData((prev) => ({
-                  ...prev,
-                  lifecycleStages: values,
-                }))
-              }
-              placeholder="Select lifecycle stages..."
-              required={false}
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-ink mb-2">Keywords</label>
-            <input
-              type="text"
-              name="keywords"
-              value={formData.keywords}
-              onChange={handleChange}
-              placeholder="e.g., plastic ban, single-use, recyclable"
-              className="w-full rounded-lg border border-ink/20 bg-paper px-4 py-2 text-ink placeholder:text-ink/40 focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20"
-            />
-          </div>
-
-          <div>
             <label className="block text-sm font-medium text-ink mb-2">Level</label>
             <select
               name="level"
@@ -368,6 +324,54 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
                 </option>
               ))}
             </select>
+          </div>
+
+          <div className="md:col-span-2">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              <div>
+                <MultiSelectDropdown
+                  label="Instrument Type *"
+                  options={INSTRUMENT_TYPES}
+                  selectedValues={formData.instrumentTypes}
+                  onChange={(values) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      instrumentTypes: values,
+                    }))
+                  }
+                  placeholder="Search and select instrument types..."
+                  required={true}
+                />
+              </div>
+
+              <div>
+                <MultiSelectDropdown
+                  label="Stage in Plastic Lifecycle"
+                  options={LIFECYCLE_STAGES}
+                  selectedValues={formData.lifecycleStages}
+                  onChange={(values) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      lifecycleStages: values,
+                    }))
+                  }
+                  placeholder="Select lifecycle stages..."
+                  required={false}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-ink mb-2">Keywords</label>
+            <input
+              type="text"
+              name="keywords"
+              value={formData.keywords}
+              onChange={handleChange}
+              placeholder="e.g., plastic ban, single-use, recyclable"
+              className="w-full rounded-lg border border-ink/20 bg-paper px-4 py-2 text-ink placeholder:text-ink/40 focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20"
+            />
           </div>
 
           <div>
