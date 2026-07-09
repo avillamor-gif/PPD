@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { COUNTRIES, REGIONS, INSTRUMENT_TYPES, STATUSES } from '@/lib/constants';
+import { COUNTRIES, REGIONS, INSTRUMENT_TYPES, LIFECYCLE_STAGES, STATUSES } from '@/lib/constants';
 import { MultiSelectDropdown } from './MultiSelectDropdown';
 import type { Policy, PolicyLevel, PolicyStatus } from '@/lib/types';
 
@@ -49,6 +49,14 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
     return initialData.category.split(',').map((item: string) => item.trim());
   };
 
+  // Parse lifecycle stages from metadata or keywords field
+  const getLifecycleStages = (): string[] => {
+    if (!initialData) return [];
+    // For now, lifecycle stages are stored in a separate field in the future
+    // or as part of keywords - adjust as needed based on database schema
+    return [];
+  };
+
   const [formData, setFormData] = useState({
     title: initialData?.title || '',
     summary: initialData?.summary || '',
@@ -57,9 +65,9 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
     country: initialData?.country || '',
     level: (initialData?.level || 'National') as PolicyLevel,
     instrumentTypes: getInstrumentTypes(),
+    lifecycleStages: getLifecycleStages(),
     keywords: '',
     status: (initialData?.status || 'Unknown') as PolicyStatus,
-    instrument: initialData?.instrument || '',
     authority: initialData?.authority || '',
     link: initialData?.link || '',
     otherLinks: getOtherLinks(),
@@ -118,7 +126,7 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
       
       // Extract only the fields that should be sent to the API
       // Remove 'region' since it's only for UI filtering, not stored in database
-      const { region, instrumentTypes, ...dataToSend } = formData;
+      const { region, instrumentTypes, lifecycleStages, ...dataToSend } = formData;
 
       const yearFromDate = dataToSend.commencementDate
         ? parseInt(dataToSend.commencementDate.slice(0, 4), 10)
@@ -127,6 +135,7 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
       const apiData = {
         ...dataToSend,
         category: instrumentTypes.join(', '), // Convert array to comma-separated string
+        lifecycle: lifecycleStages.join(', '), // Convert array to comma-separated string
         year: yearFromDate,
       };
       
@@ -169,9 +178,9 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
           country: '',
           level: 'National',
           instrumentTypes: [],
+          lifecycleStages: [],
           keywords: '',
           status: 'Unknown',
-          instrument: '',
           authority: '',
           link: '',
           otherLinks: '',
@@ -318,6 +327,22 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
           </div>
 
           <div>
+            <MultiSelectDropdown
+              label="Stage in Plastic Lifecycle"
+              options={LIFECYCLE_STAGES}
+              selectedValues={formData.lifecycleStages}
+              onChange={(values) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  lifecycleStages: values,
+                }))
+              }
+              placeholder="Select lifecycle stages..."
+              required={false}
+            />
+          </div>
+
+          <div>
             <label className="block text-sm font-medium text-ink mb-2">Keywords</label>
             <input
               type="text"
@@ -361,17 +386,6 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
             </select>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-ink mb-2">Instrument Type</label>
-            <input
-              type="text"
-              name="instrument"
-              value={formData.instrument}
-              onChange={handleChange}
-              placeholder="e.g., Act, Bill, Regulation, Directive"
-              className="w-full rounded-lg border border-ink/20 bg-paper px-4 py-2 text-ink placeholder:text-ink/40 focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20"
-            />
-          </div>
         </div>
       </div>
 
@@ -444,8 +458,8 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
             type="reset"
             onClick={() => setFormData({
               title: '', summary: '', commencementDate: '',
-              region: '', country: '', level: 'National', instrumentTypes: [], keywords: '', status: 'Unknown',
-              instrument: '', authority: '', link: '', otherLinks: '', language: '',
+              region: '', country: '', level: 'National', instrumentTypes: [], lifecycleStages: [], keywords: '', status: 'Unknown',
+              authority: '', link: '', otherLinks: '', language: '',
             })}
             className="inline-flex items-center gap-2 rounded-full border border-ink/30 px-8 py-3 font-mono text-sm uppercase tracking-[0.18em] text-ink transition hover:bg-ink/5"
           >

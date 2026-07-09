@@ -58,6 +58,12 @@ export const INSTRUMENT_TYPES: PolicyCategory[] = [
   "Circular Economy",
 ];
 
+export const LIFECYCLE_STAGES: PolicyCategory[] = [
+  "Upstream",
+  "Midstream",
+  "Downstream",
+];
+
 export const STATUSES: PolicyStatus[] = [
   "Unknown",
   "In Force",
