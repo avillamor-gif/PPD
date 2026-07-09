@@ -207,7 +207,7 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
     <form onSubmit={handleSubmit} className="space-y-8">
       {/* Success Message */}
       {submitted && (
-        <div className="sticky top-20 z-40 rounded-lg border border-ocean/30 bg-ocean/5 p-6 shadow-lg">
+        <div className="sticky top-20 z-40 rounded-lg border border-ocean/30 bg-ocean/15 p-6 shadow-lg">
           <p className="font-display text-lg font-bold text-ocean">✓ Policy {isEditing ? 'updated' : 'submitted'} successfully!</p>
           <p className="text-sm text-ocean/70 mt-1">Redirecting in a moment...</p>
         </div>
@@ -215,7 +215,7 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
 
       {/* Error Message */}
       {error && (
-        <div className="rounded-lg border border-coral/30 bg-coral/5 p-4">
+        <div className="rounded-lg border border-coral/30 bg-coral/15 p-4">
           <p className="font-medium text-coral">✗ {error}</p>
           {Object.keys(fieldErrors).length > 0 && (
             <ul className="mt-2 text-sm text-coral/80 space-y-1">
