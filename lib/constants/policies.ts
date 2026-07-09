@@ -37,10 +37,24 @@ export const REGIONS: string[] = [
   ...new Set(COUNTRIES.map(c => c.region))
 ].sort();
 
-export const THEMES: PolicyCategory[] = [
-  "Plastic Ban",
-  "EPR",
-  "Waste Management",
+export const INSTRUMENT_TYPES: PolicyCategory[] = [
+  "Umbrella law",
+  "Environment Impact Assessment (EIA)",
+  "Waste Management Regulation",
+  "Recycling Regulation",
+  "Penalities",
+  "Taxes",
+  "Incentives",
+  "Polluter Pays",
+  "Bans",
+  "Waste Reduction",
+  "Single-Use Plastics",
+  "Hazardous Waste",
+  "Waste Burning",
+  "Reuse",
+  "Redesign",
+  "Waste Trade",
+  "Plastic Alternatives",
   "Circular Economy",
 ];
 

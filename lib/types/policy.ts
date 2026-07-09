@@ -1,5 +1,5 @@
 export type PolicyStatus = "Unknown" | "In Force" | "Proposed" | "Phased" | "Repealed";
-export type PolicyCategory = "Plastic Ban" | "EPR" | "Waste Management" | "Circular Economy";
+export type PolicyCategory = "Umbrella law" | "Environment Impact Assessment (EIA)" | "Waste Management Regulation" | "Recycling Regulation" | "Penalities" | "Taxes" | "Incentives" | "Polluter Pays" | "Bans" | "Waste Reduction" | "Single-Use Plastics" | "Hazardous Waste" | "Waste Burning" | "Reuse" | "Redesign" | "Waste Trade" | "Plastic Alternatives" | "Circular Economy";
 export type PolicyLevel = "National" | "Sub-national" | "Regional" | "International";
 
 export interface Policy {

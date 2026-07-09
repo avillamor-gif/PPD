@@ -2,7 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { COUNTRIES, THEMES, STATUSES } from '@/lib/constants';
+import { COUNTRIES, INSTRUMENT_TYPES, STATUSES } from '@/lib/constants';
 import type { Policy, PolicyStatus } from '@/lib/types';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';

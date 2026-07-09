@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { COUNTRIES, THEMES } from '@/lib/constants';
+import { COUNTRIES, INSTRUMENT_TYPES } from '@/lib/constants';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import type { Policy } from '@/lib/types/policy';
 import { CountryGridRealtime } from '@/app/components/CountryGridRealtime';
@@ -39,17 +39,33 @@ export default async function Home() {
   }, {});
 
   // theme counts for the bar
-  const themeCounts = THEMES.map((c) => ({
+  const themeCounts = INSTRUMENT_TYPES.map((c) => ({
     name: c,
-    count: POLICIES.filter((p: Policy) => p.category === c).length,
+    count: POLICIES.filter((p: Policy) => 
+      p.category && p.category.split(',').map((t: string) => t.trim()).includes(c)
+    ).length,
   })).sort((a, b) => b.count - a.count);
   const maxCat = Math.max(...themeCounts.map((c) => c.count), 1);
 
   const themeColors: Record<string, string> = {
-    "Plastic Ban": "bg-coral/20 text-coral",
-    "EPR": "bg-ocean/20 text-ocean",
-    "Waste Management": "bg-sand text-ink",
-    "Circular Economy": "bg-ocean-deep/20 text-ocean-deep",
+    "Umbrella law": "bg-ocean/20 text-ocean",
+    "Environment Impact Assessment (EIA)": "bg-ocean-deep/20 text-ocean-deep",
+    "Waste Management Regulation": "bg-sand text-ink",
+    "Recycling Regulation": "bg-ocean/20 text-ocean",
+    "Penalities": "bg-coral/20 text-coral",
+    "Taxes": "bg-sand text-ink",
+    "Incentives": "bg-ocean/20 text-ocean",
+    "Polluter Pays": "bg-ocean-deep/20 text-ocean-deep",
+    "Bans": "bg-coral/20 text-coral",
+    "Waste Reduction": "bg-sand text-ink",
+    "Single-Use Plastics": "bg-coral/20 text-coral",
+    "Hazardous Waste": "bg-ocean-deep/20 text-ocean-deep",
+    "Waste Burning": "bg-coral/20 text-coral",
+    "Reuse": "bg-ocean/20 text-ocean",
+    "Redesign": "bg-sand text-ink",
+    "Waste Trade": "bg-ocean-deep/20 text-ocean-deep",
+    "Plastic Alternatives": "bg-ocean/20 text-ocean",
+    "Circular Economy": "bg-ocean/20 text-ocean",
   };
 
   const statusColors: Record<string, string> = {

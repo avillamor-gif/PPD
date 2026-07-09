@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { COUNTRIES, REGIONS, THEMES, STATUSES } from '@/lib/constants';
+import { COUNTRIES, REGIONS, INSTRUMENT_TYPES, STATUSES } from '@/lib/constants';
+import { MultiSelectDropdown } from './MultiSelectDropdown';
 import type { Policy, PolicyLevel, PolicyStatus } from '@/lib/types';
 
 const LEVELS: PolicyLevel[] = ['National', 'Sub-national', 'Regional', 'International'];
@@ -42,6 +43,12 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
     return '';
   };
 
+  // Parse instrument types from comma-separated string
+  const getInstrumentTypes = () => {
+    if (!initialData?.category) return [];
+    return initialData.category.split(',').map((item: string) => item.trim());
+  };
+
   const [formData, setFormData] = useState({
     title: initialData?.title || '',
     summary: initialData?.summary || '',
@@ -49,7 +56,7 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
     region: '',
     country: initialData?.country || '',
     level: (initialData?.level || 'National') as PolicyLevel,
-    category: initialData?.category || '',
+    instrumentTypes: getInstrumentTypes(),
     keywords: '',
     status: (initialData?.status || 'Unknown') as PolicyStatus,
     instrument: initialData?.instrument || '',
@@ -94,7 +101,7 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
       // Validation
       if (!formData.title.trim()) throw new Error('Legislation/Regulation is required');
       if (!formData.country) throw new Error('Country is required');
-      if (!formData.category) throw new Error('Themes is required');
+      if (formData.instrumentTypes.length === 0) throw new Error('Instrument Type is required (select at least one)');
       if (!formData.authority.trim()) throw new Error('Authority is required');
       if (!formData.link.trim()) throw new Error('Policy link is required');
 
@@ -111,7 +118,7 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
       
       // Extract only the fields that should be sent to the API
       // Remove 'region' since it's only for UI filtering, not stored in database
-      const { region, ...dataToSend } = formData;
+      const { region, instrumentTypes, ...dataToSend } = formData;
 
       const yearFromDate = dataToSend.commencementDate
         ? parseInt(dataToSend.commencementDate.slice(0, 4), 10)
@@ -119,6 +126,7 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
       
       const apiData = {
         ...dataToSend,
+        category: instrumentTypes.join(', '), // Convert array to comma-separated string
         year: yearFromDate,
       };
       
@@ -160,7 +168,7 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
           region: '',
           country: '',
           level: 'National',
-          category: '',
+          instrumentTypes: [],
           keywords: '',
           status: 'Unknown',
           instrument: '',
@@ -294,20 +302,19 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-ink mb-2">Themes *</label>
-            <select
-              name="category"
-              value={formData.category}
-              onChange={handleChange}
-              className="w-full rounded-lg border border-ink/20 bg-paper px-4 py-2 text-ink focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20"
-            >
-              <option value="">Select themes...</option>
-              {THEMES.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </select>
+            <MultiSelectDropdown
+              label="Instrument Type *"
+              options={INSTRUMENT_TYPES}
+              selectedValues={formData.instrumentTypes}
+              onChange={(values) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  instrumentTypes: values,
+                }))
+              }
+              placeholder="Search and select instrument types..."
+              required={true}
+            />
           </div>
 
           <div>
@@ -437,7 +444,7 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
             type="reset"
             onClick={() => setFormData({
               title: '', summary: '', commencementDate: '',
-              region: '', country: '', level: 'National', category: '', keywords: '', status: 'Unknown',
+              region: '', country: '', level: 'National', instrumentTypes: [], keywords: '', status: 'Unknown',
               instrument: '', authority: '', link: '', otherLinks: '', language: '',
             })}
             className="inline-flex items-center gap-2 rounded-full border border-ink/30 px-8 py-3 font-mono text-sm uppercase tracking-[0.18em] text-ink transition hover:bg-ink/5"
