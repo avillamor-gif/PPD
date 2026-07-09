@@ -96,25 +96,42 @@ export async function POST(req: NextRequest) {
       console.log('👤 [ADMIN] User role updated to:', role);
     }
 
-    // Send welcome email to new user
-    try {
-      console.log('📧 [ADMIN] Sending welcome email to:', email);
-      await sendNewUserWelcomeEmail(email, displayName, password);
-      console.log('📧 [ADMIN] Welcome email sent successfully');
-    } catch (emailError) {
-      console.warn('📧 [ADMIN] Welcome email failed (non-critical):', emailError);
-      // Don't fail the user creation if email fails
-    }
-
-    // Send admin notification email
-    try {
-      console.log('📧 [ADMIN] Sending admin notification...');
-      await sendNewUserAdminNotification(email, displayName, role || 'user');
-      console.log('📧 [ADMIN] Admin notification sent successfully');
-    } catch (emailError) {
-      console.warn('📧 [ADMIN] Admin notification failed (non-critical):', emailError);
-      // Don't fail the user creation if email fails
-    }
+    // Send emails in parallel (but don't block user creation if they fail)
+    Promise.all([
+      // Send welcome email to new user
+      (async () => {
+        try {
+          console.log('📧 [ADMIN] Sending welcome email to:', email);
+          const result = await sendNewUserWelcomeEmail(email, displayName, password);
+          console.log('📧 [ADMIN] Welcome email sent successfully:', result);
+          return result;
+        } catch (emailError) {
+          console.error('📧 [ADMIN] Welcome email FAILED:', {
+            error: emailError,
+            message: emailError instanceof Error ? emailError.message : String(emailError),
+          });
+          return { success: false, error: emailError };
+        }
+      })(),
+      
+      // Send admin notification email
+      (async () => {
+        try {
+          console.log('📧 [ADMIN] Sending admin notification...');
+          const result = await sendNewUserAdminNotification(email, displayName, role || 'user');
+          console.log('📧 [ADMIN] Admin notification sent successfully:', result);
+          return result;
+        } catch (emailError) {
+          console.error('📧 [ADMIN] Admin notification FAILED:', {
+            error: emailError,
+            message: emailError instanceof Error ? emailError.message : String(emailError),
+          });
+          return { success: false, error: emailError };
+        }
+      })(),
+    ]).catch(error => {
+      console.error('📧 [ADMIN] Email sending error (non-blocking):', error);
+    });
 
     return NextResponse.json({ 
       user: { id: user.id, email: user.email, role: role || 'user' },
