@@ -179,6 +179,26 @@ export default async function PolicyPage({ params }: { params: Promise<{ id: str
                     Official Website
                   </a>
                 )}
+                {policy.other_links && (
+                  <div className="space-y-2">
+                    {policy.other_links.split(',').map((url: string, index: number) => {
+                      const trimmedUrl = url.trim();
+                      if (!trimmedUrl) return null;
+                      return (
+                        <a
+                          key={index}
+                          href={trimmedUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-ocean/10 text-ocean hover:bg-ocean/20 transition font-medium text-sm"
+                        >
+                          <Globe className="w-4 h-4" />
+                          Related Link
+                        </a>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             </div>
 
