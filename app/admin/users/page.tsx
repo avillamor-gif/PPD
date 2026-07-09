@@ -67,7 +67,7 @@ export default function UserManagementPage() {
         return;
       }
 
-      // Simple role check - get profile with role_id directly
+      // Get user role from profile
       const { data: profile, error } = await supabase
         .from('user_profiles')
         .select('role_id')
@@ -80,9 +80,8 @@ export default function UserManagementPage() {
         return;
       }
 
-      // Check if role_id is 1 (admin) - role_id is an integer, not a relationship
+      // Check if role_id is 1 (admin)
       if (profile?.role_id !== 1) {
-        console.log('User role_id:', profile?.role_id, '(not admin)');
         router.push('/');
         return;
       }

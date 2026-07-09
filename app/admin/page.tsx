@@ -18,27 +18,34 @@ export default function AdminDashboard() {
   useEffect(() => {
     const initializeDashboard = async () => {
       try {
+        console.log('[ADMIN PAGE] Starting initialization...');
         // Check authentication
         const { data: { session } } = await supabase.auth.getSession();
+        console.log('[ADMIN PAGE] Session user:', session?.user?.id);
         if (!session?.user) {
+          console.log('[ADMIN PAGE] No session, redirecting to login');
           router.push('/auth/login');
           return;
         }
+        console.log('[ADMIN PAGE] Authentication successful');
         setIsAuthenticated(true);
 
         // Fetch policies from API
+        console.log('[ADMIN PAGE] Fetching policies...');
         const response = await fetch('/api/policies');
         if (response.ok) {
           const data = await response.json();
+          console.log('[ADMIN PAGE] Policies fetched:', data.data?.length);
           setPolicies(data.data || []);
         } else {
-          console.error('Failed to fetch policies');
+          console.error('[ADMIN PAGE] Failed to fetch policies:', response.status);
           setPolicies([]);
         }
       } catch (err) {
-        console.error('Error initializing dashboard:', err);
+        console.error('[ADMIN PAGE] Error initializing dashboard:', err);
         router.push('/auth/login');
       } finally {
+        console.log('[ADMIN PAGE] Initialization complete');
         setIsLoading(false);
       }
     };

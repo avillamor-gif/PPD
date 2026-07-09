@@ -39,22 +39,17 @@ function LoginContent() {
           // Get user role and redirect to appropriate dashboard
           const { data: profile } = await supabase
             .from('user_profiles')
-            .select('roles(name)')
+            .select('role_id')
             .eq('id', session.user.id)
             .single();
 
-          const roles = Array.isArray(profile?.roles)
-            ? profile.roles
-            : profile?.roles
-              ? [profile.roles]
-              : [];
-          const userRole = roles?.[0]?.name || 'user';
+          const roleId = profile?.role_id || 4; // Default to USER (4)
 
-          if (userRole === 'admin') {
+          if (roleId === 1) {
             router.push('/admin');
-          } else if (userRole === 'moderator') {
+          } else if (roleId === 2) {
             router.push('/admin/moderation');
-          } else if (userRole === 'expert') {
+          } else if (roleId === 3) {
             router.push('/admin/submit');
           } else {
             router.push(`/profile/${session.user.id}`);
@@ -123,23 +118,18 @@ function LoginContent() {
       // Get user role and redirect to appropriate dashboard
       const { data: profile } = await supabase
         .from('user_profiles')
-        .select('roles(name)')
+        .select('role_id')
         .eq('id', user.id)
         .single();
 
-      const roles = Array.isArray(profile?.roles)
-        ? profile.roles
-        : profile?.roles
-          ? [profile.roles]
-          : [];
-      const userRole = roles?.[0]?.name || 'user';
+      const roleId = profile?.role_id || 4; // Default to USER (4)
 
       setRedirected(true);
-      if (userRole === 'admin') {
+      if (roleId === 1) {
         router.push('/admin');
-      } else if (userRole === 'moderator') {
+      } else if (roleId === 2) {
         router.push('/admin/moderation');
-      } else if (userRole === 'expert') {
+      } else if (roleId === 3) {
         router.push('/admin/submit');
       } else {
         router.push(`/profile/${user.id}`);
