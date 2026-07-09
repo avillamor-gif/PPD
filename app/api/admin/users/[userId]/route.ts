@@ -137,13 +137,27 @@ export async function DELETE(
 
     const { userId } = await params;
 
-    // Soft delete by marking status
-    await supabaseAdmin.auth.admin.updateUserById(userId, {
+    console.log('🗑️ [DELETE] Starting user deletion for userId:', userId);
+
+    // Soft delete by marking status in auth metadata
+    console.log('🗑️ [DELETE] Updating auth metadata...');
+    const { data: updateData, error: updateError } = await supabaseAdmin.auth.admin.updateUserById(userId, {
       user_metadata: { account_status: 'deleted' },
     });
 
+    if (updateError) {
+      console.error('🗑️ [DELETE] Auth update error:', updateError);
+      return NextResponse.json(
+        { error: `Failed to delete user: ${updateError.message}` },
+        { status: 400 }
+      );
+    }
+
+    console.log('🗑️ [DELETE] Auth metadata updated successfully');
+
     // Log audit event
-    await supabaseAdmin
+    console.log('🗑️ [DELETE] Logging audit event...');
+    const { error: auditError } = await supabaseAdmin
       .from('audit_logs')
       .insert({
         resource_type: 'user',
@@ -151,11 +165,21 @@ export async function DELETE(
         action: 'user_deleted',
       });
 
-    return NextResponse.json({ success: true });
+    if (auditError) {
+      console.warn('🗑️ [DELETE] Audit log error (non-critical):', auditError);
+      // Don't fail the delete if audit logging fails
+    }
+
+    console.log('🗑️ [DELETE] User deletion completed successfully');
+    return NextResponse.json({ success: true, message: 'User deleted successfully' });
   } catch (error) {
-    console.error('Delete user error:', error);
+    console.error('🗑️ [DELETE] Exception during deletion:', {
+      error,
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : 'N/A',
+    });
     return NextResponse.json(
-      { error: (error as Error).message },
+      { error: (error as Error).message || 'Failed to delete user' },
       { status: 500 }
     );
   }

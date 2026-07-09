@@ -9,6 +9,7 @@ const config = {
   email: {
     from: process.env.NEXT_PUBLIC_EMAIL_FROM || 'noreply@plasticpolicydatabase.com',
     appName: process.env.NEXT_PUBLIC_APP_NAME || 'Plastic Policy Database',
+    adminNotificationEmail: process.env.ADMIN_NOTIFICATION_EMAIL || 'admin@plasticpolicydatabase.com',
   },
 
   // App URLs

@@ -157,3 +157,78 @@ export async function updateEmailStatus(
 
   return { error };
 }
+
+export async function sendNewUserWelcomeEmail(email: string, displayName: string, password: string) {
+  const loginUrl = `${config.app.url}/auth/login`;
+
+  try {
+    await getResend().emails.send({
+      from: config.email.from,
+      to: email,
+      subject: `Welcome to ${config.email.appName} - Your Account is Ready`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #1B72A8;">Welcome to ${config.email.appName}</h2>
+          <p>Hi ${displayName},</p>
+          <p>Your account has been created by an administrator. Here are your login credentials:</p>
+          
+          <div style="background-color: #f5f5f5; padding: 16px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #1B72A8;">
+            <p style="margin: 0;"><strong>Email:</strong> ${email}</p>
+            <p style="margin: 8px 0 0 0;"><strong>Temporary Password:</strong> ${password}</p>
+          </div>
+
+          <p style="color: #666; font-size: 14px;">
+            Please change your password after your first login for security.
+          </p>
+
+          <a href="${loginUrl}" style="display: inline-block; padding: 12px 24px; background-color: #1B72A8; color: white; text-decoration: none; border-radius: 8px; margin: 20px 0;">Login to Your Account</a>
+
+          <p style="color: #999; font-size: 12px; margin-top: 30px;">
+            If you did not request this account creation, please contact support immediately.
+          </p>
+        </div>
+      `,
+    });
+    return { success: true };
+  } catch (error) {
+    console.error('New user welcome email error:', error);
+    throw error;
+  }
+}
+
+export async function sendNewUserAdminNotification(email: string, displayName: string, role: string) {
+  const adminUrl = `${config.app.url}/admin/users`;
+  const adminEmail = config.email.adminNotificationEmail;
+
+  try {
+    await getResend().emails.send({
+      from: config.email.from,
+      to: adminEmail,
+      subject: `New User Created: ${displayName} (${role})`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #E88860;">New User Registration</h2>
+          
+          <p>A new user has been added to ${config.email.appName}:</p>
+
+          <div style="background-color: #f5f5f5; padding: 16px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #E88860;">
+            <p style="margin: 0;"><strong>Name:</strong> ${displayName}</p>
+            <p style="margin: 8px 0 0 0;"><strong>Email:</strong> ${email}</p>
+            <p style="margin: 8px 0 0 0;"><strong>Role:</strong> ${role}</p>
+            <p style="margin: 8px 0 0 0;"><strong>Created:</strong> ${new Date().toLocaleString()}</p>
+          </div>
+
+          <a href="${adminUrl}" style="display: inline-block; padding: 12px 24px; background-color: #E88860; color: white; text-decoration: none; border-radius: 8px; margin: 20px 0;">View User Management</a>
+
+          <p style="color: #999; font-size: 12px; margin-top: 30px;">
+            This is an automated notification from your admin panel.
+          </p>
+        </div>
+      `,
+    });
+    return { success: true };
+  } catch (error) {
+    console.error('Admin notification email error:', error);
+    throw error;
+  }
+}

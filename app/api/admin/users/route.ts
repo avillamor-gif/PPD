@@ -1,4 +1,5 @@
 import { supabaseAdmin } from '@/lib/supabase-admin';
+import { sendNewUserAdminNotification, sendNewUserWelcomeEmail } from '@/lib/email';
 import { NextRequest, NextResponse } from 'next/server';
 
 // GET all users (admin only)
@@ -73,7 +74,7 @@ export async function POST(req: NextRequest) {
     const { data: { user }, error: createError } = await supabaseAdmin.auth.admin.createUser({
       email,
       password,
-      email_confirm: true,
+      email_confirm: false, // Send verification email
       user_metadata: { display_name: displayName },
     });
 
@@ -84,16 +85,40 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    console.log('👤 [ADMIN] User created successfully:', { userId: user.id, email: user.email, role });
+
     // Update role if not 'user'
     if (role && role !== 'user') {
       await supabaseAdmin
         .from('user_profiles')
         .update({ role_id: (roleData as any).id })
         .eq('id', user.id);
+      console.log('👤 [ADMIN] User role updated to:', role);
+    }
+
+    // Send welcome email to new user
+    try {
+      console.log('📧 [ADMIN] Sending welcome email to:', email);
+      await sendNewUserWelcomeEmail(email, displayName, password);
+      console.log('📧 [ADMIN] Welcome email sent successfully');
+    } catch (emailError) {
+      console.warn('📧 [ADMIN] Welcome email failed (non-critical):', emailError);
+      // Don't fail the user creation if email fails
+    }
+
+    // Send admin notification email
+    try {
+      console.log('📧 [ADMIN] Sending admin notification...');
+      await sendNewUserAdminNotification(email, displayName, role || 'user');
+      console.log('📧 [ADMIN] Admin notification sent successfully');
+    } catch (emailError) {
+      console.warn('📧 [ADMIN] Admin notification failed (non-critical):', emailError);
+      // Don't fail the user creation if email fails
     }
 
     return NextResponse.json({ 
-      user: { id: user.id, email: user.email } 
+      user: { id: user.id, email: user.email, role: role || 'user' },
+      message: 'User created successfully and notification emails sent'
     }, { status: 201 });
   } catch (error) {
     console.error('Create user error:', error);

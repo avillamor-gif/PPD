@@ -176,8 +176,11 @@ export default function UserManagementPage() {
       
       if (!token) {
         alert('Session expired. Please refresh and try again.');
+        setActionInProgress(false);
         return;
       }
+
+      console.log('🗑️ Attempting to delete user:', userId);
 
       const response = await fetch(`/api/admin/users/${userId}`, {
         method: 'DELETE',
@@ -187,16 +190,20 @@ export default function UserManagementPage() {
       });
 
       const data = await response.json();
+      console.log('🗑️ Delete response:', { status: response.status, data });
 
       if (!response.ok) {
-        alert(`Error: ${data.error || 'Failed to delete user'}`);
+        const errorMsg = data.error || data.message || 'Failed to delete user';
+        console.error('🗑️ Delete failed:', errorMsg);
+        alert(`Error: ${errorMsg}`);
         return;
       }
 
+      console.log('🗑️ Delete successful, reloading users...');
       loadUsers();
       alert('User deleted successfully');
     } catch (error) {
-      console.error('Delete user error:', error);
+      console.error('🗑️ Delete user error:', error);
       alert(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setActionInProgress(false);
