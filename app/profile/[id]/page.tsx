@@ -34,33 +34,46 @@ export default function ProfilePage({
   const router = useRouter();
 
   useEffect(() => {
-    checkAuth();
-    loadProfile();
-  }, [params.id]);
+    const initProfile = async () => {
+      // First, check auth to get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      setCurrentUser(user);
 
-  const checkAuth = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    setCurrentUser(user);
-  };
+      // Only allow viewing own profile for regular users
+      if (!user) {
+        router.push('/auth/login');
+        setLoading(false);
+        return;
+      }
 
-  const loadProfile = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('user_stats')
-        .select('*')
-        .eq('id', params.id)
-        .single();
+      if (params.id !== user.id) {
+        // Regular users can only view their own profile
+        router.push(`/profile/${user.id}`);
+        setLoading(false);
+        return;
+      }
 
-      if (error) throw error;
+      // Then load the profile
+      try {
+        const { data, error } = await supabase
+          .from('user_stats')
+          .select('*')
+          .eq('id', params.id)
+          .single();
 
-      setProfile(data as UserProfile);
-      setIsOwnProfile(data?.id === currentUser?.id);
-    } catch (error) {
-      console.error('Load profile error:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+        if (error) throw error;
+
+        setProfile(data as UserProfile);
+        setIsOwnProfile(true); // We already verified it's their profile above
+      } catch (error) {
+        console.error('Load profile error:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initProfile();
+  }, [params.id, router]);
 
   if (loading) {
     return (
