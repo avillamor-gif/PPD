@@ -17,8 +17,16 @@ export async function POST(req: NextRequest) {
     // Query all users to find one with matching token (this is slow but works without a separate tokens table)
     const { data: users, error: queryError } = await supabaseAdmin.auth.admin.listUsers();
 
-    if (queryError || !users) {
+    if (queryError) {
       console.error('🔐 [VALIDATE-TOKEN] Failed to list users:', queryError);
+      return NextResponse.json(
+        { error: 'Token validation failed', valid: false },
+        { status: 500 }
+      );
+    }
+
+    if (!users || !Array.isArray(users)) {
+      console.error('🔐 [VALIDATE-TOKEN] Users is not an array:', { users, type: typeof users });
       return NextResponse.json(
         { error: 'Token validation failed', valid: false },
         { status: 500 }

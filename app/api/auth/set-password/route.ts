@@ -26,8 +26,16 @@ export async function POST(req: NextRequest) {
     // Find user with matching token
     const { data: users, error: queryError } = await supabaseAdmin.auth.admin.listUsers();
 
-    if (queryError || !users) {
+    if (queryError) {
       console.error('🔐 [SET-PASSWORD] Failed to list users:', queryError);
+      return NextResponse.json(
+        { error: 'Failed to set password', valid: false },
+        { status: 500 }
+      );
+    }
+
+    if (!users || !Array.isArray(users)) {
+      console.error('🔐 [SET-PASSWORD] Users is not an array:', { users, type: typeof users });
       return NextResponse.json(
         { error: 'Failed to set password', valid: false },
         { status: 500 }

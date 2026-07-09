@@ -19,7 +19,23 @@ function SetPasswordContent() {
   const token = searchParams.get('token');
 
   useEffect(() => {
-    validateToken();
+    // If user is logged in, log them out first before validating token
+    const init = async () => {
+      try {
+        // Check if user is logged in
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          console.log('🔐 [SET-PASSWORD] User already logged in, logging out...');
+          await supabase.auth.signOut();
+          console.log('🔐 [SET-PASSWORD] User logged out');
+        }
+        validateToken();
+      } catch (err) {
+        console.error('🔐 [SET-PASSWORD] Init error:', err);
+        validateToken();
+      }
+    };
+    init();
   }, [token]);
 
   const validateToken = async () => {
