@@ -3,16 +3,11 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
-import config from '@/lib/config';
-import PasswordInput from '@/app/components/PasswordInput';
-import { Mail, Lock, User, ArrowRight } from 'lucide-react';
+import { Mail, User, ArrowRight, AlertCircle } from 'lucide-react';
 
 export default function SignupPage() {
   const [displayName, setDisplayName] = useState('');
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
@@ -26,90 +21,45 @@ export default function SignupPage() {
     try {
       if (!displayName.trim()) throw new Error('Display name is required');
       if (!email.trim()) throw new Error('Email is required');
-      if (!password.trim()) throw new Error('Password is required');
-      if (password.length < config.auth.passwordMinLength) throw new Error(`Password must be at least ${config.auth.passwordMinLength} characters`);
-      if (password !== confirmPassword) throw new Error('Passwords do not match');
 
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
         throw new Error('Please enter a valid email address');
       }
 
-      console.log('📝 Submitting signup form...');
+      console.log('📝 [SIGNUP] Submitting signup form with email and display name...');
 
-      // Sign up with Supabase Auth using server-side API
       const signupRes = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email,
-          password,
           displayName,
         }),
       });
 
-      let signupData;
-      try {
-        signupData = await signupRes.json();
-      } catch (parseError) {
-        console.error('❌ Failed to parse response:', parseError);
-        throw new Error('Server error - invalid response. Please try again.');
-      }
+      const signupData = await signupRes.json();
 
-      console.log('📨 Signup response:', { status: signupRes.status, data: signupData });
-      console.log('📨 signupData keys:', Object.keys(signupData));
-      console.log('📨 signupData.error:', signupData.error);
-      console.log('📨 signupData.error type:', typeof signupData.error);
+      console.log('📨 [SIGNUP] Response:', { status: signupRes.status, data: signupData });
 
       if (!signupRes.ok) {
-        let errorMessage = 'An error occurred. Please try again.';
-        
-        console.log('Response not OK, extracting error...');
-        
-        if (signupData?.error) {
-          if (typeof signupData.error === 'object') {
-            errorMessage = JSON.stringify(signupData.error);
-            console.error('Error is object:', signupData.error);
-          } else if (typeof signupData.error === 'string' && signupData.error.length > 0) {
-            errorMessage = signupData.error;
-            console.error('Error is string:', signupData.error);
-          } else {
-            errorMessage = `Error: ${signupRes.status}`;
-            console.error('Error property exists but is empty or unusual');
-          }
-        } else if (signupData?.message) {
-          errorMessage = signupData.message;
-        } else if (signupData?.details) {
-          errorMessage = signupData.details;
-        }
-        
-        console.error('❌ Final error message:', errorMessage);
+        const errorMessage = signupData?.error || 'Signup failed. Please try again.';
         throw new Error(errorMessage);
       }
 
       if (!signupData.success) {
-        const errorMessage = signupData?.error || 'Signup failed - please check your email is not already registered.';
-        console.error('❌ Signup not successful:', errorMessage);
-        throw new Error(errorMessage);
+        throw new Error(signupData?.error || 'Signup failed');
       }
 
-      console.log('✅ Signup successful:', signupData);
+      console.log('✅ [SIGNUP] Signup successful, verification email sent');
 
       setSubmitted(true);
       setDisplayName('');
       setEmail('');
-      setPassword('');
-      setConfirmPassword('');
 
-      // If email verification not required, redirect to login
-      // Otherwise redirect to verification pending page
       setTimeout(() => {
-        if (!config.features.emailVerificationRequired) {
-          router.push('/auth/login');
-        } else {
-          router.push(`/auth/verify-pending?email=${encodeURIComponent(email)}`);
-        }
-      }, 300);
+        router.push(`/auth/verify-pending?email=${encodeURIComponent(email)}`);
+      }, 2000);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -125,8 +75,10 @@ export default function SignupPage() {
             <Mail className="w-8 h-8 text-ocean" />
           </div>
           <h2 className="text-2xl font-bold text-ink">Check your email</h2>
-          <p className="text-ink/60">We've sent a verification link to {email}</p>
-          <p className="text-sm text-ink/50">Click the link in your inbox to verify your account and get started.</p>
+          <p className="text-ink/60">We've sent a verification link to:</p>
+          <p className="font-mono text-sm text-ink/80 bg-sand/20 p-3 rounded-lg">{email}</p>
+          <p className="text-sm text-ink/50">Click the link in your email to verify your account and set your password.</p>
+          <p className="text-xs text-ink/40">The link will expire in 24 hours</p>
         </div>
       </div>
     );
@@ -142,8 +94,9 @@ export default function SignupPage() {
 
         <form onSubmit={handleSignup} className="space-y-4">
           {error && (
-            <div className="p-4 rounded-lg bg-coral/10 border border-coral/20 text-coral text-sm">
-              {error}
+            <div className="p-4 rounded-lg bg-coral/10 border border-coral/20 text-coral text-sm flex gap-3">
+              <AlertCircle className="w-5 h-5 shrink-0" />
+              <span>{error}</span>
             </div>
           )}
 
@@ -158,65 +111,40 @@ export default function SignupPage() {
                 placeholder="Your name"
                 className="w-full pl-12 pr-4 py-3 rounded-lg border border-ink/20 bg-white focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20 transition"
                 required
+                disabled={loading}
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-ink mb-2">Email</label>
+            <label className="block text-sm font-medium text-ink mb-2">Email Address</label>
             <div className="relative">
               <Mail className="absolute left-4 top-3 w-5 h-5 text-ink/40" />
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="your@email.com"
+                placeholder="you@example.com"
                 className="w-full pl-12 pr-4 py-3 rounded-lg border border-ink/20 bg-white focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20 transition"
                 required
+                disabled={loading}
               />
             </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-ink mb-2">Password</label>
-            <PasswordInput
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              required
-            />
-            <p className="text-xs text-ink/50 mt-1">Minimum {config.auth.passwordMinLength} characters</p>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-ink mb-2">Confirm Password</label>
-            <PasswordInput
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              placeholder="••••••••"
-              required
-            />
+            <p className="text-xs text-ink/50 mt-1">We'll send a verification link to this email</p>
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 px-4 rounded-lg bg-ocean text-white font-semibold hover:bg-ocean/90 disabled:opacity-50 disabled:cursor-not-allowed transition flex items-center justify-center gap-2"
+            className="w-full py-3 px-4 rounded-lg bg-ocean text-paper font-medium hover:bg-ocean-deep disabled:opacity-50 transition flex items-center justify-center gap-2"
           >
-            {loading ? 'Creating account...' : (
-              <>
-                Create Account
-                <ArrowRight className="w-4 h-4" />
-              </>
-            )}
+            {loading ? 'Creating account...' : 'Create Account'}
+            {!loading && <ArrowRight className="w-4 h-4" />}
           </button>
         </form>
 
-        <div className="text-center text-sm">
-          <span className="text-ink/60">Already have an account? </span>
-          <Link href="/auth/login" className="text-coral hover:underline font-medium">
-            Log in
-          </Link>
+        <div className="text-center">
+          <p className="text-ink/60">Already have an account? <Link href="/auth/login" className="text-ocean hover:text-ocean-deep font-medium">Sign in</Link></p>
         </div>
       </div>
     </div>

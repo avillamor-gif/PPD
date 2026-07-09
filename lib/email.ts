@@ -232,3 +232,38 @@ export async function sendNewUserAdminNotification(email: string, displayName: s
     throw error;
   }
 }
+
+export async function sendSetPasswordEmail(email: string, displayName: string, token: string) {
+  const setPasswordUrl = `${config.app.url}/auth/set-password?token=${token}`;
+
+  try {
+    await getResend().emails.send({
+      from: config.email.from,
+      to: email,
+      subject: `Verify Your Email & Set Password - ${config.email.appName}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #1B72A8;">Welcome to ${config.email.appName}</h2>
+          <p>Hi ${displayName},</p>
+          
+          <p>Thanks for signing up! To complete your account setup, click the button below to verify your email and set your password.</p>
+
+          <a href="${setPasswordUrl}" style="display: inline-block; padding: 12px 24px; background-color: #1B72A8; color: white; text-decoration: none; border-radius: 8px; margin: 20px 0; font-weight: bold;">Verify Email & Set Password</a>
+
+          <p style="color: #666; font-size: 14px;">Or paste this link in your browser:</p>
+          <p style="background-color: #f5f5f5; padding: 12px; border-radius: 4px; font-size: 12px; word-break: break-all; color: #666;">${setPasswordUrl}</p>
+
+          <div style="border-top: 1px solid #e0e0e0; padding-top: 20px; margin-top: 30px;">
+            <p style="color: #999; font-size: 12px;">
+              This link will expire in 24 hours. If you didn't sign up for this account, please ignore this email.
+            </p>
+          </div>
+        </div>
+      `,
+    });
+    return { success: true };
+  } catch (error) {
+    console.error('Set password email error:', error);
+    throw error;
+  }
+}

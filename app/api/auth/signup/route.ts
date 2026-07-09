@@ -1,21 +1,17 @@
 import { supabaseAdmin } from '@/lib/supabase-admin';
+import { sendSetPasswordEmail } from '@/lib/email';
 import config from '@/lib/config';
 import { NextRequest, NextResponse } from 'next/server';
+import { randomBytes } from 'crypto';
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, password, displayName } = await req.json();
+    const { email, displayName } = await req.json();
 
-    if (!email || !password || !displayName) {
+    // Validate required fields
+    if (!email || !displayName) {
       return NextResponse.json(
-        { error: 'Email, password, and display name are required' },
-        { status: 400 }
-      );
-    }
-
-    if (password.length < config.auth.passwordMinLength) {
-      return NextResponse.json(
-        { error: `Password must be at least ${config.auth.passwordMinLength} characters` },
+        { error: 'Email and display name are required' },
         { status: 400 }
       );
     }
@@ -31,72 +27,44 @@ export async function POST(req: NextRequest) {
 
     console.log('🔐 [SIGNUP] Starting signup for:', email);
 
+    // Generate verification token (valid for 24 hours)
+    const verificationToken = randomBytes(32).toString('hex');
+    const tokenExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+
+    console.log('🔐 [SIGNUP] Generated verification token');
+
     try {
-      // Create auth user - trigger will auto-create user_profiles + preferences
-      console.log('🔐 [SIGNUP] Creating user in auth with email:', email);
+      // Create unverified user (no password yet)
+      console.log('🔐 [SIGNUP] Creating unverified user in auth...');
       
-      let user, authError;
-      try {
-        console.log('🔐 [SIGNUP] About to call createUser with:', { email, passwordLength: password.length });
-        const result = await supabaseAdmin.auth.admin.createUser({
-          email,
-          password,
-          email_confirm: !config.features.emailVerificationRequired,
-          user_metadata: {
-            full_name: displayName,
-          },
-        });
-        user = result.data?.user;
-        authError = result.error;
-        console.log('🔐 [SIGNUP] Result from createUser:', { 
-          userCreated: !!user, 
-          userId: user?.id,
-          errorExists: !!authError,
-          errorMessage: authError?.message,
-        });
-      } catch (createError) {
-        console.error('🔐 [SIGNUP] Exception during createUser:', {
-          error: createError,
-          message: createError instanceof Error ? createError.message : String(createError),
-          stack: createError instanceof Error ? createError.stack : 'N/A',
-        });
-        const errorMsg = createError instanceof Error ? createError.message : String(createError);
-        return NextResponse.json(
-          { error: `Failed to create user: ${errorMsg}` },
-          { status: 500 }
-        );
-      }
+      const result = await supabaseAdmin.auth.admin.createUser({
+        email,
+        password: randomBytes(16).toString('hex'), // Temporary password, won't be used
+        email_confirm: false, // Not confirmed yet
+        user_metadata: {
+          display_name: displayName,
+          verification_token: verificationToken,
+          token_expires_at: tokenExpiresAt,
+          password_set: false, // Flag for incomplete signup
+        },
+      });
 
-      if (authError) {
-        console.error('🔐 [SIGNUP] Auth error returned:', {
-          message: authError.message,
-          status: authError.status,
-          name: authError.name,
-          code: (authError as any).code,
-          statusCode: (authError as any).statusCode,
-          fullError: JSON.stringify(authError),
-          keys: Object.keys(authError),
-        });
-        const errorMsg = authError.message || (authError as any).code || JSON.stringify(authError) || 'Unknown auth error';
-        const statusCode = authError.status || (authError as any).statusCode || 400;
-        return NextResponse.json(
-          { error: `Auth failed: ${errorMsg}` },
-          { status: statusCode }
-        );
-      }
+      const user = result.data?.user;
+      const authError = result.error;
 
-      if (!user) {
-        console.error('🔐 [SIGNUP] No user returned from createUser');
+      if (authError || !user) {
+        const errorMsg = authError?.message || 'Failed to create user';
+        console.error('🔐 [SIGNUP] Auth error:', errorMsg);
         return NextResponse.json(
-          { error: 'Failed to create user - no user returned' },
+          { error: errorMsg },
           { status: 400 }
         );
       }
 
-      console.log('🔐 [SIGNUP] User successfully created:', user.id);
+      console.log('🔐 [SIGNUP] User created successfully:', user.id);
 
-      // Manually create user_profiles and user_preferences since trigger may be blocked
-      console.log('🔐 [SIGNUP] Creating user_profiles...');
+      // Create user profile
+      console.log('🔐 [SIGNUP] Creating user profile...');
       const { error: profileError } = await supabaseAdmin
         .from('user_profiles')
         .insert({
@@ -106,12 +74,13 @@ export async function POST(req: NextRequest) {
         });
 
       if (profileError) {
-        console.error('🔐 [SIGNUP] Profile creation error:', profileError);
+        console.warn('🔐 [SIGNUP] Profile creation error (non-critical):', profileError);
       } else {
         console.log('🔐 [SIGNUP] User profile created successfully');
       }
 
-      console.log('🔐 [SIGNUP] Creating user_preferences...');
+      // Create user preferences
+      console.log('🔐 [SIGNUP] Creating user preferences...');
       const { error: prefsError } = await supabaseAdmin
         .from('user_preferences')
         .insert({
@@ -119,16 +88,19 @@ export async function POST(req: NextRequest) {
         });
 
       if (prefsError) {
-        console.error('🔐 [SIGNUP] Preferences creation error:', prefsError);
+        console.warn('🔐 [SIGNUP] Preferences creation error (non-critical):', prefsError);
       } else {
         console.log('🔐 [SIGNUP] User preferences created successfully');
       }
 
-      // Supabase automatically sends confirmation email if email_confirm is false
-      if (config.features.emailVerificationRequired) {
-        console.log('🔐 [SIGNUP] Supabase will send confirmation email to:', user.email);
-      } else {
-        console.log('🔐 [SIGNUP] Email already confirmed - user can login immediately');
+      // Send verification email with set-password link
+      console.log('🔐 [SIGNUP] Sending set-password email...');
+      try {
+        await sendSetPasswordEmail(email, displayName, verificationToken);
+        console.log('📧 [SIGNUP] Set-password email sent successfully');
+      } catch (emailError) {
+        console.warn('📧 [SIGNUP] Email sending failed (non-critical):', emailError);
+        // Don't fail the signup if email fails - user can request resend later
       }
 
       return NextResponse.json({
@@ -137,16 +109,10 @@ export async function POST(req: NextRequest) {
           id: user.id,
           email: user.email,
         },
-        message: config.features.emailVerificationRequired 
-          ? 'Signup successful. Please verify your email.'
-          : 'Signup successful. You can now login.',
-      });
+        message: 'Signup successful. Check your email to set your password.',
+      }, { status: 201 });
     } catch (innerError) {
-      console.error('🔐 [SIGNUP] Outer inner catch:', {
-        error: innerError,
-        message: innerError instanceof Error ? innerError.message : String(innerError),
-        stack: innerError instanceof Error ? innerError.stack : 'no stack',
-      });
+      console.error('🔐 [SIGNUP] Inner error:', innerError);
       const msg = innerError instanceof Error ? innerError.message : String(innerError);
       return NextResponse.json(
         { error: `Signup error: ${msg}` },
