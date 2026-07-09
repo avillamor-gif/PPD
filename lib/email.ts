@@ -236,8 +236,22 @@ export async function sendNewUserAdminNotification(email: string, displayName: s
 export async function sendSetPasswordEmail(email: string, displayName: string, token: string) {
   const setPasswordUrl = `${config.app.url}/auth/set-password?token=${token}`;
 
+  console.log('📧 [EMAIL] sendSetPasswordEmail called with:', {
+    email,
+    displayName,
+    tokenLength: token.length,
+    from: config.email.from,
+    appName: config.email.appName,
+    setPasswordUrl,
+  });
+
   try {
-    await getResend().emails.send({
+    console.log('📧 [EMAIL] Calling getResend()...');
+    const resendClient = getResend();
+    console.log('📧 [EMAIL] Resend client obtained');
+
+    console.log('📧 [EMAIL] Sending email with getResend().emails.send()...');
+    const result = await resendClient.emails.send({
       from: config.email.from,
       to: email,
       subject: `Verify Your Email & Set Password - ${config.email.appName}`,
@@ -261,9 +275,15 @@ export async function sendSetPasswordEmail(email: string, displayName: string, t
         </div>
       `,
     });
+
+    console.log('📧 [EMAIL] Email sent successfully, result:', result);
     return { success: true };
   } catch (error) {
-    console.error('Set password email error:', error);
+    console.error('📧 [EMAIL] Set password email error:', {
+      error,
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : 'no stack',
+    });
     throw error;
   }
 }

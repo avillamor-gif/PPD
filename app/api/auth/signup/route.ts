@@ -94,12 +94,16 @@ export async function POST(req: NextRequest) {
       }
 
       // Send verification email with set-password link
-      console.log('🔐 [SIGNUP] Sending set-password email...');
+      console.log('🔐 [SIGNUP] Sending set-password email to:', email);
       try {
-        await sendSetPasswordEmail(email, displayName, verificationToken);
-        console.log('📧 [SIGNUP] Set-password email sent successfully');
+        const emailResult = await sendSetPasswordEmail(email, displayName, verificationToken);
+        console.log('📧 [SIGNUP] Set-password email sent successfully:', emailResult);
       } catch (emailError) {
-        console.warn('📧 [SIGNUP] Email sending failed (non-critical):', emailError);
+        console.error('📧 [SIGNUP] Email sending FAILED:', {
+          error: emailError,
+          message: emailError instanceof Error ? emailError.message : String(emailError),
+          stack: emailError instanceof Error ? emailError.stack : 'no stack',
+        });
         // Don't fail the signup if email fails - user can request resend later
       }
 
