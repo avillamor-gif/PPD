@@ -43,19 +43,12 @@ export default function ProfilePage() {
         const { data: { user } } = await supabase.auth.getUser();
         setCurrentUser(user);
 
-        // Only allow viewing own profile for regular users
-        if (!user) {
-          router.push('/auth/login');
-          return;
+        // Check if this is the current user's profile
+        if (user && profileId === user.id) {
+          setIsOwnProfile(true);
         }
 
-        if (profileId !== user.id) {
-          // Regular users can only view their own profile
-          router.push(`/profile/${user.id}`);
-          return;
-        }
-
-        // Then load the profile
+        // Load the profile
         const { data, error } = await supabase
           .from('user_stats')
           .select('*')
@@ -65,7 +58,6 @@ export default function ProfilePage() {
         if (error) throw error;
 
         setProfile(data as UserProfile);
-        setIsOwnProfile(true); // We already verified it's their profile above
       } catch (error) {
         console.error('Load profile error:', error);
       } finally {
@@ -78,117 +70,200 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p className="text-ink/60">Loading profile...</p>
+      <div className="w-full min-h-screen bg-paper flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block w-8 h-8 border-4 border-ocean/20 border-t-ocean rounded-full animate-spin mb-4" />
+          <p className="text-ink/60">Loading profile...</p>
+        </div>
       </div>
     );
   }
 
   if (!profile) {
     return (
-      <div className="space-y-6 py-12">
-        <h1 className="text-4xl font-bold text-ink">User not found</h1>
-        <Link href="/" className="inline-flex items-center gap-2 text-ocean hover:text-ocean-deep">
-          <ArrowLeft className="w-4 h-4" />
-          Back to home
-        </Link>
+      <div className="w-full min-h-screen bg-paper">
+        <section className="mx-auto max-w-350 px-6 py-12 lg:px-10">
+          <div className="flex items-center gap-4 mb-6">
+            <Link href="/" className="text-ink/60 hover:text-ink transition">
+              <ArrowLeft className="w-6 h-6" />
+            </Link>
+            <h1 className="text-2xl font-bold text-ink">User not found</h1>
+          </div>
+          <Link href="/" className="text-ocean hover:text-ocean/80 transition">
+            Back to home →
+          </Link>
+        </section>
       </div>
     );
   }
 
   return (
-    <div className="max-w-2xl mx-auto space-y-8">
+    <div className="w-full min-h-screen bg-paper">
       {/* Header */}
-      <div className="space-y-6 p-8 rounded-lg border border-ink/10 bg-card">
-        <div className="flex items-start justify-between">
-          <div className="flex items-start gap-6">
-            {profile.avatar_url && (
-              <img
-                src={profile.avatar_url}
-                alt={profile.display_name}
-                className="w-24 h-24 rounded-full object-cover"
-              />
+      <section className="border-b border-rule bg-white">
+        <div className="mx-auto max-w-350 px-6 py-6 lg:px-10">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Link href="/" className="text-ink/60 hover:text-ink transition">
+                <ArrowLeft className="w-6 h-6" />
+              </Link>
+              <h1 className="text-2xl font-bold text-ink">Profile</h1>
+            </div>
+            {isOwnProfile && (
+              <Link
+                href={`/profile/${profileId}/edit`}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-ocean text-white hover:bg-ocean/90 transition font-medium text-sm"
+              >
+                <Edit2 className="w-4 h-4" />
+                Edit Profile
+              </Link>
             )}
-            <div className="flex-1">
-              <div className="flex items-center gap-3 mb-2">
-                <h1 className="text-4xl font-bold text-ink">{profile.display_name}</h1>
-                {profile.role && (
-                  <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-ocean/10 text-ocean">
-                    <Shield className="w-3 h-3" />
-                    {profile.role}
-                  </span>
-                )}
+          </div>
+        </div>
+      </section>
+
+      {/* Content */}
+      <section className="mx-auto max-w-350 px-6 py-12 lg:px-10">
+        <div className="grid gap-8 md:grid-cols-3">
+          {/* Main Content */}
+          <div className="md:col-span-2 space-y-6">
+            {/* Profile Card */}
+            <div className="rounded-xl border border-ink/10 bg-white p-6 space-y-6">
+              <div className="flex items-start gap-4 pb-6 border-b border-ink/10">
+                <div className="flex-shrink-0">
+                  {profile.avatar_url ? (
+                    <img
+                      src={profile.avatar_url}
+                      alt={profile.display_name}
+                      className="w-24 h-24 rounded-full object-cover border border-ink/20"
+                    />
+                  ) : (
+                    <div className="w-24 h-24 rounded-full bg-sand border border-ink/20 flex items-center justify-center">
+                      <span className="text-4xl">👤</span>
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-2">
+                    <h2 className="text-3xl font-bold text-ink">{profile.display_name}</h2>
+                    {profile.role && (
+                      <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold bg-ocean/10 text-ocean">
+                        <Shield className="w-3 h-3" />
+                        {profile.role}
+                      </span>
+                    )}
+                  </div>
+                  {profile.bio && (
+                    <p className="text-ink/60 mt-2">{profile.bio}</p>
+                  )}
+                </div>
               </div>
-              {profile.full_name && (
-                <p className="text-lg text-ink/60 mb-3">{profile.full_name}</p>
-              )}
-              {profile.bio && <p className="text-ink/60 mb-4">{profile.bio}</p>}
-              <div className="flex flex-wrap gap-4 text-sm text-ink/60">
+
+              {/* Details */}
+              <div className="space-y-4">
                 {profile.organization && (
-                  <div className="flex items-center gap-1">
-                    <Building2 className="w-4 h-4" />
-                    {profile.organization}
+                  <div>
+                    <p className="text-sm font-medium text-ink/60 mb-1">Organization</p>
+                    <div className="flex items-center gap-2">
+                      <Building2 className="w-4 h-4 text-ink/60" />
+                      <p className="text-ink">{profile.organization}</p>
+                    </div>
                   </div>
                 )}
+
                 {profile.country_code && (
-                  <div className="flex items-center gap-1">
-                    <MapPin className="w-4 h-4" />
-                    {profile.country_code}
+                  <div>
+                    <p className="text-sm font-medium text-ink/60 mb-1">Country</p>
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-4 h-4 text-ink/60" />
+                      <p className="text-ink">{profile.country_code}</p>
+                    </div>
+                  </div>
+                )}
+
+                <div>
+                  <p className="text-sm font-medium text-ink/60 mb-1">Email</p>
+                  <div className="flex items-center gap-2">
+                    <Mail className="w-4 h-4 text-ink/60" />
+                    <p className="text-ink break-all">{currentUser?.email}</p>
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-sm font-medium text-ink/60 mb-1">Member Since</p>
+                  <p className="text-ink">
+                    {new Date(profile.created_at).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric',
+                    })}
+                  </p>
+                </div>
+
+                {profile.last_activity_at && (
+                  <div>
+                    <p className="text-sm font-medium text-ink/60 mb-1">Last Active</p>
+                    <p className="text-ink">
+                      {new Date(profile.last_activity_at).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                      })}
+                    </p>
                   </div>
                 )}
               </div>
             </div>
-          </div>
-          {isOwnProfile && (
-            <Link
-              href={`/profile/${params.id}/edit`}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-ocean text-paper hover:bg-ocean-deep transition font-medium text-sm"
-            >
-              <Edit2 className="w-4 h-4" />
-              Edit Profile
-            </Link>
-          )}
-        </div>
-      </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-3 gap-4">
-        <div className="p-6 rounded-lg border border-ink/10 bg-card text-center">
-          <p className="text-3xl font-bold text-ocean">{profile.thread_count}</p>
-          <p className="text-sm text-ink/60 mt-2">Discussions Started</p>
-        </div>
-        <div className="p-6 rounded-lg border border-ink/10 bg-card text-center">
-          <p className="text-3xl font-bold text-coral">{profile.comment_count}</p>
-          <p className="text-sm text-ink/60 mt-2">Comments</p>
-        </div>
-        <div className="p-6 rounded-lg border border-ink/10 bg-card text-center">
-          <p className="text-sm text-ink/60">Member Since</p>
-          <p className="text-lg font-semibold text-ink mt-2">
-            {new Date(profile.created_at).toLocaleDateString()}
-          </p>
-        </div>
-      </div>
-
-      {/* Details */}
-      <div className="space-y-4 p-6 rounded-lg border border-ink/10 bg-card">
-        <h2 className="font-bold text-ink text-lg">Profile Information</h2>
-        <div className="space-y-3 text-sm">
-          <div>
-            <p className="text-ink/60">Last Active</p>
-            <p className="text-ink font-medium">
-              {profile.last_activity_at
-                ? new Date(profile.last_activity_at).toLocaleDateString()
-                : 'Never'}
-            </p>
-          </div>
-          {profile.bio && (
-            <div>
-              <p className="text-ink/60">Bio</p>
-              <p className="text-ink">{profile.bio}</p>
+            {/* Statistics */}
+            <div className="rounded-xl border border-ink/10 bg-white p-6 space-y-4">
+              <h3 className="text-lg font-bold text-ink border-b border-ink/10 pb-4">Activity</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-4 rounded-lg border border-ink/10 bg-paper">
+                  <p className="text-3xl font-bold text-ocean">{profile.thread_count}</p>
+                  <p className="text-sm text-ink/60 mt-2">Discussions Started</p>
+                </div>
+                <div className="p-4 rounded-lg border border-ink/10 bg-paper">
+                  <p className="text-3xl font-bold text-coral">{profile.comment_count}</p>
+                  <p className="text-sm text-ink/60 mt-2">Comments</p>
+                </div>
+              </div>
             </div>
-          )}
+          </div>
+
+          {/* Sidebar */}
+          <div className="md:col-span-1">
+            <div className="rounded-xl border border-ink/10 bg-white p-6 space-y-4 sticky top-20">
+              <h3 className="font-bold text-ink">Status</h3>
+
+              <div className="space-y-3">
+                <div>
+                  <p className="text-sm text-ink/60">Account Status</p>
+                  <p className="inline-flex items-center gap-2 mt-1">
+                    <span className="w-2 h-2 rounded-full bg-ocean" />
+                    <span className="text-ink font-medium">Active</span>
+                  </p>
+                </div>
+
+                {profile.role && (
+                  <div>
+                    <p className="text-sm text-ink/60">Role</p>
+                    <p className="text-ink font-medium capitalize mt-1">{profile.role}</p>
+                  </div>
+                )}
+              </div>
+
+              {isOwnProfile && (
+                <div className="border-t border-ink/10 pt-4">
+                  <Link href={`/profile/${profileId}/edit`} className="text-sm text-ocean hover:text-ocean/80 transition">
+                    Edit your profile →
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
-      </div>
+      </section>
     </div>
   );
 }

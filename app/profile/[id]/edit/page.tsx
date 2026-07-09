@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import config from '@/lib/config';
@@ -12,6 +12,8 @@ import { ArrowLeft, Check, AlertCircle } from 'lucide-react';
 
 export default function EditProfilePage() {
   const router = useRouter();
+  const params = useParams();
+  const profileId = params?.id as string;
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [user, setUser] = useState<any>(null);
@@ -40,6 +42,12 @@ export default function EditProfilePage() {
       const { data: { user: currentUser } } = await supabase.auth.getUser();
       if (!currentUser) {
         router.push('/auth/login');
+        return;
+      }
+
+      // Only allow editing own profile
+      if (profileId && profileId !== currentUser.id) {
+        router.push(`/profile/${profileId}`);
         return;
       }
 
