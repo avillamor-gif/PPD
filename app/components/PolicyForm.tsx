@@ -135,7 +135,7 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
       const apiData = {
         ...dataToSend,
         category: instrumentTypes.join(', '), // Convert array to comma-separated string
-        lifecycle: lifecycleStages.join(', '), // Convert array to comma-separated string
+        lifecycle_stage: lifecycleStages.join(', '), // Convert array to comma-separated string
         year: yearFromDate,
       };
       
