@@ -58,11 +58,18 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
     return lifecycleStr.split(',').map((item: string) => item.trim()).filter(Boolean);
   };
 
+  // Get region based on country code
+  const getRegionForCountry = (countryCode: string): string => {
+    if (!countryCode) return '';
+    const country = COUNTRIES.find(c => c.code === countryCode);
+    return country?.region || '';
+  };
+
   const [formData, setFormData] = useState({
     title: initialData?.title || '',
     summary: initialData?.summary || '',
     commencementDate: getCommencementDate(),
-    region: '',
+    region: getRegionForCountry(initialData?.country || ''),
     country: initialData?.country || '',
     level: (initialData?.level || 'National') as PolicyLevel,
     instrumentTypes: getInstrumentTypes(),
@@ -86,6 +93,14 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
         ...prev,
         region: value,
         country: '',
+      }));
+    } else if (name === 'country') {
+      // When country changes, auto-populate the region
+      const regionForCountry = getRegionForCountry(value);
+      setFormData((prev) => ({
+        ...prev,
+        country: value,
+        region: regionForCountry,
       }));
     } else {
       setFormData((prev) => ({
