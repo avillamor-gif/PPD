@@ -276,15 +276,15 @@ export default function UserManagementPage() {
     <div className="space-y-8">
       {/* Success Message */}
       {successMessage && (
-        <div className="sticky top-20 z-40 rounded-lg border border-ocean/30 bg-ocean/15 p-6 shadow-lg">
-          <p className="font-display text-lg font-bold text-ocean">{successMessage}</p>
+        <div className="sticky top-20 z-40 rounded-lg border border-ocean/30 bg-ocean p-6 shadow-lg">
+          <p className="font-display text-lg font-bold text-white">{successMessage}</p>
         </div>
       )}
 
       {/* Error Message */}
       {errorMessage && (
-        <div className="sticky top-20 z-40 rounded-lg border border-coral/30 bg-coral/15 p-6 shadow-lg">
-          <p className="font-display text-lg font-bold text-coral">{errorMessage}</p>
+        <div className="sticky top-20 z-40 rounded-lg border border-coral/30 bg-coral p-6 shadow-lg">
+          <p className="font-display text-lg font-bold text-white">{errorMessage}</p>
         </div>
       )}
 

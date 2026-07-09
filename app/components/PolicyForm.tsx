@@ -207,18 +207,18 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
     <form onSubmit={handleSubmit} className="space-y-8">
       {/* Success Message */}
       {submitted && (
-        <div className="sticky top-20 z-40 rounded-lg border border-ocean/30 bg-ocean/15 p-6 shadow-lg">
-          <p className="font-display text-lg font-bold text-ocean">✓ Policy {isEditing ? 'updated' : 'submitted'} successfully!</p>
-          <p className="text-sm text-ocean/70 mt-1">Redirecting in a moment...</p>
+        <div className="sticky top-20 z-40 rounded-lg border border-ocean/30 bg-ocean p-6 shadow-lg">
+          <p className="font-display text-lg font-bold text-white">✓ Policy {isEditing ? 'updated' : 'submitted'} successfully!</p>
+          <p className="text-sm text-white/80 mt-1">Redirecting in a moment...</p>
         </div>
       )}
 
       {/* Error Message */}
       {error && (
-        <div className="rounded-lg border border-coral/30 bg-coral/15 p-4">
-          <p className="font-medium text-coral">✗ {error}</p>
+        <div className="rounded-lg border border-coral/30 bg-coral p-4">
+          <p className="font-medium text-white">✗ {error}</p>
           {Object.keys(fieldErrors).length > 0 && (
-            <ul className="mt-2 text-sm text-coral/80 space-y-1">
+            <ul className="mt-2 text-sm text-white/80 space-y-1">
               {Object.entries(fieldErrors).map(([field, message]) => (
                 <li key={field}>• {message}</li>
               ))}
