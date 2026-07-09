@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { Mail, MapPin, Building2, Edit2, ArrowLeft, Shield } from 'lucide-react';
 
@@ -22,11 +22,9 @@ interface UserProfile {
   last_activity_at: string;
 }
 
-export default function ProfilePage({
-  params,
-}: {
-  params: { id: string };
-}) {
+export default function ProfilePage() {
+  const params = useParams();
+  const profileId = params?.id as string;
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<any>(null);
@@ -34,31 +32,34 @@ export default function ProfilePage({
   const router = useRouter();
 
   useEffect(() => {
+    if (!profileId) {
+      setLoading(false);
+      return;
+    }
+
     const initProfile = async () => {
-      // First, check auth to get current user
-      const { data: { user } } = await supabase.auth.getUser();
-      setCurrentUser(user);
-
-      // Only allow viewing own profile for regular users
-      if (!user) {
-        router.push('/auth/login');
-        setLoading(false);
-        return;
-      }
-
-      if (params.id !== user.id) {
-        // Regular users can only view their own profile
-        router.push(`/profile/${user.id}`);
-        setLoading(false);
-        return;
-      }
-
-      // Then load the profile
       try {
+        // First, check auth to get current user
+        const { data: { user } } = await supabase.auth.getUser();
+        setCurrentUser(user);
+
+        // Only allow viewing own profile for regular users
+        if (!user) {
+          router.push('/auth/login');
+          return;
+        }
+
+        if (profileId !== user.id) {
+          // Regular users can only view their own profile
+          router.push(`/profile/${user.id}`);
+          return;
+        }
+
+        // Then load the profile
         const { data, error } = await supabase
           .from('user_stats')
           .select('*')
-          .eq('id', params.id)
+          .eq('id', profileId)
           .single();
 
         if (error) throw error;
@@ -73,7 +74,7 @@ export default function ProfilePage({
     };
 
     initProfile();
-  }, [params.id, router]);
+  }, [profileId, router]);
 
   if (loading) {
     return (
