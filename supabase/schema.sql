@@ -403,45 +403,50 @@ FOR EACH ROW
 EXECUTE FUNCTION update_comment_reply_count();
 
 -- Function: Sync user_profiles when new auth user created
-CREATE OR REPLACE FUNCTION handle_new_user()
-RETURNS TRIGGER AS $$
-BEGIN
-  INSERT INTO user_profiles (id, display_name, email_verified)
-  VALUES (
-    NEW.id,
-    COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.email),
-    FALSE
-  );
+-- NOTE: This function is properly defined in triggers.sql with SECURITY DEFINER
+-- Do not redefine here as the simpler version without SECURITY DEFINER causes RLS issues
+-- Keeping commented for reference only
+-- CREATE OR REPLACE FUNCTION handle_new_user()
+-- RETURNS TRIGGER AS $$
+-- BEGIN
+--   INSERT INTO user_profiles (id, display_name, email_verified)
+--   VALUES (
+--     NEW.id,
+--     COALESCE(NEW.raw_user_meta_data->>'full_name', NEW.email),
+--     FALSE
+--   );
+-- 
+--   INSERT INTO user_preferences (user_id)
+--   VALUES (NEW.id);
+-- 
+--   RETURN NEW;
+-- END;
+-- $$ LANGUAGE plpgsql;
 
-  INSERT INTO user_preferences (user_id)
-  VALUES (NEW.id);
-
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER trigger_handle_new_user
-AFTER INSERT ON auth.users
-FOR EACH ROW
-EXECUTE FUNCTION handle_new_user();
+-- CREATE TRIGGER trigger_handle_new_user
+-- AFTER INSERT ON auth.users
+-- FOR EACH ROW
+-- EXECUTE FUNCTION handle_new_user();
 
 -- Function: Update user profile when email verified
-CREATE OR REPLACE FUNCTION handle_email_verified()
-RETURNS TRIGGER AS $$
-BEGIN
-  IF NEW.email_confirmed_at IS NOT NULL AND OLD.email_confirmed_at IS NULL THEN
-    UPDATE user_profiles
-    SET email_verified = TRUE
-    WHERE id = NEW.id;
-  END IF;
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
+-- NOTE: This function is properly defined in triggers.sql
+-- Do not redefine here
+-- CREATE OR REPLACE FUNCTION handle_email_verified()
+-- RETURNS TRIGGER AS $$
+-- BEGIN
+--   IF NEW.email_confirmed_at IS NOT NULL AND OLD.email_confirmed_at IS NULL THEN
+--     UPDATE user_profiles
+--     SET email_verified = TRUE
+--     WHERE id = NEW.id;
+--   END IF;
+--   RETURN NEW;
+-- END;
+-- $$ LANGUAGE plpgsql;
 
-CREATE TRIGGER trigger_handle_email_verified
-AFTER UPDATE ON auth.users
-FOR EACH ROW
-EXECUTE FUNCTION handle_email_verified();
+-- CREATE TRIGGER trigger_handle_email_verified
+-- AFTER UPDATE ON auth.users
+-- FOR EACH ROW
+-- EXECUTE FUNCTION handle_email_verified();
 
 -- Function: RPC for updating user email_confirmed (used during verification)
 CREATE OR REPLACE FUNCTION update_user_email_confirmed(user_id UUID)

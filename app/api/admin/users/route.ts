@@ -81,8 +81,13 @@ export async function GET(req: NextRequest) {
 
 // POST create user (admin only)
 export async function POST(req: NextRequest) {
+  console.log('📨 [API] POST /api/admin/users called');
   try {
-    const { email, password, displayName, role } = await req.json();
+    const body = await req.json();
+    console.log('📦 [API] Request body:', body);
+    const { email, password, displayName, role } = body;
+
+    console.log('📋 [ADMIN-CREATE] Request received:', { email, displayName, role, hasPassword: !!password });
 
     if (!email || !password || !displayName) {
       return NextResponse.json(
@@ -98,23 +103,84 @@ export async function POST(req: NextRequest) {
       .eq('name', role || 'user')
       .single();
 
+    console.log('🔍 [ADMIN-CREATE] Role lookup:', { role: role || 'user', roleData, roleError });
+
     if (roleError || !roleData) {
-      return NextResponse.json({ error: 'Invalid role' }, { status: 400 });
+      console.error('❌ [ADMIN-CREATE] Role lookup failed:', roleError);
+      return NextResponse.json({ error: `Invalid role: ${roleError?.message || 'not found'}` }, { status: 400 });
     }
 
     // Create auth user - trigger creates user_profiles + preferences
-    const { data: { user }, error: createError } = await supabaseAdmin.auth.admin.createUser({
+    console.log('👤 [ADMIN-CREATE] Creating auth user:', email);
+    let { data: { user }, error: createError } = await supabaseAdmin.auth.admin.createUser({
       email,
       password,
       email_confirm: true, // Auto-confirm email for admin-created users
       user_metadata: { display_name: displayName },
     });
+    
+    console.log('👤 [ADMIN-CREATE] Auth user created:', { userId: user?.id, createError });
+
+    // WORKAROUND: If creation failed, check if user exists despite the error
+    if ((createError || !user) && email) {
+      console.log('⚠️  [ADMIN-CREATE] Creation error detected, checking if user exists...');
+      try {
+        const { data: { users }, error: listError } = await supabaseAdmin.auth.admin.listUsers();
+        if (!listError && users) {
+          const existingUser = users.find((u: any) => u.email === email);
+          if (existingUser) {
+            console.log('✅ [ADMIN-CREATE] User already exists despite error:', existingUser.id);
+            user = existingUser;
+            createError = null;
+          }
+        }
+      } catch (e) {
+        console.warn('⚠️  [ADMIN-CREATE] Error checking for existing user:', e);
+      }
+    }
 
     if (createError || !user) {
+      console.error('❌ [ADMIN-CREATE] Create user failed:', {
+        createErrorMessage: createError?.message,
+        createErrorStatus: createError?.status,
+        createErrorCode: createError?.code,
+        fullError: JSON.stringify(createError, null, 2),
+      });
       return NextResponse.json(
         { error: createError?.message || 'Failed to create user' },
         { status: 400 }
       );
+    }
+
+    // WORKAROUND: Manually create user_profiles if trigger failed
+    // (Supabase trigger has permission issues - missing SECURITY DEFINER)
+    console.log('📋 [ADMIN-CREATE] Creating user_profiles manually...');
+    const { error: profileError } = await supabaseAdmin
+      .from('user_profiles')
+      .insert([{
+        id: user.id,
+        display_name: displayName,
+        full_name: displayName,
+        role_id: (roleData as any).id,
+        email_verified: true, // Auto-confirm
+      }]);
+
+    if (profileError) {
+      console.warn('⚠️  [ADMIN-CREATE] user_profiles insert warning (may already exist):', profileError);
+    } else {
+      console.log('✅ [ADMIN-CREATE] user_profiles created successfully');
+    }
+
+    // WORKAROUND: Manually create user_preferences if trigger failed
+    console.log('📋 [ADMIN-CREATE] Creating user_preferences manually...');
+    const { error: prefsError } = await supabaseAdmin
+      .from('user_preferences')
+      .insert([{ user_id: user.id }]);
+
+    if (prefsError) {
+      console.warn('⚠️  [ADMIN-CREATE] user_preferences insert warning (may already exist):', prefsError);
+    } else {
+      console.log('✅ [ADMIN-CREATE] user_preferences created successfully');
     }
 
     console.log('👤 [ADMIN] User created successfully:', { userId: user.id, email: user.email, role });
@@ -170,9 +236,13 @@ export async function POST(req: NextRequest) {
       message: 'User created successfully and notification emails sent'
     }, { status: 201 });
   } catch (error) {
-    console.error('Create user error:', error);
+    console.error('❌ Create user error:', {
+      error,
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    });
     return NextResponse.json(
-      { error: (error as Error).message },
+      { error: error instanceof Error ? error.message : 'Unknown error occurred' },
       { status: 500 }
     );
   }
