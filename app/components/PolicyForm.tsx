@@ -207,7 +207,7 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
     <form onSubmit={handleSubmit} className="space-y-8">
       {/* Success Message */}
       {submitted && (
-        <div className="sticky top-0 z-50 rounded-lg border border-ocean/30 bg-ocean/5 p-6 shadow-lg">
+        <div className="sticky top-20 z-40 rounded-lg border border-ocean/30 bg-ocean/5 p-6 shadow-lg">
           <p className="font-display text-lg font-bold text-ocean">✓ Policy {isEditing ? 'updated' : 'submitted'} successfully!</p>
           <p className="text-sm text-ocean/70 mt-1">Redirecting in a moment...</p>
         </div>
