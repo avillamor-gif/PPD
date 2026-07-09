@@ -5,7 +5,10 @@ export async function POST(req: NextRequest) {
   try {
     const { token } = await req.json();
 
+    console.log('🔐 [VALIDATE-TOKEN] Request received with token:', { tokenLength: token?.length, token });
+
     if (!token) {
+      console.error('🔐 [VALIDATE-TOKEN] No token provided');
       return NextResponse.json(
         { error: 'Token is required', valid: false },
         { status: 400 }
@@ -16,6 +19,13 @@ export async function POST(req: NextRequest) {
 
     // Query all users to find one with matching token (this is slow but works without a separate tokens table)
     const { data: users, error: queryError } = await supabaseAdmin.auth.admin.listUsers();
+
+    console.log('🔐 [VALIDATE-TOKEN] listUsers response:', { 
+      hasError: !!queryError, 
+      errorMessage: queryError?.message,
+      usersLength: users?.length,
+      usersIsArray: Array.isArray(users)
+    });
 
     if (queryError) {
       console.error('🔐 [VALIDATE-TOKEN] Failed to list users:', queryError);
@@ -33,8 +43,17 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    console.log('🔐 [VALIDATE-TOKEN] Searching through', users.length, 'users for matching token');
+
     // Find user with matching token
-    const user = users.find((u: any) => u.user_metadata?.verification_token === token);
+    const user = users.find((u: any) => {
+      const userToken = u.user_metadata?.verification_token;
+      const matches = userToken === token;
+      if (matches) {
+        console.log('🔐 [VALIDATE-TOKEN] Found matching user:', u.id);
+      }
+      return matches;
+    });
 
     if (!user) {
       console.log('🔐 [VALIDATE-TOKEN] No user found with this token');
