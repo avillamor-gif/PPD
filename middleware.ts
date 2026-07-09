@@ -33,7 +33,6 @@ const protectedRoutes: Record<string, string[]> = {
   '/admin/moderation': ['admin', 'moderator'],
   '/admin/submit': ['admin', 'expert'],
   '/admin/manage': ['admin', 'expert'],
-  '/profile': ['user', 'expert', 'moderator', 'admin'],
   '/notifications': ['user', 'expert', 'moderator', 'admin'],
 };
 
@@ -42,6 +41,11 @@ export async function middleware(request: NextRequest) {
 
   // Allow public routes
   if (publicRoutes.some((route) => pathname === route || pathname.startsWith(route + '/'))) {
+    return NextResponse.next();
+  }
+
+  // Allow profile routes - handle auth on client side
+  if (pathname.startsWith('/profile/')) {
     return NextResponse.next();
   }
 
@@ -89,14 +93,6 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(new URL('/', request.url));
       }
       break;
-    }
-  }
-
-  // Allow profile access only to owner or admin
-  if (pathname.startsWith('/profile/')) {
-    const profileId = pathname.split('/')[2];
-    if (profileId !== session.user.id && userRole !== 'admin') {
-      return NextResponse.redirect(new URL('/', request.url));
     }
   }
 

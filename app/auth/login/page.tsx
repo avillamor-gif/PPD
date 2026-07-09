@@ -36,7 +36,29 @@ function LoginContent() {
         const { data: { session } } = await supabase.auth.getSession();
         if (session?.user) {
           setRedirected(true);
-          router.push('/admin');
+          // Get user role and redirect to appropriate dashboard
+          const { data: profile } = await supabase
+            .from('user_profiles')
+            .select('roles(name)')
+            .eq('id', session.user.id)
+            .single();
+
+          const roles = Array.isArray(profile?.roles)
+            ? profile.roles
+            : profile?.roles
+              ? [profile.roles]
+              : [];
+          const userRole = roles?.[0]?.name || 'user';
+
+          if (userRole === 'admin') {
+            router.push('/admin');
+          } else if (userRole === 'moderator') {
+            router.push('/admin/moderation');
+          } else if (userRole === 'expert') {
+            router.push('/admin/submit');
+          } else {
+            router.push(`/profile/${session.user.id}`);
+          }
           return;
         }
         
@@ -98,9 +120,30 @@ function LoginContent() {
       setEmail('');
       setPassword('');
 
-      // Redirect immediately - let the admin page handle auth verification
+      // Get user role and redirect to appropriate dashboard
+      const { data: profile } = await supabase
+        .from('user_profiles')
+        .select('roles(name)')
+        .eq('id', user.id)
+        .single();
+
+      const roles = Array.isArray(profile?.roles)
+        ? profile.roles
+        : profile?.roles
+          ? [profile.roles]
+          : [];
+      const userRole = roles?.[0]?.name || 'user';
+
       setRedirected(true);
-      router.push('/admin');
+      if (userRole === 'admin') {
+        router.push('/admin');
+      } else if (userRole === 'moderator') {
+        router.push('/admin/moderation');
+      } else if (userRole === 'expert') {
+        router.push('/admin/submit');
+      } else {
+        router.push(`/profile/${user.id}`);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred during login');
     } finally {
