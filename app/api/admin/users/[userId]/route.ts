@@ -120,7 +120,7 @@ export async function PATCH(
   }
 }
 
-// DELETE user (soft delete)
+// DELETE user (hard delete)
 export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ userId: string }> }
@@ -139,21 +139,31 @@ export async function DELETE(
 
     console.log('🗑️ [DELETE] Starting user deletion for userId:', userId);
 
-    // Soft delete by marking status in auth metadata
-    console.log('🗑️ [DELETE] Updating auth metadata...');
-    const { data: updateData, error: updateError } = await supabaseAdmin.auth.admin.updateUserById(userId, {
-      user_metadata: { account_status: 'deleted' },
-    });
-
-    if (updateError) {
-      console.error('🗑️ [DELETE] Auth update error:', updateError);
+    // First, verify user exists
+    console.log('🗑️ [DELETE] Verifying user exists...');
+    const { data: userExists } = await supabaseAdmin.auth.admin.getUserById(userId);
+    
+    if (!userExists) {
       return NextResponse.json(
-        { error: `Failed to delete user: ${updateError.message}` },
+        { error: 'User not found' },
+        { status: 404 }
+      );
+    }
+
+    console.log('🗑️ [DELETE] User found, attempting deletion...');
+
+    // Delete from auth using admin API
+    const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(userId);
+
+    if (deleteError) {
+      console.error('🗑️ [DELETE] Auth deletion error:', deleteError);
+      return NextResponse.json(
+        { error: `Failed to delete user: ${deleteError.message}` },
         { status: 400 }
       );
     }
 
-    console.log('🗑️ [DELETE] Auth metadata updated successfully');
+    console.log('🗑️ [DELETE] User deleted from auth successfully');
 
     // Log audit event
     console.log('🗑️ [DELETE] Logging audit event...');
