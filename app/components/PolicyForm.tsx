@@ -165,7 +165,12 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
         endpoint: url,
         hasOtherLinks: !!apiData.otherLinks,
         otherLinks: apiData.otherLinks,
-        allFields: Object.keys(apiData)
+        hasKeywords: !!apiData.keywords,
+        keywords: apiData.keywords,
+        hasLifecycleStage: !!apiData.lifecycle_stage,
+        lifecycle_stage: apiData.lifecycle_stage,
+        allFields: Object.keys(apiData),
+        fullApiData: JSON.stringify(apiData, null, 2)
       });
       
       const response = await fetch(url, {
