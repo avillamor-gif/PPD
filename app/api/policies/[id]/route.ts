@@ -172,8 +172,9 @@ export async function PUT(
       .eq('slug', id)
       .select();
 
-    // If not found by slug, try by id
-    if ((!result.data || result.data.length === 0) && result.error?.code === 'PGRST116') {
+    // If not found by slug, try by id instead
+    // This condition checks for NO results, not just specific error codes
+    if (!result.data || result.data.length === 0) {
       result = await supabaseAdmin
         .from('policies')
         .update(policyData)
