@@ -138,7 +138,7 @@ export default function ProfilePage() {
             {/* Profile Card */}
             <div className="rounded-xl border border-ink/10 bg-white p-6 space-y-6">
               <div className="flex items-start gap-4 pb-6 border-b border-ink/10">
-                <div className="flex-shrink-0">
+                <div className="shrink-0">
                   {profile.avatar_url ? (
                     <img
                       src={profile.avatar_url}

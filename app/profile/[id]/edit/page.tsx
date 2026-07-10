@@ -252,7 +252,7 @@ export default function EditProfilePage() {
               <form onSubmit={handleSaveProfile} className="space-y-4">
                 {/* Avatar Upload */}
                 <div className="flex items-start gap-4 pb-4 border-b border-ink/10">
-                  <div className="flex-shrink-0">
+                  <div className="shrink-0">
                     {avatarUrl ? (
                       <img
                         src={avatarUrl}
