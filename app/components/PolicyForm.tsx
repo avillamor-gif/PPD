@@ -58,6 +58,12 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
     return lifecycleStr.split(',').map((item: string) => item.trim()).filter(Boolean);
   };
 
+  // Get keywords from initialData
+  const getKeywords = () => {
+    if (!initialData) return '';
+    return (initialData as any).keywords || '';
+  };
+
   // Get region based on country code
   const getRegionForCountry = (countryCode: string): string => {
     if (!countryCode) return '';
@@ -74,7 +80,7 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
     level: (initialData?.level || 'National') as PolicyLevel,
     instrumentTypes: getInstrumentTypes(),
     lifecycleStages: getLifecycleStages(),
-    keywords: '',
+    keywords: getKeywords(),
     status: (initialData?.status || 'Unknown') as PolicyStatus,
     authority: initialData?.authority || '',
     link: initialData?.link || '',
