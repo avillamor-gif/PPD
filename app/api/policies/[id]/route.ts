@@ -55,7 +55,15 @@ function convertFormDataToDbFormat(data: Record<string, any>) {
     }
   }
   
-  console.log('📤 Converted data:', { other_links: converted.other_links });
+  console.log('� [CONVERSION] Input keys:', Object.keys(data));
+  console.log('🔄 [CONVERSION] Output keys:', Object.keys(converted));
+  console.log('🔄 [CONVERSION] Converted values:', {
+    other_links: converted['other_links'],
+    keywords: converted['keywords'],
+    lifecycle_stage: converted['lifecycle_stage'],
+    category: converted['category']
+  });
+  
   return converted;
 }
 
@@ -118,7 +126,15 @@ export async function PUT(
   try {
     const { id } = await params;
     const body = await request.json();
-    console.log('✏️ [PUT] Incoming form data:', { id, otherLinks: body.otherLinks, other_links: body.other_links });
+    console.log('✏️ [PUT] Incoming form data:', { 
+      id, 
+      otherLinks: body.otherLinks,
+      other_links: body.other_links,
+      keywords: body.keywords,
+      lifecycleStages: body.lifecycleStages,
+      lifecycle_stage: body.lifecycle_stage,
+      allBodyKeys: Object.keys(body)
+    });
     const normalizedBody = normalizePolicyDateFields(body);
 
     // Validate input
@@ -139,11 +155,15 @@ export async function PUT(
       updated_at: new Date().toISOString(),
     };
 
-    console.log('✏️ [PUT] Updating in Supabase:', { 
+    console.log('✏️ [PUT] After conversion:', { 
       id,
       other_links: (policyData as any).other_links,
-      allKeys: Object.keys(policyData)
+      keywords: (policyData as any).keywords,
+      lifecycle_stage: (policyData as any).lifecycle_stage,
+      allDataKeys: Object.keys(policyData)
     });
+    
+    console.log('✏️ [PUT] Full policyData object:', JSON.stringify(policyData, null, 2));
 
     // Update in Supabase - try by slug first, then by id
     let result = await supabaseAdmin
@@ -165,6 +185,17 @@ export async function PUT(
       console.error('Supabase error:', result.error);
       throw new Error(result.error.message || 'Failed to update policy');
     }
+
+    console.log('✏️ [PUT] Supabase update response:', {
+      success: !!result.data,
+      returnedData: result.data?.[0] ? {
+        other_links: (result.data[0] as any).other_links,
+        keywords: (result.data[0] as any).keywords,
+        lifecycle_stage: (result.data[0] as any).lifecycle_stage,
+        category: (result.data[0] as any).category,
+      } : null,
+      fullResponse: result.data?.[0]
+    });
 
     return NextResponse.json(
       {

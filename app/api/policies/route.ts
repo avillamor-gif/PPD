@@ -55,7 +55,15 @@ function convertFormDataToDbFormat(data: Record<string, any>) {
     }
   }
   
-  console.log('📤 Converted data:', { other_links: converted.other_links });
+  console.log('� [CONVERSION] Input keys:', Object.keys(data));
+  console.log('🔄 [CONVERSION] Output keys:', Object.keys(converted));
+  console.log('🔄 [CONVERSION] Converted values:', {
+    other_links: converted['other_links'],
+    keywords: converted['keywords'],
+    lifecycle_stage: converted['lifecycle_stage'],
+    category: converted['category']
+  });
+  
   return converted;
 }
 
