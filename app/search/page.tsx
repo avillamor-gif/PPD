@@ -128,29 +128,46 @@ export default function SearchPage() {
     return ["All Instrument Types", ...sorted];
   }, [POLICIES]);
 
-  // Get available regions from policies (only show regions with entries)
+  // Get available regions from policies with usage count (only show regions with entries)
   const availableRegions = useMemo(() => {
-    const regionsWithEntries = new Set(
-      POLICIES.map(p => COUNTRIES.find(c => c.code === p.countryCode)?.region)
-        .filter(Boolean)
-    );
-    return ["All regions", ...Array.from(regionsWithEntries).sort()];
+    const regionCounts = new Map<string, number>();
+    POLICIES.forEach(p => {
+      const countryData = COUNTRIES.find(c => c.code === p.countryCode);
+      const region = countryData?.region;
+      if (region) {
+        regionCounts.set(region, (regionCounts.get(region) || 0) + 1);
+      }
+    });
+    // Sort by name and format with count
+    const sorted = Array.from(regionCounts.entries())
+      .sort((a, b) => a[0].localeCompare(b[0]))
+      .map(([name, count]) => `${name} (${count})`);
+    return ["All regions", ...sorted];
   }, [POLICIES]);
 
-  // Get available countries from policies (only show countries with entries)
+  // Get available countries from policies with usage count (only show countries with entries)
   const countriesWithEntries = useMemo(() => {
-    const countryCodesWithEntries = new Set(POLICIES.map(p => p.countryCode));
-    return COUNTRIES.filter(c => countryCodesWithEntries.has(c.code));
+    const countryCounts = new Map<string, number>();
+    POLICIES.forEach(p => {
+      countryCounts.set(p.countryCode, (countryCounts.get(p.countryCode) || 0) + 1);
+    });
+    return COUNTRIES.filter(c => countryCounts.has(c.code)).map(c => ({
+      ...c,
+      displayName: `${c.name} (${countryCounts.get(c.code) || 0})`
+    }));
   }, [POLICIES]);
 
   // Filter countries by selected region - same logic as PolicyForm
   const filteredCountries = useMemo(() => {
+    const allCountriesObj = { code: "all", name: "All countries", region: "", displayName: "All countries" };
     if (region === "All regions") {
-      return [{ code: "all", name: "All countries" }, ...countriesWithEntries];
+      return [allCountriesObj, ...countriesWithEntries];
     }
+    // Extract region name from region (remove the count: "Region (5)" -> "Region")
+    const regionName = region.replace(/ \(\d+\)$/, '');
     return [
-      { code: "all", name: "All countries" },
-      ...countriesWithEntries.filter((c) => c.region === region)
+      allCountriesObj,
+      ...countriesWithEntries.filter((c: any) => c.region === regionName)
     ];
   }, [region, countriesWithEntries]);
 
@@ -167,9 +184,11 @@ export default function SearchPage() {
       .filter((p) => {
         // Filter by region
         if (region === "All regions") return true;
+        // Extract region name from region (remove the count: "Region (5)" -> "Region")
+        const regionName = region.replace(/ \(\d+\)$/, '');
         // Find the country in COUNTRIES to get its region
         const countryData = COUNTRIES.find((c) => c.code === p.countryCode);
-        return countryData?.region === region;
+        return countryData?.region === regionName;
       })
       .filter((p) => (country === "all" ? true : p.countryCode === country))
       .filter((p) => {
@@ -236,7 +255,7 @@ export default function SearchPage() {
             label="Country" 
             value={country} 
             onChange={setCountry} 
-            options={filteredCountries.map((c) => [c.code, c.code === "all" ? c.name : `${c.name} (${c.code})`] as [string, string])} 
+            options={filteredCountries.map((c: any) => [c.code, c.displayName || c.name] as [string, string])} 
           />
           <Select 
             label="Instrument Type" 
