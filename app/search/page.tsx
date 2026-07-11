@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useState, useMemo, useEffect } from 'react';
 import { Search, ChevronDown, Loader } from 'lucide-react';
-import { COUNTRIES, REGIONS as ALL_REGIONS } from '@/lib/constants';
+import { COUNTRIES } from '@/lib/constants';
 import { useReferenceData } from '@/lib/hooks/useReferenceData';
 
 // Transform policies to include country names for display
