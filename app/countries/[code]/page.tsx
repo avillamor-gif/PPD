@@ -32,17 +32,14 @@ export default async function CountryPage({ params }: { params: Promise<{ code: 
     console.error('Error fetching policies:', err);
   }
 
-  const THEMES = ['Plastic Ban', 'EPR', 'Waste Management', 'Circular Economy'];
+  const THEMES = ['Waste Management Regulation'];
   const byTheme = THEMES.map((c) => ({
     name: c,
     count: policies.filter((p: any) => p?.category === c).length,
   })).filter((c) => c.count > 0);
 
   const themeColors: Record<string, string> = {
-    "Plastic Ban": "bg-coral/20 text-coral",
-    "EPR": "bg-ocean/20 text-ocean",
-    "Waste Management": "bg-sand text-ink",
-    "Circular Economy": "bg-ocean-deep/20 text-ocean-deep",
+    "Waste Management Regulation": "bg-sand text-ink",
   };
 
   const statusColors: Record<string, string> = {
