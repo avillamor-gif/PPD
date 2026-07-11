@@ -107,21 +107,25 @@ export default function SearchPage() {
   // Categories to exclude from the dropdown filter
   const EXCLUDED_CATEGORIES = ["Plastic Ban", "Circular Economy", "EPR"];
 
-  // Get available themes from policies (instrument types)
+  // Get available themes from policies with usage count (instrument types)
   const availableThemes = useMemo(() => {
-    const themes = new Set<string>();
+    const themeCounts = new Map<string, number>();
     POLICIES.forEach(p => {
       if (p.category) {
-        // Split comma-separated categories and add each individually
+        // Split comma-separated categories and count each individually
         p.category.split(',').forEach((cat: string) => {
           const trimmed = cat.trim();
           if (trimmed && !EXCLUDED_CATEGORIES.includes(trimmed)) {
-            themes.add(trimmed);
+            themeCounts.set(trimmed, (themeCounts.get(trimmed) || 0) + 1);
           }
         });
       }
     });
-    return ["All Instrument Types", ...Array.from(themes).sort()];
+    // Sort by name and format with count
+    const sorted = Array.from(themeCounts.entries())
+      .sort((a, b) => a[0].localeCompare(b[0]))
+      .map(([name, count]) => `${name} (${count})`);
+    return ["All Instrument Types", ...sorted];
   }, [POLICIES]);
 
   // Get available regions from policies (only show regions with entries)
@@ -170,9 +174,11 @@ export default function SearchPage() {
       .filter((p) => (country === "all" ? true : p.countryCode === country))
       .filter((p) => {
         if (theme === "All Instrument Types") return true;
+        // Extract category name from theme (remove the count: "Name (5)" -> "Name")
+        const themeName = theme.replace(/ \(\d+\)$/, '');
         // Handle comma-separated categories
         const categories = p.category?.split(',').map((cat: string) => cat.trim()) || [];
-        return categories.includes(theme);
+        return categories.includes(themeName);
       })
       .filter((p) => (status === "Any status" ? true : p.status === status))
       .filter((p) =>
