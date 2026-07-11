@@ -1,5 +1,5 @@
 export type PolicyStatus = "Unknown" | "In Force" | "Proposed" | "Phased" | "Repealed";
-export type PolicyCategory = "Umbrella law" | "Environment Impact Assessment (EIA)" | "Waste Management" | "Recycling Regulation" | "Penalities" | "Taxes" | "Incentives" | "Polluter Pays" | "Bans" | "Plastic Ban" | "Waste Reduction" | "Single-Use Plastics" | "Hazardous Waste" | "Waste Burning" | "Reuse" | "Redesign" | "Waste Trade" | "Plastic Alternatives" | "Circular Economy" | "EPR" | "Upstream" | "Midstream" | "Downstream";
+export type PolicyCategory = "Umbrella law" | "Environment Impact Assessment (EIA)" | "Waste Management Regulation" | "Recycling Regulation" | "Penalities" | "Taxes" | "Incentives" | "Polluter Pays" | "Bans" | "Waste Reduction" | "Single-Use Plastics" | "Hazardous Waste" | "Waste Burning" | "Reuse" | "Redesign" | "Waste Trade" | "Plastic Alternatives" | "Upstream" | "Midstream" | "Downstream";
 export type PolicyLevel = "National" | "Sub-national" | "Regional" | "International";
 
 export interface Policy {

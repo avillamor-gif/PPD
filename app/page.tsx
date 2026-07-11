@@ -65,7 +65,6 @@ export default async function Home() {
     "Redesign": "bg-sand text-ink",
     "Waste Trade": "bg-ocean-deep/20 text-ocean-deep",
     "Plastic Alternatives": "bg-ocean/20 text-ocean",
-    "Circular Economy": "bg-ocean/20 text-ocean",
   };
 
   const statusColors: Record<string, string> = {

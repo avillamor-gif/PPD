@@ -40,14 +40,13 @@ export const REGIONS: string[] = [
 export const INSTRUMENT_TYPES: PolicyCategory[] = [
   "Umbrella law",
   "Environment Impact Assessment (EIA)",
-  "Waste Management",
+  "Waste Management Regulation",
   "Recycling Regulation",
   "Penalities",
   "Taxes",
   "Incentives",
   "Polluter Pays",
   "Bans",
-  "Plastic Ban",
   "Waste Reduction",
   "Single-Use Plastics",
   "Hazardous Waste",
@@ -56,8 +55,6 @@ export const INSTRUMENT_TYPES: PolicyCategory[] = [
   "Redesign",
   "Waste Trade",
   "Plastic Alternatives",
-  "Circular Economy",
-  "EPR",
 ];
 
 export const LIFECYCLE_STAGES: PolicyCategory[] = [
