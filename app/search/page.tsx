@@ -231,7 +231,7 @@ export default function SearchPage() {
       {/* Sticky Controls */}
       <section className="sticky top-14 z-20 border-b border-rule bg-paper">
         {/* Search bar - full width */}
-        <div className="flex w-full items-center gap-3 px-6 py-5 pb-0 lg:px-10">
+        <div className="flex w-full items-center gap-3 px-6 py-5 pb-2 lg:px-10">
           <div className="relative w-full">
             <input
               value={q}
