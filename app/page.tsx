@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { COUNTRIES, INSTRUMENT_TYPES } from '@/lib/constants';
+import { COUNTRIES } from '@/lib/constants';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import type { Policy } from '@/lib/types/policy';
 import { CountryGridRealtime } from '@/app/components/CountryGridRealtime';
@@ -12,15 +12,30 @@ export const metadata = {
 export const revalidate = 60; // ISR: revalidate every 60 seconds on Vercel
 
 export default async function Home() {
-  // Fetch policies from Supabase
-  const { data: POLICIES = [], error } = await supabaseAdmin
-    .from('policies')
-    .select('*')
-    .order('year', { ascending: false }) as { data: Policy[], error: any };
+  // Fetch policies and instrument types from Supabase
+  const [
+    { data: POLICIES = [], error: policiesError },
+    { data: instrumentTypes = [], error: typesError }
+  ] = await Promise.all([
+    supabaseAdmin
+      .from('policies')
+      .select('*')
+      .order('year', { ascending: false }) as { data: Policy[], error: any },
+    supabaseAdmin
+      .from('instrument_types')
+      .select('name')
+      .order('name') as { data: Array<{ name: string }>, error: any }
+  ]);
 
-  if (error) {
-    console.error('Error fetching policies:', error);
+  if (policiesError) {
+    console.error('Error fetching policies:', policiesError);
   }
+
+  if (typesError) {
+    console.error('Error fetching instrument types:', typesError);
+  }
+
+  const INSTRUMENT_TYPES = instrumentTypes.map(t => t.name);
 
   const total = POLICIES.length;
   const inForce = POLICIES.filter((p: Policy) => p.status === "In Force").length;

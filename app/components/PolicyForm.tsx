@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
-import { COUNTRIES, REGIONS, INSTRUMENT_TYPES, LIFECYCLE_STAGES, STATUSES } from '@/lib/constants';
+import { useState, useEffect } from 'react';
+import { COUNTRIES, REGIONS } from '@/lib/constants';
+import { useReferenceData } from '@/lib/hooks/useReferenceData';
 import { MultiSelectDropdown } from './MultiSelectDropdown';
 import type { Policy, PolicyLevel, PolicyStatus } from '@/lib/types';
 
@@ -14,6 +15,7 @@ export interface PolicyFormProps {
 }
 
 export function PolicyForm({ initialData, isEditing = false, onSuccess }: PolicyFormProps) {
+  const { data: referenceData, loading: refLoading } = useReferenceData();
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -365,7 +367,7 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
               <div>
                 <MultiSelectDropdown
                   label="Instrument Type *"
-                  options={INSTRUMENT_TYPES}
+                  options={referenceData?.instrumentTypes || []}
                   selectedValues={formData.instrumentTypes}
                   onChange={(values) =>
                     setFormData((prev) => ({
@@ -375,13 +377,14 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
                   }
                   placeholder="Search and select instrument types..."
                   required={true}
+                  disabled={refLoading}
                 />
               </div>
 
               <div>
                 <MultiSelectDropdown
                   label="Stage in Plastic Lifecycle"
-                  options={LIFECYCLE_STAGES}
+                  options={referenceData?.lifecycleStages || []}
                   selectedValues={formData.lifecycleStages}
                   onChange={(values) =>
                     setFormData((prev) => ({
@@ -391,6 +394,7 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
                   }
                   placeholder="Select lifecycle stages..."
                   required={false}
+                  disabled={refLoading}
                 />
               </div>
             </div>
@@ -414,9 +418,10 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
               name="status"
               value={formData.status}
               onChange={handleChange}
-              className="w-full rounded-lg border border-ink/20 bg-paper px-4 py-2 text-ink focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20"
+              disabled={refLoading}
+              className="w-full rounded-lg border border-ink/20 bg-paper px-4 py-2 text-ink focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20 disabled:opacity-50"
             >
-              {STATUSES.map((s) => (
+              {referenceData?.statuses.map((s) => (
                 <option key={s} value={s}>
                   {s}
                 </option>

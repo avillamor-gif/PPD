@@ -32,7 +32,27 @@ export default async function CountryPage({ params }: { params: Promise<{ code: 
     console.error('Error fetching policies:', err);
   }
 
-  const THEMES = ['Waste Management Regulation'];
+  // Fetch available instrument types for this country from reference data
+  let availableThemes: string[] = [];
+  try {
+    const { data: instrumentTypes, error } = await supabaseAdmin
+      .from('instrument_types')
+      .select('name')
+      .order('name');
+    
+    if (!error && instrumentTypes) {
+      // Filter to only show themes that have policies in this country
+      const allThemes = instrumentTypes.map(t => t.name);
+      availableThemes = allThemes.filter(theme => 
+        policies.some(p => p?.category === theme)
+      );
+    }
+  } catch (err) {
+    console.error('Error fetching instrument types:', err);
+    availableThemes = ['Waste Management Regulation'];
+  }
+
+  const THEMES = availableThemes.length > 0 ? availableThemes : ['Waste Management Regulation'];
   const byTheme = THEMES.map((c) => ({
     name: c,
     count: policies.filter((p: any) => p?.category === c).length,
