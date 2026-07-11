@@ -104,9 +104,23 @@ export default function SearchPage() {
 
   const POLICIES = rawPolicies;
 
+  // Categories to exclude from the dropdown filter
+  const EXCLUDED_CATEGORIES = ["Plastic Ban", "Circular Economy", "EPR"];
+
   // Get available themes from policies (instrument types)
   const availableThemes = useMemo(() => {
-    const themes = new Set(POLICIES.map(p => p.category).filter(Boolean));
+    const themes = new Set<string>();
+    POLICIES.forEach(p => {
+      if (p.category) {
+        // Split comma-separated categories and add each individually
+        p.category.split(',').forEach((cat: string) => {
+          const trimmed = cat.trim();
+          if (trimmed && !EXCLUDED_CATEGORIES.includes(trimmed)) {
+            themes.add(trimmed);
+          }
+        });
+      }
+    });
     return ["All Instrument Types", ...Array.from(themes).sort()];
   }, [POLICIES]);
 
@@ -154,7 +168,12 @@ export default function SearchPage() {
         return countryData?.region === region;
       })
       .filter((p) => (country === "all" ? true : p.countryCode === country))
-      .filter((p) => (theme === "All Instrument Types" ? true : p.category === theme))
+      .filter((p) => {
+        if (theme === "All Instrument Types") return true;
+        // Handle comma-separated categories
+        const categories = p.category?.split(',').map((cat: string) => cat.trim()) || [];
+        return categories.includes(theme);
+      })
       .filter((p) => (status === "Any status" ? true : p.status === status))
       .filter((p) =>
         s
