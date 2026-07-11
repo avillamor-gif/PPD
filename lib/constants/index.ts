@@ -1,1 +1,1 @@
-export { COUNTRIES, REGIONS, INSTRUMENT_TYPES, LIFECYCLE_STAGES, STATUSES } from './policies';
+export { COUNTRIES, REGIONS } from './policies';

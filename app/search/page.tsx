@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useState, useMemo, useEffect } from 'react';
 import { Search, ChevronDown, Loader } from 'lucide-react';
 import { COUNTRIES, REGIONS as ALL_REGIONS } from '@/lib/constants';
+import { useReferenceData } from '@/lib/hooks/useReferenceData';
 
 // Transform policies to include country names for display
 const transformPolicies = (policies: any[]) => {
@@ -23,14 +24,6 @@ const THEMES = [
   "EPR",
   "Waste Management",
   "Circular Economy",
-];
-
-const STATUSES = [
-  "Any status",
-  "In Force",
-  "Proposed",
-  "Phased",
-  "Repealed",
 ];
 
 const REGIONS = ["All regions", ...ALL_REGIONS];
@@ -86,6 +79,7 @@ function Select({
 }
 
 export default function SearchPage() {
+  const { data: referenceData, loading: refLoading } = useReferenceData();
   const [rawPolicies, setRawPolicies] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [q, setQ] = useState("");
@@ -93,6 +87,11 @@ export default function SearchPage() {
   const [country, setCountry] = useState("all");
   const [theme, setTheme] = useState("All themes");
   const [status, setStatus] = useState("Any status");
+
+  // Statuses from reference data with "Any status" option
+  const STATUSES = referenceData?.statuses 
+    ? ["Any status", ...referenceData.statuses]
+    : ["Any status", "In Force", "Proposed", "Phased", "Repealed"];
 
   // Fetch policies from API
   useEffect(() => {

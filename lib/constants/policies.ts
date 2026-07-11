@@ -37,39 +37,7 @@ export const REGIONS: string[] = [
   ...new Set(COUNTRIES.map(c => c.region))
 ].sort();
 
-export const INSTRUMENT_TYPES: PolicyCategory[] = [
-  "Umbrella law",
-  "Environment Impact Assessment (EIA)",
-  "Waste Management Regulation",
-  "Recycling Regulation",
-  "Penalities",
-  "Taxes",
-  "Incentives",
-  "Polluter Pays",
-  "Bans",
-  "Waste Reduction",
-  "Single-Use Plastics",
-  "Hazardous Waste",
-  "Waste Burning",
-  "Reuse",
-  "Redesign",
-  "Waste Trade",
-  "Plastic Alternatives",
-];
-
-export const LIFECYCLE_STAGES: PolicyCategory[] = [
-  "Upstream",
-  "Midstream",
-  "Downstream",
-];
-
-export const STATUSES: PolicyStatus[] = [
-  "Unknown",
-  "In Force",
-  "Proposed",
-  "Phased",
-  "Repealed",
-];
-
+// Reference data (INSTRUMENT_TYPES, LIFECYCLE_STAGES, STATUSES) is now fetched from Supabase
+// Use lib/reference-data.ts with useReferenceData() hook for React components
 // POLICIES are now fetched from Supabase database
 // Use API endpoint /api/policies to get the list of policies
