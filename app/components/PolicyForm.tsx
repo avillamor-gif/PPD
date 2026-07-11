@@ -377,7 +377,6 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
                   }
                   placeholder="Search and select instrument types..."
                   required={true}
-                  disabled={refLoading}
                 />
               </div>
 
@@ -394,7 +393,6 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
                   }
                   placeholder="Select lifecycle stages..."
                   required={false}
-                  disabled={refLoading}
                 />
               </div>
             </div>
@@ -418,8 +416,7 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
               name="status"
               value={formData.status}
               onChange={handleChange}
-              disabled={refLoading}
-              className="w-full rounded-lg border border-ink/20 bg-paper px-4 py-2 text-ink focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20 disabled:opacity-50"
+              className="w-full rounded-lg border border-ink/20 bg-paper px-4 py-2 text-ink focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20"
             >
               {referenceData?.statuses.map((s) => (
                 <option key={s} value={s}>
