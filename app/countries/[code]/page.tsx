@@ -42,9 +42,9 @@ export default async function CountryPage({ params }: { params: Promise<{ code: 
     
     if (!error && instrumentTypes) {
       // Filter to only show themes that have policies in this country
-      const allThemes = instrumentTypes.map(t => t.name);
-      availableThemes = allThemes.filter(theme => 
-        policies.some(p => p?.category === theme)
+      const allThemes = instrumentTypes.map((t: any) => t.name);
+      availableThemes = allThemes.filter((theme: string) => 
+        policies.some((p: any) => p?.category === theme)
       );
     }
   } catch (err) {

@@ -33,9 +33,9 @@ export async function fetchReferenceData(): Promise<ReferenceData> {
     }
 
     cachedData = {
-      instrumentTypes: instrumentTypesRes.data?.map(t => t.name) || [],
-      lifecycleStages: lifecycleStagesRes.data?.map(l => l.name) || [],
-      statuses: statusesRes.data?.map(s => s.name) || [],
+      instrumentTypes: instrumentTypesRes.data?.map((t: any) => t.name) || [],
+      lifecycleStages: lifecycleStagesRes.data?.map((l: any) => l.name) || [],
+      statuses: statusesRes.data?.map((s: any) => s.name) || [],
       countries: countriesRes.data || [],
     };
 
