@@ -18,16 +18,6 @@ const transformPolicies = (policies: any[]) => {
   });
 };
 
-const THEMES = [
-  "All themes",
-  "Plastic Ban",
-  "EPR",
-  "Waste Management",
-  "Circular Economy",
-];
-
-const REGIONS = ["All regions", ...ALL_REGIONS];
-
 function StatusPill({ status }: { status: string }) {
   const colors: Record<string, string> = {
     "In Force": "bg-ocean text-white",
@@ -85,7 +75,7 @@ export default function SearchPage() {
   const [q, setQ] = useState("");
   const [region, setRegion] = useState("All regions");
   const [country, setCountry] = useState("all");
-  const [theme, setTheme] = useState("All themes");
+  const [theme, setTheme] = useState("All Instrument Types");
   const [status, setStatus] = useState("Any status");
 
   // Statuses from reference data with "Any status" option
@@ -114,16 +104,37 @@ export default function SearchPage() {
 
   const POLICIES = rawPolicies;
 
+  // Get available themes from policies (instrument types)
+  const availableThemes = useMemo(() => {
+    const themes = new Set(POLICIES.map(p => p.category).filter(Boolean));
+    return ["All Instrument Types", ...Array.from(themes).sort()];
+  }, [POLICIES]);
+
+  // Get available regions from policies (only show regions with entries)
+  const availableRegions = useMemo(() => {
+    const regionsWithEntries = new Set(
+      POLICIES.map(p => COUNTRIES.find(c => c.code === p.countryCode)?.region)
+        .filter(Boolean)
+    );
+    return ["All regions", ...Array.from(regionsWithEntries).sort()];
+  }, [POLICIES]);
+
+  // Get available countries from policies (only show countries with entries)
+  const countriesWithEntries = useMemo(() => {
+    const countryCodesWithEntries = new Set(POLICIES.map(p => p.countryCode));
+    return COUNTRIES.filter(c => countryCodesWithEntries.has(c.code));
+  }, [POLICIES]);
+
   // Filter countries by selected region - same logic as PolicyForm
   const filteredCountries = useMemo(() => {
     if (region === "All regions") {
-      return [{ code: "all", name: "All countries" }, ...COUNTRIES];
+      return [{ code: "all", name: "All countries" }, ...countriesWithEntries];
     }
     return [
       { code: "all", name: "All countries" },
-      ...COUNTRIES.filter((c) => c.region === region)
+      ...countriesWithEntries.filter((c) => c.region === region)
     ];
-  }, [region]);
+  }, [region, countriesWithEntries]);
 
   // Update country selection when region changes
   const handleRegionChange = (newRegion: string) => {
@@ -143,7 +154,7 @@ export default function SearchPage() {
         return countryData?.region === region;
       })
       .filter((p) => (country === "all" ? true : p.countryCode === country))
-      .filter((p) => (theme === "All themes" ? true : p.category === theme))
+      .filter((p) => (theme === "All Instrument Types" ? true : p.category === theme))
       .filter((p) => (status === "Any status" ? true : p.status === status))
       .filter((p) =>
         s
@@ -189,7 +200,7 @@ export default function SearchPage() {
             label="Region" 
             value={region} 
             onChange={handleRegionChange} 
-            options={REGIONS.map((r) => [r, r] as [string, string])} 
+            options={availableRegions.map((r) => [r, r] as [string, string])} 
           />
           <Select 
             label="Country" 
@@ -198,10 +209,10 @@ export default function SearchPage() {
             options={filteredCountries.map((c) => [c.code, c.code === "all" ? c.name : `${c.name} (${c.code})`] as [string, string])} 
           />
           <Select 
-            label="Theme" 
+            label="Instrument Type" 
             value={theme} 
             onChange={setTheme} 
-            options={THEMES.map((c) => [c, c] as [string, string])} 
+            options={availableThemes.map((c) => [c, c] as [string, string])} 
           />
           <Select 
             label="Status" 
