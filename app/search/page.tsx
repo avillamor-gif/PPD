@@ -211,8 +211,8 @@ export default function SearchPage() {
 
       {/* Sticky Controls */}
       <section className="sticky top-14 z-20 border-b border-rule bg-paper">
-        <div className="mx-auto flex max-w-350 flex-wrap items-center gap-3 px-6 py-5 lg:px-10">
-          <div className="relative min-w-60 flex-1">
+        <div className="flex w-full flex-wrap items-center gap-3 px-6 py-5 lg:px-10">
+          <div className="relative flex-1 min-w-60">
             <input
               value={q}
               onChange={(e) => setQ(e.target.value)}
