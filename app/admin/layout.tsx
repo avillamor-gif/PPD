@@ -128,7 +128,7 @@ export default function AdminLayout({
               const hasSubmenu = item.submenu && item.submenu.length > 0;
               
               return (
-                <div key={item.href} className="relative group">
+                <div key={item.href} className="relative group pb-32">
                   <Link
                     href={item.href}
                     className={`inline-flex items-center gap-2 border-b-2 transition font-mono text-sm uppercase tracking-widest ${
