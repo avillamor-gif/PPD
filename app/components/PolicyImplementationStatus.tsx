@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Calendar, Plus, X, Check } from 'lucide-react';
+import { Calendar, Plus, X, Check, Trash2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
 interface StatusHistoryEntry {
@@ -234,6 +234,42 @@ export function PolicyImplementationStatus({
     }
   };
 
+  const handleDeleteHistoryEntry = async (entryId: string) => {
+    if (!confirm('Are you sure you want to delete this history entry?')) {
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        setError('Not authenticated');
+        return;
+      }
+
+      const res = await fetch(`/api/policies/${policyId}/status-history/${entryId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`
+        }
+      });
+
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || 'Failed to delete entry');
+      }
+
+      // Remove from local state
+      setStatusHistory(statusHistory.filter(e => e.id !== entryId));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to delete history entry');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="rounded-xl border border-ink/10 bg-white p-6 space-y-4">
       <h2 className="text-xl font-bold text-ink flex items-center gap-2">
@@ -323,25 +359,25 @@ export function PolicyImplementationStatus({
       {statusHistory.length > 0 && (
         <div className="mt-6 pt-6 border-t border-ink/10">
           <h3 className="text-sm font-bold text-ink uppercase tracking-wider mb-4">Status Timeline</h3>
-          <div className="space-y-3">
+          <div className="space-y-4">
             {statusHistory.map((entry, index) => (
-              <div key={entry.id} className="flex gap-3">
+              <div key={entry.id} className="flex gap-3 group">
                 {/* Timeline dot and line */}
-                <div className="flex flex-col items-center">
-                  <div className="w-3 h-3 rounded-full bg-ocean mt-1.5" />
+                <div className="flex flex-col items-center pt-1">
+                  <div className="w-3 h-3 rounded-full bg-ocean" />
                   {index < statusHistory.length - 1 && (
-                    <div className="w-0.5 h-12 bg-ink/10 my-1" />
+                    <div className="w-0.5 h-16 bg-ink/10 my-1" />
                   )}
                 </div>
-                {/* Content */}
-                <div className="flex-1 pb-3">
-                  <div className="flex items-start justify-between">
-                    <div>
+                {/* Content with delete button */}
+                <div className="flex-1 pb-4">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1">
                       <p className="text-sm font-semibold text-ink">
                         {entry.old_status && `${entry.old_status} → `}
-                        <span className="text-ocean">{entry.new_status}</span>
+                        <span className="text-ocean font-bold">{entry.new_status}</span>
                       </p>
-                      <p className="text-xs text-ink/60 mt-1">
+                      <p className="text-xs text-ink/60 mt-1 font-mono">
                         {new Date(entry.change_date).toLocaleDateString('en-US', {
                           year: 'numeric',
                           month: 'short',
@@ -352,6 +388,16 @@ export function PolicyImplementationStatus({
                         <p className="text-xs text-ink/50 mt-2 italic">{entry.notes}</p>
                       )}
                     </div>
+                    {isAdmin && (
+                      <button
+                        onClick={() => handleDeleteHistoryEntry(entry.id)}
+                        disabled={isLoading}
+                        className="mt-1 p-1.5 rounded text-coral hover:bg-coral/10 transition opacity-0 group-hover:opacity-100"
+                        title="Delete this history entry"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
