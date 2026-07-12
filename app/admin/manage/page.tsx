@@ -15,8 +15,9 @@ export default function AdminManagePage() {
   
   // Filter states
   const [searchQuery, setSearchQuery] = useState('');
+  const [filterRegion, setFilterRegion] = useState('');
   const [filterCountry, setFilterCountry] = useState('');
-  const [filterCategory, setFilterCategory] = useState('');
+  const [filterInstrumentType, setFilterInstrumentType] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
   const [filterYear, setFilterYear] = useState('');
 
@@ -24,7 +25,25 @@ export default function AdminManagePage() {
   const countries = Array.from(new Set(policies.map(p => p.country)))
     .map(code => COUNTRIES.find(c => c.code === code))
     .filter(Boolean);
-  const categories = Array.from(new Set(policies.map(p => p.category)));
+  
+  // Get regions from countries that have policies
+  const regions = Array.from(new Set(
+    countries.map(c => c?.region).filter(Boolean)
+  )).sort();
+  
+  // Get countries filtered by selected region
+  const filteredCountriesList = filterRegion 
+    ? countries.filter(c => c?.region === filterRegion)
+    : countries;
+  
+  // Get instrument types from comma-separated categories
+  const instrumentTypes = Array.from(new Set(
+    policies
+      .map(p => p.category)
+      .filter(Boolean)
+      .flatMap(cat => cat.split(',').map(c => c.trim()))
+  )).sort();
+  
   const statuses = Array.from(new Set(policies.map(p => p.status)));
   const years = Array.from(new Set(policies.map(p => p.year))).sort((a, b) => b - a);
 
@@ -60,12 +79,20 @@ export default function AdminManagePage() {
       );
     }
 
+    if (filterRegion) {
+      const regionCountries = COUNTRIES.filter(c => c.region === filterRegion).map(c => c.code);
+      filtered = filtered.filter(p => regionCountries.includes(p.country));
+    }
+
     if (filterCountry) {
       filtered = filtered.filter(p => p.country === filterCountry);
     }
 
-    if (filterCategory) {
-      filtered = filtered.filter(p => p.category === filterCategory);
+    if (filterInstrumentType) {
+      filtered = filtered.filter(p => {
+        const categories = p.category?.split(',').map(c => c.trim()) || [];
+        return categories.includes(filterInstrumentType);
+      });
     }
 
     if (filterStatus) {
@@ -77,7 +104,7 @@ export default function AdminManagePage() {
     }
 
     setFilteredPolicies(filtered);
-  }, [policies, searchQuery, filterCountry, filterCategory, filterStatus, filterYear]);
+  }, [policies, searchQuery, filterRegion, filterCountry, filterInstrumentType, filterStatus, filterYear]);
 
   const handleDelete = async (policyId: string, slug?: string) => {
     try {
@@ -124,24 +151,35 @@ export default function AdminManagePage() {
         {/* Filter Row */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
           <select
+            value={filterRegion}
+            onChange={(e) => setFilterRegion(e.target.value)}
+            className="px-4 py-2 rounded-lg border border-ink/20 bg-paper focus:outline-none focus:border-ocean text-sm"
+          >
+            <option value="">All Regions</option>
+            {regions.map(region => (
+              <option key={region} value={region}>{region}</option>
+            ))}
+          </select>
+
+          <select
             value={filterCountry}
             onChange={(e) => setFilterCountry(e.target.value)}
             className="px-4 py-2 rounded-lg border border-ink/20 bg-paper focus:outline-none focus:border-ocean text-sm"
           >
             <option value="">All Countries</option>
-            {countries.map(c => (
+            {filteredCountriesList.map(c => (
               <option key={c?.code} value={c?.code}>{c?.name}</option>
             ))}
           </select>
 
           <select
-            value={filterCategory}
-            onChange={(e) => setFilterCategory(e.target.value)}
+            value={filterInstrumentType}
+            onChange={(e) => setFilterInstrumentType(e.target.value)}
             className="px-4 py-2 rounded-lg border border-ink/20 bg-paper focus:outline-none focus:border-ocean text-sm"
           >
-            <option value="">All Categories</option>
-            {categories.map(cat => (
-              <option key={cat} value={cat}>{cat}</option>
+            <option value="">All Instrument Types</option>
+            {instrumentTypes.map(type => (
+              <option key={type} value={type}>{type}</option>
             ))}
           </select>
 
@@ -169,12 +207,13 @@ export default function AdminManagePage() {
         </div>
 
         {/* Clear Filters Button */}
-        {(searchQuery || filterCountry || filterCategory || filterStatus || filterYear) && (
+        {(searchQuery || filterRegion || filterCountry || filterInstrumentType || filterStatus || filterYear) && (
           <button
             onClick={() => {
               setSearchQuery('');
+              setFilterRegion('');
               setFilterCountry('');
-              setFilterCategory('');
+              setFilterInstrumentType('');
               setFilterStatus('');
               setFilterYear('');
             }}
