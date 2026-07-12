@@ -15,6 +15,7 @@ export default function AdminLayout({
   const navItems = [
     { href: '/admin', label: 'Dashboard' },
     { href: '/admin/users', label: 'Users' },
+    { href: '/admin/instrument-types', label: 'Instrument Types' },
     { href: '/admin/moderation', label: 'Moderation' },
     { href: '/admin/submit', label: 'Submit Entry' },
     { href: '/admin/manage', label: 'Manage Entries' },
