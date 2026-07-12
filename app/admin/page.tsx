@@ -246,20 +246,19 @@ export default function AdminDashboard() {
         <div className="rounded-2xl border border-ink/10 bg-card p-8 lg:col-span-2">
           <h2 className="font-display text-2xl font-bold text-ink mb-6">By Instrument Type</h2>
           {analytics?.policyByCategory && analytics.policyByCategory.length > 0 ? (
-            <ResponsiveContainer width="100%" height={700}>
+            <ResponsiveContainer width="100%" height={500}>
               <BarChart
                 data={ALL_INSTRUMENT_TYPES.map(type => {
                   const found = analytics.policyByCategory.find((c: any) => c.category === type);
                   return { category: type, count: found?.count || 0 };
                 })}
-                layout="vertical"
-                margin={{ top: 5, right: 30, left: 280, bottom: 5 }}
+                margin={{ top: 20, right: 30, left: 30, bottom: 100 }}
               >
                 <CartesianGrid strokeDasharray="3 3" stroke="#e8e8e0" />
-                <XAxis type="number" tickFormatter={(value) => (value || 0).toString()} />
-                <YAxis dataKey="category" type="category" width={270} tick={{ fontSize: 12 }} />
+                <XAxis dataKey="category" angle={-45} textAnchor="end" height={120} tick={{ fontSize: 11 }} />
+                <YAxis tickFormatter={(value) => (value || 0).toString()} />
                 <Tooltip formatter={(value: any) => (value || 0).toString()} />
-                <Bar dataKey="count" fill={CHART_COLORS.oceanDeep} radius={[0, 8, 8, 0]} />
+                <Bar dataKey="count" fill={CHART_COLORS.oceanDeep} radius={[8, 8, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           ) : (

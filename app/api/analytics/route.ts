@@ -90,7 +90,7 @@ function getPolicyByCountry(policies: any[]) {
 
 function getPolicyByCategory(policies: any[]) {
   const grouped = policies.reduce((acc, p) => {
-    const category = p.category || 'Unknown';
+    const category = p.instrument_type || 'Unknown';
     acc[category] = (acc[category] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
@@ -163,7 +163,7 @@ function getTopCountries(policies: any[]) {
 
 function getTopCategories(policies: any[]) {
   const grouped = policies.reduce((acc, p) => {
-    const category = p.category || 'Unknown';
+    const category = p.instrument_type || 'Unknown';
     acc[category] = (acc[category] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
