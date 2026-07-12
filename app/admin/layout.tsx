@@ -144,7 +144,7 @@ export default function AdminLayout({
                   </Link>
                   
                   {hasSubmenu && (
-                    <div className="absolute left-0 top-full mt-0 w-max bg-paper border border-rule rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 pointer-events-none group-hover:pointer-events-auto">
+                    <div className="absolute left-0 top-full mt-2 w-max bg-paper border border-rule rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 pointer-events-none group-hover:pointer-events-auto">
                       {item.submenu.map((subitem) => (
                         <Link
                           key={subitem.href}
