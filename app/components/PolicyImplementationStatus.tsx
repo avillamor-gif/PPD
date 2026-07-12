@@ -76,21 +76,29 @@ export function PolicyImplementationStatus({
         if (profile?.role_id) {
           console.log('🎯 User role_id:', profile.role_id);
           // Query the roles table to get the role name
-          const { data: role, error: roleError } = await supabase
-            .from('roles')
-            .select('name')
-            .eq('id', profile.role_id)
-            .single();
-          
-          console.log('🔍 Role lookup:', role, 'Error:', roleError);
-          
-          if (roleError) {
-            console.error('❌ Error looking up role:', roleError);
-            setError(`Failed to look up role: ${roleError.message}`);
+          try {
+            const { data: roles, error: roleError } = await supabase
+              .from('roles')
+              .select('name')
+              .eq('id', profile.role_id);
+            
+            console.log('🔍 Role lookup result:', roles, 'Error:', roleError);
+            
+            if (roleError) {
+              console.error('❌ Error looking up role:', roleError);
+              setError(`Failed to look up role: ${roleError.message}`);
+              return;
+            }
+            
+            // Find the admin role
+            const role = roles?.[0];
+            isUserAdmin = role?.name === 'admin';
+            console.log('✅ Role found:', role?.name, 'Is admin:', isUserAdmin);
+          } catch (err) {
+            console.error('❌ Exception looking up role:', err);
+            setError(`Role lookup error: ${err instanceof Error ? err.message : String(err)}`);
             return;
           }
-          
-          isUserAdmin = role?.name === 'admin';
         } else {
           console.warn('⚠️ User has no role_id set');
           setError('User role not set');
