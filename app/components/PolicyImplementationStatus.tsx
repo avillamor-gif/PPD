@@ -229,6 +229,13 @@ export function PolicyImplementationStatus({
         <Calendar className="w-5 h-5 text-coral" />
         Implementation Status
       </h2>
+
+      {/* Error display */}
+      {error && (
+        <div className="mb-4 p-3 rounded-lg bg-coral/10 border border-coral/30 text-coral text-sm">
+          ⚠️ {error}
+        </div>
+      )}
       
       {/* Current Status */}
       <div className="space-y-3">
