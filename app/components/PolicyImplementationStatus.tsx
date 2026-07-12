@@ -43,6 +43,8 @@ export function PolicyImplementationStatus({
   useEffect(() => {
     const initializeData = async () => {
       try {
+        console.log('🚀 Initializing PolicyImplementationStatus');
+        
         // Check if user is admin
         const { data: { user } } = await supabase.auth.getUser();
         console.log('🔍 Current user:', user?.id);
@@ -68,25 +70,48 @@ export function PolicyImplementationStatus({
 
         // Fetch available statuses
         try {
+          console.log('📡 Fetching statuses...');
           const res = await fetch('/api/reference-data/statuses');
+          console.log('📡 Statuses response status:', res.status);
+          
+          if (!res.ok) {
+            const errorText = await res.text();
+            console.error('❌ Status fetch failed:', res.status, errorText);
+            setError('Failed to load statuses');
+            return;
+          }
+          
           const data = await res.json();
           console.log('✅ Statuses fetched:', data);
           setAvailableStatuses(data.map((s: any) => s.name));
         } catch (err) {
           console.error('❌ Error fetching statuses:', err);
+          setError(`Statuses error: ${err instanceof Error ? err.message : String(err)}`);
         }
 
         // Fetch status history
         try {
+          console.log('📡 Fetching status history for policy:', policyId);
           const historyRes = await fetch(`/api/policies/${policyId}/status-history`);
+          console.log('📡 History response status:', historyRes.status);
+          
+          if (!historyRes.ok) {
+            const errorText = await historyRes.text();
+            console.error('❌ History fetch failed:', historyRes.status, errorText);
+            // Don't set error for history - it's optional
+            return;
+          }
+          
           const historyData = await historyRes.json();
           console.log('📜 Status history fetched:', historyData);
           setStatusHistory(historyData || []);
         } catch (err) {
           console.error('❌ Error fetching status history:', err);
+          // Don't set error - history is optional
         }
       } catch (err) {
         console.error('❌ Error initializing:', err);
+        setError(`Init error: ${err instanceof Error ? err.message : String(err)}`);
       }
     };
 
