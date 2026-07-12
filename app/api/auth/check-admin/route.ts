@@ -37,18 +37,32 @@ export async function GET(request: NextRequest) {
       process.env.SUPABASE_SERVICE_ROLE_KEY!
     );
 
-    // Check user role
+    // Check user role - get profile
     const { data: profile, error: profileError } = await supabaseAdmin
       .from('user_profiles')
-      .select('role_id, role:roles(name)')
+      .select('role_id')
       .eq('id', user.id)
       .maybeSingle();
 
     if (profileError || !profile) {
+      console.log('Profile error or not found:', { profileError, profile });
       return NextResponse.json({ isAdmin: false });
     }
 
-    const isAdmin = (profile.role as any)?.name === 'admin';
+    // Get role name
+    const { data: role, error: roleError } = await supabaseAdmin
+      .from('roles')
+      .select('name')
+      .eq('id', profile.role_id)
+      .maybeSingle();
+
+    if (roleError || !role) {
+      console.log('Role error or not found:', { roleError, role });
+      return NextResponse.json({ isAdmin: false });
+    }
+
+    const isAdmin = role.name === 'admin';
+    console.log('Admin check:', { userId: user.id, roleId: profile.role_id, roleName: role.name, isAdmin });
     return NextResponse.json({ isAdmin });
   } catch (error) {
     console.error('Error checking admin status:', error);
