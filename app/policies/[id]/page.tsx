@@ -113,8 +113,8 @@ export default async function PolicyPage({ params }: { params: Promise<{ id: str
             <div className="space-y-3">
               <div className="rounded-xl border border-ink/10 bg-white/50 p-4 space-y-3">
                 <div>
-                  <p className="text-xs uppercase tracking-wider text-ink/60 font-mono">Policy Type</p>
-                  <p className="text-lg font-semibold text-ink mt-1">{policy.instrument}</p>
+                  <p className="text-xs uppercase tracking-wider text-ink/60 font-mono">Instrument Type</p>
+                  <p className="text-lg font-semibold text-ink mt-1">{policy.category}</p>
                 </div>
                 <div className="border-t border-ink/10 pt-3">
                   <p className="text-xs uppercase tracking-wider text-ink/60 font-mono">Level</p>
