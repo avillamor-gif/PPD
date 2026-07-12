@@ -97,6 +97,14 @@ export default function AdminDashboard() {
         if (analyticsRes.ok) {
           const data = await analyticsRes.json();
           console.log('[ADMIN PAGE] Analytics fetched');
+          console.log('[ADMIN PAGE] policyByCategory:', data.policyByCategory);
+          console.log('[ADMIN PAGE] All instrument types:', ALL_INSTRUMENT_TYPES);
+          const mappedData = ALL_INSTRUMENT_TYPES.map(type => {
+            const found = data.policyByCategory.find((c: any) => c.category === type);
+            console.log(`[ADMIN PAGE] ${type}: ${found?.count || 0}`);
+            return { category: type, count: found?.count || 0 };
+          });
+          console.log('[ADMIN PAGE] Mapped chart data:', mappedData);
           setAnalytics(data);
         }
       } catch (err) {
