@@ -5,6 +5,7 @@ import { ArrowLeft, MapPin, Calendar, Building2, Globe, MessageCircle, ThumbsUp,
 import { PolicyForumSection } from '@/app/components/PolicyForumSection';
 import { AdminEditButton } from '@/app/components/AdminEditButton';
 import { PolicyImplementationStatus } from '@/app/components/PolicyImplementationStatus';
+import { PolicyShareCard } from '@/app/components/PolicyShareCard';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 
 const statusColors: Record<string, { bg: string; badge: string }> = {
@@ -210,13 +211,10 @@ export default async function PolicyPage({ params }: { params: Promise<{ id: str
           <div className="space-y-6">
             
             {/* Share Card */}
-            <div className="rounded-xl border border-ink/10 bg-white p-6 space-y-3">
-              <h3 className="font-bold text-ink text-sm uppercase tracking-wider">Share</h3>
-              <div className="flex gap-2">
-                <button className="flex-1 py-2 px-3 rounded-lg bg-ocean text-white text-sm font-semibold hover:bg-ocean/90 transition">Twitter</button>
-                <button className="flex-1 py-2 px-3 rounded-lg bg-ink text-white text-sm font-semibold hover:bg-ink/90 transition">Copy</button>
-              </div>
-            </div>
+            <PolicyShareCard 
+              title={policy.title}
+              url={`https://ppd-pink.vercel.app/policies/${policy.slug}`}
+            />
 
             {/* Engagement Card */}
             <div className="rounded-xl border border-ink/10 bg-white p-6 space-y-4">
