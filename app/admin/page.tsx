@@ -222,18 +222,18 @@ export default function AdminDashboard() {
         </div>
 
         {/* Instrument Type Distribution - Bar Chart */}
-        <div className="rounded-2xl border border-ink/10 bg-card p-8">
+        <div className="rounded-2xl border border-ink/10 bg-card p-8 lg:col-span-2">
           <h2 className="font-display text-2xl font-bold text-ink mb-6">By Instrument Type</h2>
           {analytics?.policyByCategory && analytics.policyByCategory.length > 0 ? (
-            <ResponsiveContainer width="100%" height={300}>
+            <ResponsiveContainer width="100%" height={600}>
               <BarChart
                 data={analytics.policyByCategory}
                 layout="vertical"
-                margin={{ top: 5, right: 30, left: 200, bottom: 5 }}
+                margin={{ top: 5, right: 30, left: 280, bottom: 5 }}
               >
                 <CartesianGrid strokeDasharray="3 3" stroke="#e8e8e0" />
                 <XAxis type="number" tickFormatter={(value) => (value || 0).toString()} />
-                <YAxis dataKey="category" type="category" width={190} tick={{ fontSize: 11 }} />
+                <YAxis dataKey="category" type="category" width={270} tick={{ fontSize: 12 }} />
                 <Tooltip formatter={(value: any) => (value || 0).toString()} />
                 <Bar dataKey="count" fill={CHART_COLORS.oceanDeep} radius={[0, 8, 8, 0]} />
               </BarChart>
