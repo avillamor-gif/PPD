@@ -204,7 +204,7 @@ export default function AdminDashboard() {
                   cx="50%"
                   cy="50%"
                   outerRadius={100}
-                  label={({ name, count }) => `${name}: ${count}`}
+                  label
                 >
                   {analytics.policyByStatus.map((_, index) => (
                     <Cell
@@ -307,7 +307,7 @@ export default function AdminDashboard() {
                   cx="50%"
                   cy="50%"
                   outerRadius={100}
-                  label={({ name, count }) => `${name}: ${count}`}
+                  label
                 >
                   {analytics.policyByLifecycleStage.map((_, index) => (
                     <Cell
@@ -337,7 +337,7 @@ export default function AdminDashboard() {
                   cx="50%"
                   cy="50%"
                   outerRadius={100}
-                  label={({ name, count }) => `${name}: ${count}`}
+                  label
                 >
                   {analytics.policyByLevel.map((_, index) => (
                     <Cell
