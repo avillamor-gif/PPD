@@ -229,8 +229,8 @@ export default function AdminDashboard() {
               <BarChart data={analytics.policyByCategory}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e8e8e0" />
                 <XAxis dataKey="category" angle={-45} textAnchor="end" height={100} tick={{ fontSize: 12 }} />
-                <YAxis />
-                <Tooltip />
+                <YAxis tickFormatter={(value) => (value || 0).toString()} />
+                <Tooltip formatter={(value: any) => (value || 0).toString()} />
                 <Bar dataKey="count" fill={CHART_COLORS.oceanDeep} radius={[8, 8, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
