@@ -243,7 +243,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Instrument Type Distribution - Bar Chart */}
-        <div className="rounded-2xl border border-ink/10 bg-card p-8 lg:col-span-2">
+        <div className="rounded-2xl border border-ink/10 bg-card p-8">
           <h2 className="font-display text-2xl font-bold text-ink mb-6">By Instrument Type</h2>
           {analytics?.policyByCategory && analytics.policyByCategory.length > 0 ? (
             <ResponsiveContainer width="100%" height={500}>
@@ -400,7 +400,7 @@ export default function AdminDashboard() {
                     <h3 className="font-fraunces text-sm font-medium text-ink truncate">{policy.title}</h3>
                     <div className="mt-2 flex flex-wrap items-center gap-2">
                       <span className="inline-block px-2 py-1 text-[10px] font-mono uppercase rounded bg-sand text-ink">
-                        {policy.instrument_type || 'Unknown'}
+                        {policy.category || 'Unknown'}
                       </span>
                       <span className="inline-block px-2 py-1 text-[10px] font-mono text-ink/60">
                         {COUNTRIES.find((c: any) => c.code === policy.country)?.name || policy.country}
