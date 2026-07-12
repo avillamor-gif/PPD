@@ -7,13 +7,6 @@ import { AdminEditButton } from '@/app/components/AdminEditButton';
 import { PolicyImplementationStatus } from '@/app/components/PolicyImplementationStatus';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 
-const themeColors: Record<string, string> = {
-  "Plastic Ban": "bg-coral/20 text-coral border-coral/30",
-  "EPR": "bg-ocean/20 text-ocean border-ocean/30",
-  "Waste Management": "bg-sand text-ink border-sand/50",
-  "Circular Economy": "bg-ocean-deep/20 text-ocean-deep border-ocean-deep/30",
-};
-
 const statusColors: Record<string, { bg: string; badge: string }> = {
   "In Force": { bg: "bg-ocean/10", badge: "bg-ocean text-white" },
   "Proposed": { bg: "bg-coral/10", badge: "bg-coral text-white" },
@@ -289,11 +282,11 @@ export default async function PolicyPage({ params }: { params: Promise<{ id: str
                 href={`/policies/${relatedPolicy?.slug}`}
                 className="group rounded-xl border border-ink/10 bg-white p-6 hover:border-coral hover:shadow-lg transition space-y-3"
               >
-                <div className="flex items-start justify-between">
-                  <span className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold border ${themeColors[relatedPolicy?.category]}`}>
-                    {relatedPolicy?.category}
+                <div className="flex items-start justify-between gap-2">
+                  <span className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold border ${statusColors[relatedPolicy?.status].badge}`}>
+                    {relatedPolicy?.status}
                   </span>
-                  <span className="text-xs font-bold text-ink/40 group-hover:text-coral transition">{relatedPolicy?.year}</span>
+                  <span className="text-xs font-bold text-ink/40 group-hover:text-coral transition shrink-0">{relatedPolicy?.year}</span>
                 </div>
                 <h3 className="font-bold text-ink group-hover:text-coral transition line-clamp-2">
                   {relatedPolicy?.title}
