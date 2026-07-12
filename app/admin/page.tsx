@@ -246,17 +246,17 @@ export default function AdminDashboard() {
         <div className="rounded-2xl border border-ink/10 bg-card p-8">
           <h2 className="font-display text-2xl font-bold text-ink mb-6">By Instrument Type</h2>
           {analytics?.policyByCategory && analytics.policyByCategory.length > 0 ? (
-            <ResponsiveContainer width="100%" height={500}>
+            <ResponsiveContainer width="100%" height={420}>
               <BarChart
                 data={ALL_INSTRUMENT_TYPES.map(type => {
                   const found = analytics.policyByCategory.find((c: any) => c.category === type);
                   return { category: type, count: found?.count || 0 };
                 })}
-                margin={{ top: 20, right: 30, left: 30, bottom: 100 }}
+                margin={{ top: 10, right: 20, left: 20, bottom: 80 }}
               >
                 <CartesianGrid strokeDasharray="3 3" stroke="#e8e8e0" />
-                <XAxis dataKey="category" angle={-45} textAnchor="end" height={120} tick={{ fontSize: 11 }} />
-                <YAxis tickFormatter={(value) => (value || 0).toString()} />
+                <XAxis dataKey="category" angle={-45} textAnchor="end" height={100} tick={{ fontSize: 10 }} />
+                <YAxis tickFormatter={(value) => (value || 0).toString()} tick={{ fontSize: 10 }} />
                 <Tooltip formatter={(value: any) => (value || 0).toString()} />
                 <Bar dataKey="count" radius={[8, 8, 0, 0]}>
                   {ALL_INSTRUMENT_TYPES.map((_, index) => (
@@ -280,15 +280,15 @@ export default function AdminDashboard() {
         <div className="rounded-2xl border border-ink/10 bg-card p-8">
           <h2 className="font-display text-2xl font-bold text-ink mb-6">Policies by Country</h2>
           {analytics?.policyByCountry && analytics.policyByCountry.length > 0 ? (
-            <ResponsiveContainer width="100%" height={300}>
+            <ResponsiveContainer width="100%" height={280}>
               <BarChart
                 data={analytics.policyByCountry.slice(0, 10)}
                 layout="vertical"
-                margin={{ top: 5, right: 30, left: 150, bottom: 5 }}
+                margin={{ top: 5, right: 20, left: 120, bottom: 5 }}
               >
                 <CartesianGrid strokeDasharray="3 3" stroke="#e8e8e0" />
-                <XAxis type="number" />
-                <YAxis dataKey="country" type="category" width={140} tick={{ fontSize: 12 }} />
+                <XAxis type="number" tick={{ fontSize: 10 }} />
+                <YAxis dataKey="country" type="category" width={110} tick={{ fontSize: 11 }} />
                 <Tooltip />
                 <Bar dataKey="count" fill={CHART_COLORS.ocean} radius={[0, 8, 8, 0]} />
               </BarChart>
@@ -302,20 +302,20 @@ export default function AdminDashboard() {
         <div className="rounded-2xl border border-ink/10 bg-card p-8">
           <h2 className="font-display text-2xl font-bold text-ink mb-6">Policies by Year</h2>
           {analytics?.policyByYear && analytics.policyByYear.length > 0 ? (
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={analytics.policyByYear}>
+            <ResponsiveContainer width="100%" height={280}>
+              <LineChart data={analytics.policyByYear} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e8e8e0" />
-                <XAxis dataKey="year" />
-                <YAxis />
+                <XAxis dataKey="year" tick={{ fontSize: 10 }} />
+                <YAxis tick={{ fontSize: 10 }} />
                 <Tooltip />
-                <Legend />
+                <Legend wrapperStyle={{ fontSize: 12 }} />
                 <Line
                   type="monotone"
                   dataKey="count"
                   stroke={CHART_COLORS.coral}
-                  strokeWidth={3}
-                  dot={{ fill: CHART_COLORS.coral, r: 5 }}
-                  activeDot={{ r: 7 }}
+                  strokeWidth={2}
+                  dot={{ fill: CHART_COLORS.coral, r: 4 }}
+                  activeDot={{ r: 6 }}
                   name="Count"
                 />
               </LineChart>
