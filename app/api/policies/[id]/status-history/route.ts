@@ -11,16 +11,20 @@ export async function GET(
     // Fetch status history ordered by change_date descending
     const { data, error } = await supabaseAdmin
       .from('policy_status_history')
-      .select('*, recorded_by:user_profiles(display_name)')
+      .select('*')
       .eq('policy_id', id)
       .order('change_date', { ascending: false });
 
-    if (error) throw error;
+    if (error) {
+      console.error('Supabase error:', error);
+      throw error;
+    }
+    
     return NextResponse.json(data || []);
   } catch (err) {
     console.error('Error fetching status history:', err);
     return NextResponse.json(
-      { error: 'Failed to fetch status history' },
+      { error: 'Failed to fetch status history', details: err instanceof Error ? err.message : String(err) },
       { status: 500 }
     );
   }
