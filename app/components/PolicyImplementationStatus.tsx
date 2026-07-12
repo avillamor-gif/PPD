@@ -377,7 +377,7 @@ export function PolicyImplementationStatus({
                         {entry.old_status && `${entry.old_status} → `}
                         <span className="text-ocean font-bold">{entry.new_status}</span>
                       </p>
-                      <p className="text-xs text-ink/60 mt-1 font-mono">
+                      <p className="text-xs text-ocean mt-1 font-mono font-semibold">
                         {new Date(entry.change_date).toLocaleDateString('en-US', {
                           year: 'numeric',
                           month: 'short',
