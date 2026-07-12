@@ -152,7 +152,7 @@ export default function AdminManagePage() {
         />
 
         {/* Filter Row */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+        <div className="flex items-center gap-2 flex-wrap">
           <select
             value={filterRegion}
             onChange={(e) => setFilterRegion(e.target.value)}
