@@ -226,9 +226,14 @@ export default function AdminDashboard() {
           <h2 className="font-display text-2xl font-bold text-ink mb-6">By Instrument Type</h2>
           {analytics?.policyByCategory && analytics.policyByCategory.length > 0 ? (
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={analytics.policyByCategory}>
+              <BarChart
+                data={[{
+                  category: 'All Types',
+                  count: analytics.policyByCategory.reduce((sum: number, item: any) => sum + (item.count || 0), 0)
+                }]}
+              >
                 <CartesianGrid strokeDasharray="3 3" stroke="#e8e8e0" />
-                <XAxis dataKey="category" angle={-45} textAnchor="end" height={100} tick={{ fontSize: 12 }} />
+                <XAxis dataKey="category" />
                 <YAxis tickFormatter={(value) => (value || 0).toString()} />
                 <Tooltip formatter={(value: any) => (value || 0).toString()} />
                 <Bar dataKey="count" fill={CHART_COLORS.oceanDeep} radius={[8, 8, 0, 0]} />
