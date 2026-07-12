@@ -1,15 +1,15 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ThumbsUp, Eye } from 'lucide-react';
+import { ThumbsUp, ThumbsDown, Eye } from 'lucide-react';
 
 interface PolicyEngagementCardProps {
   policyId: string;
 }
 
 export function PolicyEngagementCard({ policyId }: PolicyEngagementCardProps) {
-  const [stats, setStats] = useState({ views: 0, helpful: 0 });
-  const [hasVoted, setHasVoted] = useState(false);
+  const [stats, setStats] = useState({ views: 0, helpful: 0, notHelpful: 0 });
+  const [votedType, setVotedType] = useState<'helpful' | 'notHelpful' | null>(null);
   const [loading, setLoading] = useState(true);
   const [sessionId] = useState(() => {
     if (typeof window === 'undefined') return '';
@@ -40,10 +40,11 @@ export function PolicyEngagementCard({ policyId }: PolicyEngagementCardProps) {
           }),
         });
 
-        // Check if user has already voted (stored in localStorage)
+        // Check if user has already voted
         const votedKey = `voted_${policyId}`;
-        const hasVotedBefore = localStorage.getItem(votedKey) === 'true';
-        setHasVoted(hasVotedBefore);
+        const savedVote = localStorage.getItem(votedKey);
+        if (savedVote === 'helpful') setVotedType('helpful');
+        else if (savedVote === 'notHelpful') setVotedType('notHelpful');
       } catch (error) {
         console.error('Error fetching engagement stats:', error);
       } finally {
@@ -54,15 +55,15 @@ export function PolicyEngagementCard({ policyId }: PolicyEngagementCardProps) {
     recordEngagement();
   }, [policyId, sessionId]);
 
-  const handleHelpfulClick = async () => {
-    if (hasVoted) return;
+  const handleVote = async (type: 'helpful' | 'notHelpful') => {
+    if (votedType) return;
 
     try {
       const res = await fetch(`/api/policies/${policyId}/engagement`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          engagementType: 'helpful',
+          engagementType: type,
           sessionId,
         }),
       });
@@ -71,29 +72,41 @@ export function PolicyEngagementCard({ policyId }: PolicyEngagementCardProps) {
 
       if (res.ok) {
         setStats(data.stats);
-        setHasVoted(true);
-        localStorage.setItem(`voted_${policyId}`, 'true');
+        setVotedType(type);
+        localStorage.setItem(`voted_${policyId}`, type);
       }
     } catch (error) {
-      console.error('Error recording helpful vote:', error);
+      console.error('Error recording vote:', error);
     }
   };
 
   return (
     <div className="rounded-xl border border-ink/10 bg-white p-6 space-y-4">
       <h3 className="font-bold text-ink text-sm uppercase tracking-wider">Engagement</h3>
-      <div className="space-y-3">
+      <div className="grid gap-2">
         <button
-          onClick={handleHelpfulClick}
-          disabled={hasVoted || loading}
+          onClick={() => handleVote('helpful')}
+          disabled={votedType !== null || loading}
           className={`w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg font-semibold transition ${
-            hasVoted
+            votedType === 'helpful'
               ? 'bg-green-100 text-green-700 cursor-default'
-              : 'bg-coral/10 text-coral hover:bg-coral/20'
+              : 'bg-ocean/10 text-ocean hover:bg-ocean/20'
           }`}
         >
           <ThumbsUp className="w-4 h-4" />
           Helpful ({stats.helpful})
+        </button>
+        <button
+          onClick={() => handleVote('notHelpful')}
+          disabled={votedType !== null || loading}
+          className={`w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg font-semibold transition ${
+            votedType === 'notHelpful'
+              ? 'bg-red-100 text-red-700 cursor-default'
+              : 'bg-coral/10 text-coral hover:bg-coral/20'
+          }`}
+        >
+          <ThumbsDown className="w-4 h-4" />
+          Not Helpful ({stats.notHelpful})
         </button>
       </div>
       <div className="flex items-center gap-2 text-xs text-ink/60 border-t border-ink/10 pt-3">

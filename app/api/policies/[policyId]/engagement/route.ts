@@ -17,7 +17,7 @@ export async function GET(
     if (error?.code === '42P01') {
       console.warn('policy_engagement table not found, creating...');
       await createEngagementTable();
-      return NextResponse.json({ views: 0, helpful: 0 });
+      return NextResponse.json({ views: 0, helpful: 0, notHelpful: 0 });
     }
 
     if (error) throw error;
@@ -25,13 +25,14 @@ export async function GET(
     const stats = {
       views: data?.filter((e: any) => e.engagement_type === 'view').length || 0,
       helpful: data?.filter((e: any) => e.engagement_type === 'helpful').length || 0,
+      notHelpful: data?.filter((e: any) => e.engagement_type === 'notHelpful').length || 0,
     };
 
     return NextResponse.json(stats);
   } catch (error) {
     console.error('Error fetching engagement stats:', error);
     return NextResponse.json(
-      { views: 0, helpful: 0 },
+      { views: 0, helpful: 0, notHelpful: 0 },
       { status: 200 }
     );
   }
@@ -50,7 +51,7 @@ export async function POST(
     const body = await request.json();
     const { engagementType, userId, sessionId } = body;
 
-    if (!engagementType || !['view', 'helpful'].includes(engagementType)) {
+    if (!engagementType || !['view', 'helpful', 'notHelpful'].includes(engagementType)) {
       return NextResponse.json(
         { error: 'Invalid engagement type' },
         { status: 400 }
@@ -98,6 +99,7 @@ export async function POST(
         const counts = {
           views: stats.data?.filter((e: any) => e.engagement_type === 'view').length || 0,
           helpful: stats.data?.filter((e: any) => e.engagement_type === 'helpful').length || 0,
+          notHelpful: stats.data?.filter((e: any) => e.engagement_type === 'notHelpful').length || 0,
         };
 
         return NextResponse.json({ 
@@ -118,6 +120,7 @@ export async function POST(
     const stats = {
       views: statsData.data?.filter((e: any) => e.engagement_type === 'view').length || 0,
       helpful: statsData.data?.filter((e: any) => e.engagement_type === 'helpful').length || 0,
+      notHelpful: statsData.data?.filter((e: any) => e.engagement_type === 'notHelpful').length || 0,
     };
 
     return NextResponse.json({ success: true, stats });
