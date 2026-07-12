@@ -22,7 +22,8 @@ export default function AdminLayout({
       href: '/admin/submit', 
       label: 'Submit Entry',
       submenu: [
-        { href: '/admin/instrument-types', label: 'Instrument Types' }
+        { href: '/admin/instrument-types', label: 'Instrument Types' },
+        { href: '/admin/statuses', label: 'Statuses' }
       ]
     },
     { href: '/admin/manage', label: 'Manage Entries' },
