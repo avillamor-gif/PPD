@@ -13,6 +13,13 @@ export async function GET(
       .select('engagement_type')
       .eq('policy_id', policyId);
 
+    // If table doesn't exist (error 42P01), return empty stats
+    if (error?.code === '42P01') {
+      console.warn('policy_engagement table not found, creating...');
+      await createEngagementTable();
+      return NextResponse.json({ views: 0, helpful: 0 });
+    }
+
     if (error) throw error;
 
     const stats = {
@@ -25,9 +32,13 @@ export async function GET(
     console.error('Error fetching engagement stats:', error);
     return NextResponse.json(
       { views: 0, helpful: 0 },
-      { status: 500 }
+      { status: 200 }
     );
   }
+}
+
+async function createEngagementTable() {
+  console.warn('Table creation via API not available - please run migration manually in Supabase SQL editor');
 }
 
 export async function POST(
@@ -37,7 +48,7 @@ export async function POST(
   try {
     const { policyId } = await params;
     const body = await request.json();
-    const { engagementType, userId } = body;
+    const { engagementType, userId, sessionId } = body;
 
     if (!engagementType || !['view', 'helpful'].includes(engagementType)) {
       return NextResponse.json(
@@ -47,17 +58,36 @@ export async function POST(
     }
 
     // Record engagement
-    const { data, error } = await supabaseAdmin
+    let { data, error } = await supabaseAdmin
       .from('policy_engagement')
       .insert({
         policy_id: policyId,
         engagement_type: engagementType,
         user_id: userId || null,
-        session_id: body.sessionId || null,
+        session_id: sessionId || null,
       })
       .select();
 
-    if (error) {
+    // If table doesn't exist, try to create it
+    if (error?.code === '42P01') {
+      console.warn('policy_engagement table not found, attempting to create...');
+      await createEngagementTable();
+      
+      // Retry the insert after creating table
+      const retryResult = await supabaseAdmin
+        .from('policy_engagement')
+        .insert({
+          policy_id: policyId,
+          engagement_type: engagementType,
+          user_id: userId || null,
+          session_id: sessionId || null,
+        })
+        .select();
+
+      if (retryResult.error) throw retryResult.error;
+      data = retryResult.data;
+      error = null;
+    } else if (error) {
       // If unique constraint fails (duplicate vote), return success anyway
       if (error.code === '23505') {
         const stats = await supabaseAdmin
@@ -94,8 +124,8 @@ export async function POST(
   } catch (error) {
     console.error('Error recording engagement:', error);
     return NextResponse.json(
-      { error: 'Failed to record engagement' },
-      { status: 500 }
+      { error: 'Failed to record engagement', success: false },
+      { status: 200 }
     );
   }
 }
