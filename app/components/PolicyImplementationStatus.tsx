@@ -43,38 +43,30 @@ export function PolicyImplementationStatus({
   useEffect(() => {
     const initializeData = async () => {
       try {
-        console.log('🚀 Initializing PolicyImplementationStatus');
-        
         // Check if user is admin
         const { data: { user } } = await supabase.auth.getUser();
-        console.log('🔍 Current user:', user?.id);
         
         if (!user) {
-          console.log('ℹ️ No user logged in');
           setIsAdmin(false);
           return;
         }
 
         // Fetch user profile with role_id (not roles relationship)
-        console.log('🔍 Fetching user profile...');
         const { data: profile, error: profileError } = await supabase
           .from('user_profiles')
           .select('id, role_id')
           .eq('id', user.id)
           .single();
 
-        console.log('👤 User profile:', profile, 'Error:', profileError);
-
         // If we got a profile with role_id, check if it's admin (admin id is 1)
         let isUserAdmin = false;
         if (!profile) {
-          console.error('❌ No user_profiles record found for user:', user.id);
+          console.error('No user_profiles record found for user:', user.id);
           setError('User profile not found');
           return;
         }
 
         if (profile?.role_id) {
-          console.log('🎯 User role_id:', profile.role_id);
           // Query the roles table to get the role name
           try {
             const { data: roles, error: roleError } = await supabase
@@ -82,10 +74,8 @@ export function PolicyImplementationStatus({
               .select('name')
               .eq('id', profile.role_id);
             
-            console.log('🔍 Role lookup result:', roles, 'Error:', roleError);
-            
             if (roleError) {
-              console.error('❌ Error looking up role:', roleError);
+              console.error('Error looking up role:', roleError);
               setError(`Failed to look up role: ${roleError.message}`);
               return;
             }
@@ -93,64 +83,56 @@ export function PolicyImplementationStatus({
             // Find the admin role
             const role = roles?.[0];
             isUserAdmin = role?.name === 'admin';
-            console.log('✅ Role found:', role?.name, 'Is admin:', isUserAdmin);
           } catch (err) {
-            console.error('❌ Exception looking up role:', err);
+            console.error('Exception looking up role:', err);
             setError(`Role lookup error: ${err instanceof Error ? err.message : String(err)}`);
             return;
           }
         } else {
-          console.warn('⚠️ User has no role_id set');
+          console.warn('User has no role_id set');
           setError('User role not set');
           return;
         }
 
-        console.log('🎯 Is admin:', isUserAdmin);
         setIsAdmin(isUserAdmin);
 
         // Fetch available statuses
         try {
-          console.log('📡 Fetching statuses...');
           const res = await fetch('/api/reference-data/statuses');
-          console.log('📡 Statuses response status:', res.status);
           
           if (!res.ok) {
             const errorText = await res.text();
-            console.error('❌ Status fetch failed:', res.status, errorText);
+            console.error('Status fetch failed:', res.status, errorText);
             setError('Failed to load statuses');
             return;
           }
           
           const data = await res.json();
-          console.log('✅ Statuses fetched:', data);
           setAvailableStatuses(data.map((s: any) => s.name));
         } catch (err) {
-          console.error('❌ Error fetching statuses:', err);
+          console.error('Error fetching statuses:', err);
           setError(`Statuses error: ${err instanceof Error ? err.message : String(err)}`);
         }
 
         // Fetch status history
         try {
-          console.log('📡 Fetching status history for policy:', policyId);
           const historyRes = await fetch(`/api/policies/${policyId}/status-history`);
-          console.log('📡 History response status:', historyRes.status);
           
           if (!historyRes.ok) {
             const errorText = await historyRes.text();
-            console.error('❌ History fetch failed:', historyRes.status, errorText);
+            console.error('History fetch failed:', historyRes.status, errorText);
             // Don't set error for history - it's optional
             return;
           }
           
           const historyData = await historyRes.json();
-          console.log('📜 Status history fetched:', historyData);
           setStatusHistory(historyData || []);
         } catch (err) {
-          console.error('❌ Error fetching status history:', err);
+          console.error('Error fetching status history:', err);
           // Don't set error - history is optional
         }
       } catch (err) {
-        console.error('❌ Error initializing:', err);
+        console.error('Error initializing:', err);
         setError(`Init error: ${err instanceof Error ? err.message : String(err)}`);
       }
     };
@@ -277,15 +259,6 @@ export function PolicyImplementationStatus({
         {error && (
           <div className="p-3 rounded-lg bg-coral/10 border border-coral/30 text-coral text-sm">
             {error}
-          </div>
-        )}
-
-        {/* Debug info (remove in production) */}
-        {isAdmin && (
-          <div className="p-2 rounded-lg bg-ocean/5 border border-ocean/20 text-xs text-ocean/70">
-            <p>✅ Admin: {isAdmin ? 'Yes' : 'No'}</p>
-            <p>📊 Statuses available: {availableStatuses.length}</p>
-            <p>📜 History entries: {statusHistory.length}</p>
           </div>
         )}
 
