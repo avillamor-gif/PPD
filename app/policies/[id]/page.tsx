@@ -266,8 +266,21 @@ export default async function PolicyPage({ params }: { params: Promise<{ id: str
                   <p className="text-ink font-mono text-xs">{policy.id}</p>
                 </div>
                 <div>
-                  <p className="text-ink/60">Category</p>
-                  <p className="text-ink font-semibold">{policy.category}</p>
+                  <p className="text-ink/60">Key Words</p>
+                  {policy.keywords ? (
+                    <div className="flex flex-wrap gap-2 mt-2">
+                      {policy.keywords.split(',').map((keyword: string, index: number) => (
+                        <span 
+                          key={index} 
+                          className="inline-block px-2 py-1 rounded bg-ocean/10 text-ocean text-xs font-semibold"
+                        >
+                          {keyword.trim()}
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-ink/40 italic">No keywords added</p>
+                  )}
                 </div>
               </div>
             </div>
