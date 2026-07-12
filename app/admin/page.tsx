@@ -97,14 +97,6 @@ export default function AdminDashboard() {
         if (analyticsRes.ok) {
           const data = await analyticsRes.json();
           console.log('[ADMIN PAGE] Analytics fetched');
-          console.log('[ADMIN PAGE] policyByCategory:', data.policyByCategory);
-          console.log('[ADMIN PAGE] All instrument types:', ALL_INSTRUMENT_TYPES);
-          const mappedData = ALL_INSTRUMENT_TYPES.map(type => {
-            const found = data.policyByCategory.find((c: any) => c.category === type);
-            console.log(`[ADMIN PAGE] ${type}: ${found?.count || 0}`);
-            return { category: type, count: found?.count || 0 };
-          });
-          console.log('[ADMIN PAGE] Mapped chart data:', mappedData);
           setAnalytics(data);
         }
       } catch (err) {
@@ -266,7 +258,14 @@ export default function AdminDashboard() {
                 <XAxis dataKey="category" angle={-45} textAnchor="end" height={120} tick={{ fontSize: 11 }} />
                 <YAxis tickFormatter={(value) => (value || 0).toString()} />
                 <Tooltip formatter={(value: any) => (value || 0).toString()} />
-                <Bar dataKey="count" fill={CHART_COLORS.oceanDeep} radius={[8, 8, 0, 0]} />
+                <Bar dataKey="count" radius={[8, 8, 0, 0]}>
+                  {ALL_INSTRUMENT_TYPES.map((_, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={[CHART_COLORS.ocean, CHART_COLORS.coral, CHART_COLORS.sand, CHART_COLORS.oceanDeep][index % 4]}
+                    />
+                  ))}
+                </Bar>
               </BarChart>
             </ResponsiveContainer>
           ) : (

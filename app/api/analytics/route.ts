@@ -101,12 +101,9 @@ function getPolicyByCategory(policies: any[]) {
     }
   });
 
-  const result = Object.entries(grouped)
+  return Object.entries(grouped)
     .map(([category, count]) => ({ category, count: count as number }))
     .sort((a, b) => b.count - a.count);
-  
-  console.log('[ANALYTICS API] Unique categories found:', result);
-  return result;
 }
 
 function getPolicyByYear(policies: any[]) {
