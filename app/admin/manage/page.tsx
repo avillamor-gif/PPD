@@ -152,11 +152,11 @@ export default function AdminManagePage() {
         />
 
         {/* Filter Row */}
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex w-full items-center gap-2 flex-wrap">
           <select
             value={filterRegion}
             onChange={(e) => setFilterRegion(e.target.value)}
-            className="px-4 py-2 rounded-lg border border-ink/20 bg-paper focus:outline-none focus:border-ocean text-sm"
+            className="flex-1 min-w-[120px] px-4 py-2 rounded-lg border border-ink/20 bg-paper focus:outline-none focus:border-ocean text-sm"
           >
             <option value="">All Regions</option>
             {regions.map(region => (
@@ -167,7 +167,7 @@ export default function AdminManagePage() {
           <select
             value={filterCountry}
             onChange={(e) => setFilterCountry(e.target.value)}
-            className="px-4 py-2 rounded-lg border border-ink/20 bg-paper focus:outline-none focus:border-ocean text-sm"
+            className="flex-1 min-w-[120px] px-4 py-2 rounded-lg border border-ink/20 bg-paper focus:outline-none focus:border-ocean text-sm"
           >
             <option value="">All Countries</option>
             {filteredCountriesList.map(c => (
@@ -178,7 +178,7 @@ export default function AdminManagePage() {
           <select
             value={filterInstrumentType}
             onChange={(e) => setFilterInstrumentType(e.target.value)}
-            className="px-4 py-2 rounded-lg border border-ink/20 bg-paper focus:outline-none focus:border-ocean text-sm"
+            className="flex-1 min-w-[120px] px-4 py-2 rounded-lg border border-ink/20 bg-paper focus:outline-none focus:border-ocean text-sm"
           >
             <option value="">All Instrument Types</option>
             {instrumentTypes.map(type => (
@@ -189,7 +189,7 @@ export default function AdminManagePage() {
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            className="px-4 py-2 rounded-lg border border-ink/20 bg-paper focus:outline-none focus:border-ocean text-sm"
+            className="flex-1 min-w-[120px] px-4 py-2 rounded-lg border border-ink/20 bg-paper focus:outline-none focus:border-ocean text-sm"
           >
             <option value="">All Statuses</option>
             {statuses.map(status => (
@@ -200,7 +200,7 @@ export default function AdminManagePage() {
           <select
             value={filterYear}
             onChange={(e) => setFilterYear(e.target.value)}
-            className="px-4 py-2 rounded-lg border border-ink/20 bg-paper focus:outline-none focus:border-ocean text-sm"
+            className="flex-1 min-w-[120px] px-4 py-2 rounded-lg border border-ink/20 bg-paper focus:outline-none focus:border-ocean text-sm"
           >
             <option value="">All Years</option>
             {years.map(year => (
