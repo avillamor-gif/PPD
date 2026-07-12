@@ -37,6 +37,27 @@ const CHART_COLORS = {
   ink: '#343129',
 };
 
+const ALL_INSTRUMENT_TYPES = [
+  'Bans',
+  'Circular Economy',
+  'Environment Impact Assessment (EIA)',
+  'Hazardous Waste',
+  'Incentives',
+  'Penalities',
+  'Plastic Alternatives',
+  'Polluter Pays',
+  'Recycling Regulation',
+  'Redesign',
+  'Reuse',
+  'Single-Use Plastics',
+  'Taxes',
+  'Umbrella law',
+  'Waste Burning',
+  'Waste Management Regulation',
+  'Waste Reduction',
+  'Waste Trade',
+];
+
 export default function AdminDashboard() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
@@ -225,9 +246,12 @@ export default function AdminDashboard() {
         <div className="rounded-2xl border border-ink/10 bg-card p-8 lg:col-span-2">
           <h2 className="font-display text-2xl font-bold text-ink mb-6">By Instrument Type</h2>
           {analytics?.policyByCategory && analytics.policyByCategory.length > 0 ? (
-            <ResponsiveContainer width="100%" height={600}>
+            <ResponsiveContainer width="100%" height={700}>
               <BarChart
-                data={analytics.policyByCategory}
+                data={ALL_INSTRUMENT_TYPES.map(type => {
+                  const found = analytics.policyByCategory.find((c: any) => c.category === type);
+                  return { category: type, count: found?.count || 0 };
+                })}
                 layout="vertical"
                 margin={{ top: 5, right: 30, left: 280, bottom: 5 }}
               >
