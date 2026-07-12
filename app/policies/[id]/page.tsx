@@ -6,6 +6,7 @@ import { PolicyForumSection } from '@/app/components/PolicyForumSection';
 import { AdminEditButton } from '@/app/components/AdminEditButton';
 import { PolicyImplementationStatus } from '@/app/components/PolicyImplementationStatus';
 import { PolicyShareCard } from '@/app/components/PolicyShareCard';
+import { PolicyEngagementCard } from '@/app/components/PolicyEngagementCard';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 
 const statusColors: Record<string, { bg: string; badge: string }> = {
@@ -217,19 +218,7 @@ export default async function PolicyPage({ params }: { params: Promise<{ id: str
             />
 
             {/* Engagement Card */}
-            <div className="rounded-xl border border-ink/10 bg-white p-6 space-y-4">
-              <h3 className="font-bold text-ink text-sm uppercase tracking-wider">Engagement</h3>
-              <div className="space-y-3">
-                <button className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg bg-coral/10 text-coral hover:bg-coral/20 transition font-semibold">
-                  <ThumbsUp className="w-4 h-4" />
-                  Helpful (0)
-                </button>
-              </div>
-              <div className="flex items-center gap-2 text-xs text-ink/60 border-t border-ink/10 pt-3">
-                <Eye className="w-4 h-4" />
-                <span>0 views</span>
-              </div>
-            </div>
+            <PolicyEngagementCard policyId={policy.id} />
 
             {/* Metadata Card */}
             <div className="rounded-xl border border-ink/10 bg-white p-6 space-y-3">
