@@ -87,15 +87,15 @@ export default function AdminDashboard() {
       .sort((a, b) => b.count - a.count);
   }, []);
 
-  const policyByTheme = useMemo(() => {
+  const policyByInstrumentType = useMemo(() => {
     const counts: Record<string, number> = {};
     POLICIES.forEach((p: any) => {
-      if (p?.category) {
-        counts[p.category] = (counts[p.category] || 0) + 1;
+      if (p?.instrument_type) {
+        counts[p.instrument_type] = (counts[p.instrument_type] || 0) + 1;
       }
     });
     return Object.entries(counts)
-      .map(([theme, count]) => ({ theme, count }))
+      .map(([type, count]) => ({ type, count }))
       .sort((a, b) => b.count - a.count);
   }, []);
 
@@ -128,8 +128,8 @@ export default function AdminDashboard() {
     <div className="mx-auto max-w-7xl px-4 md:px-6 lg:px-10 py-8 space-y-4 md:space-y-6 lg:space-y-8">
       {/* Header */}
       <div>
-        <h1 className="font-display text-2xl md:text-3xl lg:text-4xl font-bold text-ink">Analytics Dashboard</h1>
-        <p className="mt-2 text-sm md:text-base text-ink/60">Overview of all policies in the database</p>
+        <h1 className="font-display text-2xl md:text-3xl lg:text-4xl font-bold text-ink">Admin Dashboard</h1>
+        <p className="mt-2 text-sm md:text-base text-ink/60">Manage policies and view analytics</p>
       </div>
 
       {/* Admin Tools */}
@@ -236,16 +236,16 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Theme Distribution */}
+        {/* Instrument Type Distribution */}
         <div className="rounded-2xl border border-ink/10 bg-card p-8">
-          <h2 className="font-display text-2xl font-bold text-ink">By Theme</h2>
+          <h2 className="font-display text-2xl font-bold text-ink">By Instrument Type</h2>
           <div className="mt-6 space-y-4">
-            {policyByTheme.map(({ theme, count }) => {
+            {policyByInstrumentType.map(({ type, count }) => {
               const percentage = ((count / totalPolicies) * 100).toFixed(0);
               return (
-                <div key={theme}>
+                <div key={type}>
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-ink">{theme}</span>
+                    <span className="text-sm font-medium text-ink">{type}</span>
                     <span className="text-sm font-mono text-ink/60">
                       {count} ({percentage}%)
                     </span>
