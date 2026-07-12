@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 
 export default function AdminLayout({
@@ -12,12 +12,19 @@ export default function AdminLayout({
 }) {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [submitEntryDropdownOpen, setSubmitEntryDropdownOpen] = useState(false);
+  
   const navItems = [
     { href: '/admin', label: 'Dashboard' },
     { href: '/admin/users', label: 'Users' },
-    { href: '/admin/instrument-types', label: 'Instrument Types' },
     { href: '/admin/moderation', label: 'Moderation' },
-    { href: '/admin/submit', label: 'Submit Entry' },
+    { 
+      href: '/admin/submit', 
+      label: 'Submit Entry',
+      submenu: [
+        { href: '/admin/instrument-types', label: 'Instrument Types' }
+      ]
+    },
     { href: '/admin/manage', label: 'Manage Entries' },
   ];
 
@@ -65,18 +72,47 @@ export default function AdminLayout({
             <div className="mb-2 font-mono text-[10px] uppercase tracking-[0.2em] text-ink/50">Admin Navigation</div>
             <nav className="grid gap-2">
               {navItems.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`rounded-lg px-4 py-2 font-mono text-xs uppercase tracking-widest transition ${
-                    isActive(item.href)
-                      ? 'bg-sand text-coral border border-coral/20'
-                      : 'text-ink/70 hover:bg-ink/5'
-                  }`}
-                >
-                  {item.label}
-                </Link>
+                <div key={item.href}>
+                  <button
+                    onClick={() => {
+                      if (item.submenu) {
+                        setSubmitEntryDropdownOpen(!submitEntryDropdownOpen);
+                      } else {
+                        setMobileMenuOpen(false);
+                      }
+                    }}
+                    className={`w-full text-left rounded-lg px-4 py-2 font-mono text-xs uppercase tracking-widest transition flex items-center justify-between ${
+                      isActive(item.href)
+                        ? 'bg-sand text-coral border border-coral/20'
+                        : 'text-ink/70 hover:bg-ink/5'
+                    }`}
+                  >
+                    <span>{item.label}</span>
+                    {item.submenu && (
+                      <ChevronDown 
+                        className={`h-4 w-4 transition-transform ${submitEntryDropdownOpen ? 'rotate-180' : ''}`}
+                      />
+                    )}
+                  </button>
+                  {item.submenu && submitEntryDropdownOpen && (
+                    <div className="ml-2 mt-1 border-l border-rule pl-2 grid gap-2">
+                      {item.submenu.map((subitem) => (
+                        <Link
+                          key={subitem.href}
+                          href={subitem.href}
+                          onClick={() => setMobileMenuOpen(false)}
+                          className={`rounded-lg px-4 py-2 font-mono text-xs uppercase tracking-widest transition ${
+                            isActive(subitem.href)
+                              ? 'bg-sand text-coral border border-coral/20'
+                              : 'text-ink/70 hover:bg-ink/5'
+                          }`}
+                        >
+                          {subitem.label}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
               ))}
             </nav>
           </div>
@@ -87,19 +123,46 @@ export default function AdminLayout({
       <div className="hidden md:block border-b border-rule bg-paper sticky top-0 z-40 overflow-x-auto">
         <div className="mx-auto max-w-7xl px-4 md:px-6 lg:px-10">
           <nav className="flex gap-4 md:gap-8 min-w-min">
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`py-4 border-b-2 transition font-mono text-sm uppercase tracking-widest whitespace-nowrap ${
-                  isActive(item.href)
-                    ? 'border-ocean text-ink'
-                    : 'border-transparent text-ink/60 hover:text-ink hover:border-ocean'
-                }`}
-              >
-                {item.label}
-              </Link>
-            ))}
+            {navItems.map((item) => {
+              const isItemActive = isActive(item.href);
+              const hasSubmenu = item.submenu && item.submenu.length > 0;
+              
+              return (
+                <div key={item.href} className="relative group">
+                  <Link
+                    href={item.href}
+                    className={`py-4 border-b-2 transition font-mono text-sm uppercase tracking-widest whitespace-nowrap flex items-center gap-2 ${
+                      isItemActive
+                        ? 'border-ocean text-ink'
+                        : 'border-transparent text-ink/60 hover:text-ink hover:border-ocean'
+                    }`}
+                  >
+                    {item.label}
+                    {hasSubmenu && (
+                      <ChevronDown className="h-4 w-4 transition-transform group-hover:rotate-180" />
+                    )}
+                  </Link>
+                  
+                  {hasSubmenu && (
+                    <div className="absolute left-0 mt-0 w-max bg-paper border border-rule rounded-lg shadow-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
+                      {item.submenu.map((subitem) => (
+                        <Link
+                          key={subitem.href}
+                          href={subitem.href}
+                          className={`block px-4 py-3 font-mono text-xs uppercase tracking-widest transition border-b border-rule last:border-b-0 ${
+                            isActive(subitem.href)
+                              ? 'bg-sand text-coral'
+                              : 'text-ink/70 hover:bg-ink/5 hover:text-ink'
+                          }`}
+                        >
+                          {subitem.label}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </nav>
         </div>
       </div>

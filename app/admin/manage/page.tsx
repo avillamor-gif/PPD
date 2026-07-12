@@ -6,8 +6,6 @@ import Link from 'next/link';
 import { Trash2, ExternalLink, Pencil, Loader } from 'lucide-react';
 import type { Policy } from '@/lib/types/policy';
 
-const EXCLUDED_CATEGORIES = ["Plastic Ban", "Circular Economy", "EPR"];
-
 export default function AdminManagePage() {
   const [policies, setPolicies] = useState<Policy[]>([]);
   const [filteredPolicies, setFilteredPolicies] = useState<Policy[]>([]);
@@ -44,7 +42,6 @@ export default function AdminManagePage() {
       .map(p => p.category)
       .filter(Boolean)
       .flatMap(cat => cat.split(',').map(c => c.trim()))
-      .filter(type => !EXCLUDED_CATEGORIES.includes(type))
   )).sort();
   
   const statuses = Array.from(new Set(policies.map(p => p.status)));
@@ -167,7 +164,7 @@ export default function AdminManagePage() {
           <select
             value={filterCountry}
             onChange={(e) => setFilterCountry(e.target.value)}
-            className="flex-1 min-w-[120px] px-4 py-2 rounded-lg border border-ink/20 bg-paper focus:outline-none focus:border-ocean text-sm"
+            className="flex-1 min-w-30 px-4 py-2 rounded-lg border border-ink/20 bg-paper focus:outline-none focus:border-ocean text-sm"
           >
             <option value="">All Countries</option>
             {filteredCountriesList.map(c => (
@@ -178,7 +175,7 @@ export default function AdminManagePage() {
           <select
             value={filterInstrumentType}
             onChange={(e) => setFilterInstrumentType(e.target.value)}
-            className="flex-1 min-w-[120px] px-4 py-2 rounded-lg border border-ink/20 bg-paper focus:outline-none focus:border-ocean text-sm"
+            className="flex-1 min-w-30 px-4 py-2 rounded-lg border border-ink/20 bg-paper focus:outline-none focus:border-ocean text-sm"
           >
             <option value="">All Instrument Types</option>
             {instrumentTypes.map(type => (
@@ -189,7 +186,7 @@ export default function AdminManagePage() {
           <select
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            className="flex-1 min-w-[120px] px-4 py-2 rounded-lg border border-ink/20 bg-paper focus:outline-none focus:border-ocean text-sm"
+            className="flex-1 min-w-30 px-4 py-2 rounded-lg border border-ink/20 bg-paper focus:outline-none focus:border-ocean text-sm"
           >
             <option value="">All Statuses</option>
             {statuses.map(status => (
@@ -200,7 +197,7 @@ export default function AdminManagePage() {
           <select
             value={filterYear}
             onChange={(e) => setFilterYear(e.target.value)}
-            className="flex-1 min-w-[120px] px-4 py-2 rounded-lg border border-ink/20 bg-paper focus:outline-none focus:border-ocean text-sm"
+            className="flex-1 min-w-30 px-4 py-2 rounded-lg border border-ink/20 bg-paper focus:outline-none focus:border-ocean text-sm"
           >
             <option value="">All Years</option>
             {years.map(year => (

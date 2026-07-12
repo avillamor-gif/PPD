@@ -78,7 +78,7 @@ export function MultiSelectDropdown({
       {/* Main Input Field */}
       <div
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full rounded-lg border border-ink/20 bg-paper px-4 py-3 text-ink focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20 cursor-pointer flex items-center justify-between min-h-[44px]"
+        className="w-full rounded-lg border border-ink/20 bg-paper px-4 py-3 text-ink focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20 cursor-pointer flex items-center justify-between min-h-11"
       >
         <div className="flex flex-wrap gap-2 flex-1">
           {selectedValues.length === 0 ? (

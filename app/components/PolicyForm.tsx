@@ -7,7 +7,6 @@ import { MultiSelectDropdown } from './MultiSelectDropdown';
 import type { Policy, PolicyLevel, PolicyStatus } from '@/lib/types';
 
 const LEVELS: PolicyLevel[] = ['National', 'Sub-national', 'Regional', 'International'];
-const EXCLUDED_CATEGORIES = ["Plastic Ban", "Circular Economy", "EPR"];
 
 export interface PolicyFormProps {
   initialData?: Policy;
@@ -368,9 +367,7 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
               <div>
                 <MultiSelectDropdown
                   label="Instrument Type *"
-                  options={(referenceData?.instrumentTypes || []).filter(
-                    (type) => !EXCLUDED_CATEGORIES.includes(type)
-                  )}
+                  options={referenceData?.instrumentTypes || []}
                   selectedValues={formData.instrumentTypes}
                   onChange={(values) =>
                     setFormData((prev) => ({
