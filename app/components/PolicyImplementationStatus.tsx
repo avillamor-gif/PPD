@@ -45,32 +45,48 @@ export function PolicyImplementationStatus({
       try {
         // Check if user is admin
         const { data: { user } } = await supabase.auth.getUser();
+        console.log('🔍 Current user:', user?.id);
+        
         if (!user) {
+          console.log('ℹ️ No user logged in');
           setIsAdmin(false);
           return;
         }
 
-        const { data: profile } = await supabase
+        const { data: profile, error: profileError } = await supabase
           .from('user_profiles')
           .select('roles(name)')
           .eq('id', user.id)
           .single();
 
+        console.log('👤 User profile:', profile, 'Error:', profileError);
+
         const roles = Array.isArray(profile?.roles) ? profile.roles : profile?.roles ? [profile.roles] : [];
         const userRole = roles?.[0]?.name;
+        console.log('🎯 User role:', userRole);
         setIsAdmin(userRole === 'admin');
 
         // Fetch available statuses
-        const res = await fetch('/api/reference-data/statuses');
-        const data = await res.json();
-        setAvailableStatuses(data.map((s: any) => s.name));
+        try {
+          const res = await fetch('/api/reference-data/statuses');
+          const data = await res.json();
+          console.log('✅ Statuses fetched:', data);
+          setAvailableStatuses(data.map((s: any) => s.name));
+        } catch (err) {
+          console.error('❌ Error fetching statuses:', err);
+        }
 
         // Fetch status history
-        const historyRes = await fetch(`/api/policies/${policyId}/status-history`);
-        const historyData = await historyRes.json();
-        setStatusHistory(historyData || []);
+        try {
+          const historyRes = await fetch(`/api/policies/${policyId}/status-history`);
+          const historyData = await historyRes.json();
+          console.log('📜 Status history fetched:', historyData);
+          setStatusHistory(historyData || []);
+        } catch (err) {
+          console.error('❌ Error fetching status history:', err);
+        }
       } catch (err) {
-        console.error('Error initializing:', err);
+        console.error('❌ Error initializing:', err);
       }
     };
 
@@ -189,6 +205,15 @@ export function PolicyImplementationStatus({
         {error && (
           <div className="p-3 rounded-lg bg-coral/10 border border-coral/30 text-coral text-sm">
             {error}
+          </div>
+        )}
+
+        {/* Debug info (remove in production) */}
+        {isAdmin && (
+          <div className="p-2 rounded-lg bg-ocean/5 border border-ocean/20 text-xs text-ocean/70">
+            <p>✅ Admin: {isAdmin ? 'Yes' : 'No'}</p>
+            <p>📊 Statuses available: {availableStatuses.length}</p>
+            <p>📜 History entries: {statusHistory.length}</p>
           </div>
         )}
 
