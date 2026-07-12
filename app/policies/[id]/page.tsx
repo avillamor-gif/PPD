@@ -208,6 +208,8 @@ export default async function PolicyPage({ params }: { params: Promise<{ id: str
               policyId={policy.id} 
               initialStatus={policy.status} 
               initialYear={policy.year}
+              commencementDate={policy.commencement_date}
+              summary={policy.summary}
             />
 
             {/* Community Discussion */}

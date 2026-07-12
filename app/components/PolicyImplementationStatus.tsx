@@ -18,12 +18,16 @@ interface PolicyImplementationStatusProps {
   policyId: string;
   initialStatus: string;
   initialYear: number;
+  commencementDate?: string | null;
+  summary?: string | null;
 }
 
 export function PolicyImplementationStatus({
   policyId,
   initialStatus,
   initialYear,
+  commencementDate,
+  summary,
 }: PolicyImplementationStatusProps) {
   const [status, setStatus] = useState(initialStatus);
   const [statusHistory, setStatusHistory] = useState<StatusHistoryEntry[]>([]);
@@ -252,7 +256,15 @@ export function PolicyImplementationStatus({
           </div>
           <div>
             <p className="text-sm text-ink/60 font-mono">Enacted/Proposed</p>
-            <p className="font-semibold text-ink">{initialYear}</p>
+            <p className="font-semibold text-ink">
+              {commencementDate 
+                ? new Date(commencementDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+                : initialYear
+              }
+            </p>
+            {summary && (
+              <p className="text-xs text-ink/50 mt-2 max-w-sm line-clamp-2">{summary}</p>
+            )}
           </div>
         </div>
 
