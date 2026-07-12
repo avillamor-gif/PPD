@@ -362,9 +362,13 @@ export function PolicyImplementationStatus({
           <div className="space-y-4">
             {statusHistory.map((entry, index) => (
               <div key={entry.id} className="flex gap-3 group">
-                {/* Timeline dot and line */}
-                <div className="flex flex-col items-center pt-1">
-                  <div className="w-3 h-3 rounded-full bg-ocean" />
+                {/* Timeline year circle and line */}
+                <div className="flex flex-col items-center">
+                  <div className="w-12 h-12 rounded-full bg-ocean flex items-center justify-center flex-shrink-0">
+                    <span className="text-white text-xs font-bold">
+                      {new Date(entry.change_date).getFullYear()}
+                    </span>
+                  </div>
                   {index < statusHistory.length - 1 && (
                     <div className="w-0.5 h-16 bg-ink/10 my-1" />
                   )}
@@ -377,9 +381,8 @@ export function PolicyImplementationStatus({
                         {entry.old_status && `${entry.old_status} → `}
                         <span className="text-ocean font-bold">{entry.new_status}</span>
                       </p>
-                      <p className="text-xs text-ocean mt-1 font-mono font-semibold">
+                      <p className="text-xs text-ink/60 mt-1 font-mono">
                         {new Date(entry.change_date).toLocaleDateString('en-US', {
-                          year: 'numeric',
                           month: 'short',
                           day: 'numeric',
                         })}
