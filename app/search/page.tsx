@@ -111,10 +111,10 @@ export default function SearchPage() {
   const availableThemes = useMemo(() => {
     const themeCounts = new Map<string, number>();
     POLICIES.forEach(p => {
-      if (p.category) {
+      if (p?.category) {
         // Split comma-separated categories and count each individually
         p.category.split(',').forEach((cat: string) => {
-          const trimmed = cat.trim();
+          const trimmed = cat?.trim?.() || '';
           if (trimmed && !EXCLUDED_CATEGORIES.includes(trimmed)) {
             themeCounts.set(trimmed, (themeCounts.get(trimmed) || 0) + 1);
           }
@@ -123,7 +123,7 @@ export default function SearchPage() {
     });
     // Sort by name and format with count
     const sorted = Array.from(themeCounts.entries())
-      .sort((a, b) => a[0].localeCompare(b[0]))
+      .sort((a, b) => (a[0] || '').localeCompare(b[0] || ''))
       .map(([name, count]) => `${name} (${count})`);
     return ["All Instrument Types", ...sorted];
   }, [POLICIES]);
@@ -132,7 +132,7 @@ export default function SearchPage() {
   const availableRegions = useMemo(() => {
     const regionCounts = new Map<string, number>();
     POLICIES.forEach(p => {
-      const countryData = COUNTRIES.find(c => c.code === p.countryCode);
+      const countryData = COUNTRIES.find(c => c.code === p?.countryCode);
       const region = countryData?.region;
       if (region) {
         regionCounts.set(region, (regionCounts.get(region) || 0) + 1);
@@ -140,7 +140,7 @@ export default function SearchPage() {
     });
     // Sort by name and format with count
     const sorted = Array.from(regionCounts.entries())
-      .sort((a, b) => a[0].localeCompare(b[0]))
+      .sort((a, b) => (a[0] || '').localeCompare(b[0] || ''))
       .map(([name, count]) => `${name} (${count})`);
     return ["All regions", ...sorted];
   }, [POLICIES]);
@@ -196,7 +196,7 @@ export default function SearchPage() {
         // Extract category name from theme (remove the count: "Name (5)" -> "Name")
         const themeName = theme.replace(/ \(\d+\)$/, '');
         // Handle comma-separated categories
-        const categories = p.category?.split(',').map((cat: string) => cat.trim()) || [];
+        const categories = (p?.category || '').split(',').map((cat: string) => cat?.trim?.() || '') || [];
         return categories.includes(themeName);
       })
       .filter((p) => (status === "Any status" ? true : p.status === status))
