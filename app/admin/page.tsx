@@ -227,16 +227,15 @@ export default function AdminDashboard() {
           {analytics?.policyByCategory && analytics.policyByCategory.length > 0 ? (
             <ResponsiveContainer width="100%" height={300}>
               <BarChart
-                data={[{
-                  category: 'All Types',
-                  count: analytics.policyByCategory.reduce((sum: number, item: any) => sum + (item.count || 0), 0)
-                }]}
+                data={analytics.policyByCategory}
+                layout="vertical"
+                margin={{ top: 5, right: 30, left: 200, bottom: 5 }}
               >
                 <CartesianGrid strokeDasharray="3 3" stroke="#e8e8e0" />
-                <XAxis dataKey="category" />
-                <YAxis tickFormatter={(value) => (value || 0).toString()} />
+                <XAxis type="number" tickFormatter={(value) => (value || 0).toString()} />
+                <YAxis dataKey="category" type="category" width={190} tick={{ fontSize: 11 }} />
                 <Tooltip formatter={(value: any) => (value || 0).toString()} />
-                <Bar dataKey="count" fill={CHART_COLORS.oceanDeep} radius={[8, 8, 0, 0]} />
+                <Bar dataKey="count" fill={CHART_COLORS.oceanDeep} radius={[0, 8, 8, 0]} />
               </BarChart>
             </ResponsiveContainer>
           ) : (
