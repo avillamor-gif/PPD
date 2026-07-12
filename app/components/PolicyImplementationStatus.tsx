@@ -55,34 +55,29 @@ export function PolicyImplementationStatus({
           return;
         }
 
-        // Try simplified query: just get the role_id or role directly
+        // Fetch user profile with role_id (not roles relationship)
         console.log('🔍 Fetching user profile...');
         const { data: profile, error: profileError } = await supabase
           .from('user_profiles')
-          .select('id, roles')  // Get the relationship without nested select
+          .select('id, role_id')
           .eq('id', user.id)
           .single();
 
         console.log('👤 User profile:', profile, 'Error:', profileError);
 
-        // Handle both string and object role formats
+        // If we got a profile with role_id, check if it's admin (admin id is 1)
         let isUserAdmin = false;
-        if (profile) {
-          const role = profile.roles;
-          console.log('🔍 Role data:', role, 'Type:', typeof role);
+        if (profile?.role_id) {
+          console.log('🎯 User role_id:', profile.role_id);
+          // Query the roles table to get the role name
+          const { data: role, error: roleError } = await supabase
+            .from('roles')
+            .select('name')
+            .eq('id', profile.role_id)
+            .single();
           
-          // If roles is an object with 'name' property
-          if (typeof role === 'object' && role?.name === 'admin') {
-            isUserAdmin = true;
-          }
-          // If roles is a string
-          else if (typeof role === 'string' && role === 'admin') {
-            isUserAdmin = true;
-          }
-          // If roles is an array
-          else if (Array.isArray(role) && role.some((r: any) => r?.name === 'admin' || r === 'admin')) {
-            isUserAdmin = true;
-          }
+          console.log('🔍 Role lookup:', role, 'Error:', roleError);
+          isUserAdmin = role?.name === 'admin';
         }
 
         console.log('🎯 Is admin:', isUserAdmin);
