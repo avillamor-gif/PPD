@@ -1,20 +1,50 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { COUNTRIES } from '@/lib/constants';
-import type { Policy, PolicyStatus } from '@/lib/types';
+import type { Policy } from '@/lib/types';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { Loader } from 'lucide-react';
+import {
+  PieChart, Pie, Cell, BarChart, Bar, LineChart, Line,
+  XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
+} from 'recharts';
+
+interface Analytics {
+  summary: {
+    totalPolicies: number;
+    totalDiscussions: number;
+    totalComments: number;
+    totalUsers: number;
+  };
+  policyByStatus: Array<{ status: string; count: number }>;
+  policyByCountry: Array<{ country: string; count: number }>;
+  policyByCategory: Array<{ category: string; count: number }>;
+  policyByYear: Array<{ year: number; count: number }>;
+  policyByLifecycleStage: Array<{ stage: string; count: number }>;
+  policyByLevel: Array<{ level: string; count: number }>;
+  topCountries: Array<{ country: string; count: number }>;
+  topCategories: Array<{ category: string; count: number }>;
+}
+
+const CHART_COLORS = {
+  ocean: '#6bb4c8',
+  coral: '#c67d5f',
+  sand: '#d4b77f',
+  oceanDeep: '#4a7a8a',
+  ink: '#343129',
+};
 
 export default function AdminDashboard() {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [policies, setPolicies] = useState<Policy[]>([]);
+  const [analytics, setAnalytics] = useState<Analytics | null>(null);
 
-  // Check authentication and fetch policies on mount
+  // Check authentication and fetch data on mount
   useEffect(() => {
     const initializeDashboard = async () => {
       try {
@@ -30,16 +60,23 @@ export default function AdminDashboard() {
         console.log('[ADMIN PAGE] Authentication successful');
         setIsAuthenticated(true);
 
-        // Fetch policies from API
-        console.log('[ADMIN PAGE] Fetching policies...');
-        const response = await fetch('/api/policies');
-        if (response.ok) {
-          const data = await response.json();
+        // Fetch both policies and analytics data
+        console.log('[ADMIN PAGE] Fetching data...');
+        const [policiesRes, analyticsRes] = await Promise.all([
+          fetch('/api/policies'),
+          fetch('/api/analytics')
+        ]);
+
+        if (policiesRes.ok) {
+          const data = await policiesRes.json();
           console.log('[ADMIN PAGE] Policies fetched:', data.data?.length);
           setPolicies(data.data || []);
-        } else {
-          console.error('[ADMIN PAGE] Failed to fetch policies:', response.status);
-          setPolicies([]);
+        }
+
+        if (analyticsRes.ok) {
+          const data = await analyticsRes.json();
+          console.log('[ADMIN PAGE] Analytics fetched');
+          setAnalytics(data);
         }
       } catch (err) {
         console.error('[ADMIN PAGE] Error initializing dashboard:', err);
@@ -53,61 +90,7 @@ export default function AdminDashboard() {
     initializeDashboard();
   }, [router]);
 
-  // Analytics data
-  const POLICIES = policies;
-  const totalPolicies = POLICIES.length;
-  const policyByStatus = useMemo(() => {
-    const counts: Record<PolicyStatus, number> = {
-      'Unknown': 0,
-      'In Force': 0,
-      'Proposed': 0,
-      'Phased': 0,
-      'Repealed': 0,
-    };
-    POLICIES.forEach((p: any) => {
-      if (p?.status && counts.hasOwnProperty(p.status)) {
-        counts[p.status as PolicyStatus]++;
-      }
-    });
-    return counts;
-  }, []);
-
-  const policyByCountry = useMemo(() => {
-    const counts: Record<string, number> = {};
-    POLICIES.forEach((p: any) => {
-      if (p?.country) {
-        counts[p.country] = (counts[p.country] || 0) + 1;
-      }
-    });
-    return Object.entries(counts)
-      .map(([code, count]) => {
-        const country = COUNTRIES.find((c) => c.code === code);
-        return { code, name: country?.name || code, count };
-      })
-      .sort((a, b) => b.count - a.count);
-  }, []);
-
-  const policyByInstrumentType = useMemo(() => {
-    const counts: Record<string, number> = {};
-    POLICIES.forEach((p: any) => {
-      if (p?.instrument_type) {
-        counts[p.instrument_type] = (counts[p.instrument_type] || 0) + 1;
-      }
-    });
-    return Object.entries(counts)
-      .map(([type, count]) => ({ type, count }))
-      .sort((a, b) => b.count - a.count);
-  }, []);
-
-  const yearRange = useMemo(() => {
-    const years = POLICIES.map((p: any) => p?.year || 0).filter((y) => y > 0);
-    return { min: Math.min(...years), max: Math.max(...years) };
-  }, []);
-
-  const recentPolicies = useMemo(
-    () => [...POLICIES].sort((a: any, b: any) => (b?.year || 0) - (a?.year || 0)).slice(0, 5),
-    []
-  );
+  const recentPolicies = policies.sort((a: any, b: any) => (b?.year || 0) - (a?.year || 0)).slice(0, 5);
 
   if (isLoading) {
     return (
@@ -125,7 +108,7 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 md:px-6 lg:px-10 py-8 space-y-4 md:space-y-6 lg:space-y-8">
+    <div className="mx-auto max-w-7xl px-4 md:px-6 lg:px-10 py-8 space-y-8">
       {/* Header */}
       <div>
         <h1 className="font-display text-2xl md:text-3xl lg:text-4xl font-bold text-ink">Admin Dashboard</h1>
@@ -175,166 +158,248 @@ export default function AdminDashboard() {
       <div className="grid grid-cols-1 gap-3 md:gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-2xl border border-ink/10 bg-card p-6">
           <div className="text-sm font-mono uppercase tracking-[0.22em] text-ink/60">Total Policies</div>
-          <div className="mt-3 font-display text-5xl font-bold text-ink">{totalPolicies}</div>
+          <div className="mt-3 font-display text-5xl font-bold text-ink">{analytics?.summary.totalPolicies || 0}</div>
           <div className="mt-2 text-xs text-ink/50">Across {COUNTRIES.length} countries</div>
         </div>
 
         <div className="rounded-2xl border border-ink/10 bg-card p-6">
           <div className="text-sm font-mono uppercase tracking-[0.22em] text-ink/60">In Force</div>
-          <div className="mt-3 font-display text-5xl font-bold text-ocean">{policyByStatus['In Force']}</div>
+          <div className="mt-3 font-display text-5xl font-bold text-ocean">
+            {analytics?.policyByStatus.find(s => s.status === 'In Force')?.count || 0}
+          </div>
           <div className="mt-2 text-xs text-ink/50">Active regulations</div>
         </div>
 
         <div className="rounded-2xl border border-ink/10 bg-card p-6">
           <div className="text-sm font-mono uppercase tracking-[0.22em] text-ink/60">Proposed</div>
-          <div className="mt-3 font-display text-5xl font-bold text-coral">{policyByStatus['Proposed']}</div>
+          <div className="mt-3 font-display text-5xl font-bold text-coral">
+            {analytics?.policyByStatus.find(s => s.status === 'Proposed')?.count || 0}
+          </div>
           <div className="mt-2 text-xs text-ink/50">In development</div>
         </div>
 
         <div className="rounded-2xl border border-ink/10 bg-card p-6">
           <div className="text-sm font-mono uppercase tracking-[0.22em] text-ink/60">Year Range</div>
           <div className="mt-3 font-display text-5xl font-bold text-ink">
-            {yearRange.min}–{yearRange.max}
+            {analytics?.policyByYear && analytics.policyByYear.length > 0
+              ? `${Math.min(...analytics.policyByYear.map(y => y.year))}–${Math.max(...analytics.policyByYear.map(y => y.year))}`
+              : '—'}
           </div>
           <div className="mt-2 text-xs text-ink/50">Coverage period</div>
         </div>
       </div>
 
-      {/* Two Column Layout */}
+      {/* Charts Section */}
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-        {/* Status Distribution */}
+        {/* Policy Status Distribution - Pie Chart */}
         <div className="rounded-2xl border border-ink/10 bg-card p-8">
-          <h2 className="font-display text-2xl font-bold text-ink">By Status</h2>
-          <div className="mt-6 space-y-4">
-            {Object.entries(policyByStatus).map(([status, count]) => {
-              const total = totalPolicies;
-              const percentage = ((count / total) * 100).toFixed(0);
-              const colors: Record<string, string> = {
-                'Unknown': 'bg-ink/30',
-                'In Force': 'bg-ocean',
-                'Proposed': 'bg-coral',
-                'Phased': 'bg-sand',
-                'Repealed': 'bg-ink/20',
-              };
-              return (
-                <div key={status}>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-ink">{status}</span>
-                    <span className="text-sm font-mono text-ink/60">
-                      {count} ({percentage}%)
-                    </span>
-                  </div>
-                  <div className="h-2 bg-ink/10 rounded-full overflow-hidden">
-                    <div
-                      className={`h-full rounded-full ${colors[status]}`}
-                      style={{ width: `${percentage}%` }}
+          <h2 className="font-display text-2xl font-bold text-ink mb-6">Policy Status Distribution</h2>
+          {analytics?.policyByStatus && analytics.policyByStatus.length > 0 ? (
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={analytics.policyByStatus}
+                  dataKey="count"
+                  nameKey="status"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={100}
+                  label={({ name, count }) => `${name}: ${count}`}
+                >
+                  {analytics.policyByStatus.map((_, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={[CHART_COLORS.ocean, CHART_COLORS.coral, CHART_COLORS.sand, CHART_COLORS.oceanDeep][index % 4]}
                     />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          ) : (
+            <p className="text-ink/60 text-center py-12">No data available</p>
+          )}
         </div>
 
-        {/* Instrument Type Distribution */}
+        {/* Instrument Type Distribution - Bar Chart */}
         <div className="rounded-2xl border border-ink/10 bg-card p-8">
-          <h2 className="font-display text-2xl font-bold text-ink">By Instrument Type</h2>
-          <div className="mt-6 space-y-4">
-            {policyByInstrumentType.map(({ type, count }) => {
-              const percentage = ((count / totalPolicies) * 100).toFixed(0);
-              return (
-                <div key={type}>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-ink">{type}</span>
-                    <span className="text-sm font-mono text-ink/60">
-                      {count} ({percentage}%)
-                    </span>
-                  </div>
-                  <div className="h-2 bg-ink/10 rounded-full overflow-hidden">
-                    <div
-                      className="h-full rounded-full bg-ocean-deep"
-                      style={{ width: `${percentage}%` }}
-                    />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+          <h2 className="font-display text-2xl font-bold text-ink mb-6">By Instrument Type</h2>
+          {analytics?.policyByCategory && analytics.policyByCategory.length > 0 ? (
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={analytics.policyByCategory}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e8e8e0" />
+                <XAxis dataKey="category" angle={-45} textAnchor="end" height={100} tick={{ fontSize: 12 }} />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="count" fill={CHART_COLORS.oceanDeep} radius={[8, 8, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          ) : (
+            <p className="text-ink/60 text-center py-12">No data available</p>
+          )}
         </div>
       </div>
 
-      {/* Top Countries & Recently Added - Side by Side */}
-      <div className="grid grid-cols-1 gap-3 md:gap-4 lg:grid-cols-2">
-        {/* Top Countries */}
-        <div className="rounded-2xl border border-ink/10 bg-card p-4 md:p-6">
-          <h2 className="font-display text-lg md:text-xl font-bold text-ink">Top Countries</h2>
-          <div className="mt-4">
-            <div className="space-y-2 max-h-64 overflow-y-auto">
-              {policyByCountry.map(({ code, name, count }) => (
-                <a
-                  key={code}
-                  href={`/countries/${code.toLowerCase()}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-between p-2 rounded-lg hover:bg-sand/50 transition cursor-pointer"
-                >
-                  <div className="flex items-center gap-2 flex-1 min-w-0">
-                    <div className="w-8 h-8 rounded-full bg-linear-to-br from-ocean to-ocean-deep flex items-center justify-center text-white text-xs font-bold shrink-0">
-                      {code}
-                    </div>
-                    <span className="font-medium text-ink truncate">{name}</span>
-                  </div>
-                  <span className="font-display text-lg font-semibold text-ocean ml-2 shrink-0">{count}</span>
-                </a>
-              ))}
-            </div>
-          </div>
+      {/* Top Countries & Years */}
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+        {/* Top Countries - Bar Chart */}
+        <div className="rounded-2xl border border-ink/10 bg-card p-8">
+          <h2 className="font-display text-2xl font-bold text-ink mb-6">Policies by Country</h2>
+          {analytics?.policyByCountry && analytics.policyByCountry.length > 0 ? (
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart
+                data={analytics.policyByCountry.slice(0, 10)}
+                layout="vertical"
+                margin={{ top: 5, right: 30, left: 150, bottom: 5 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" stroke="#e8e8e0" />
+                <XAxis type="number" />
+                <YAxis dataKey="country" type="category" width={140} tick={{ fontSize: 12 }} />
+                <Tooltip />
+                <Bar dataKey="count" fill={CHART_COLORS.ocean} radius={[0, 8, 8, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          ) : (
+            <p className="text-ink/60 text-center py-12">No data available</p>
+          )}
         </div>
 
-        {/* Recent Policies */}
-        <div className="rounded-2xl border border-ink/10 bg-card p-4 md:p-6">
-          <h2 className="font-display text-lg md:text-xl font-bold text-ink">Recently Added</h2>
-          <div className="mt-4">
-            <div className="space-y-2 max-h-64 overflow-y-auto">
-              {recentPolicies.map((policy: any) => (
-                <a
-                  key={policy.id}
-                  href={`/policies/${policy.slug}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block p-2 border border-ink/10 rounded-lg hover:bg-sand/30 transition cursor-pointer"
+        {/* Policies by Year - Line Chart */}
+        <div className="rounded-2xl border border-ink/10 bg-card p-8">
+          <h2 className="font-display text-2xl font-bold text-ink mb-6">Policies by Year</h2>
+          {analytics?.policyByYear && analytics.policyByYear.length > 0 ? (
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={analytics.policyByYear}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e8e8e0" />
+                <XAxis dataKey="year" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Line
+                  type="monotone"
+                  dataKey="count"
+                  stroke={CHART_COLORS.coral}
+                  strokeWidth={3}
+                  dot={{ fill: CHART_COLORS.coral, r: 5 }}
+                  activeDot={{ r: 7 }}
+                  name="Count"
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          ) : (
+            <p className="text-ink/60 text-center py-12">No data available</p>
+          )}
+        </div>
+      </div>
+
+      {/* Lifecycle Stage & Level Distribution */}
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
+        {/* Lifecycle Stage - Pie Chart */}
+        <div className="rounded-2xl border border-ink/10 bg-card p-8">
+          <h2 className="font-display text-2xl font-bold text-ink mb-6">Lifecycle Stage</h2>
+          {analytics?.policyByLifecycleStage && analytics.policyByLifecycleStage.length > 0 ? (
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={analytics.policyByLifecycleStage}
+                  dataKey="count"
+                  nameKey="stage"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={100}
+                  label={({ name, count }) => `${name}: ${count}`}
                 >
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-fraunces text-sm font-medium text-ink truncate">{policy.title}</h3>
-                      <div className="mt-1 flex flex-wrap items-center gap-1">
-                        <span className="inline-block px-1.5 py-0.5 text-[10px] font-mono uppercase rounded bg-sand text-ink">
-                          {policy.category}
-                        </span>
-                        <span className="inline-block px-1.5 py-0.5 text-[10px] font-mono text-ink/60">
-                          {COUNTRIES.find((c: any) => c.code === policy.country)?.name}
-                        </span>
-                        <span className="inline-block px-1.5 py-0.5 text-[10px] font-mono text-ink/60">{policy.year}</span>
-                      </div>
-                    </div>
-                    <div
-                      className={`inline-block px-1.5 py-0.5 rounded text-[10px] font-mono font-semibold shrink-0 ${
-                        policy.status === 'In Force'
-                          ? 'bg-ocean text-white'
-                          : policy.status === 'Proposed'
-                            ? 'bg-coral text-white'
-                            : policy.status === 'Phased'
-                              ? 'bg-sand text-ink'
-                              : 'bg-ink/10 text-ink/60'
-                      }`}
-                    >
-                      {policy.status}
+                  {analytics.policyByLifecycleStage.map((_, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={[CHART_COLORS.ocean, CHART_COLORS.coral, CHART_COLORS.sand, CHART_COLORS.oceanDeep][index % 4]}
+                    />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          ) : (
+            <p className="text-ink/60 text-center py-12">No data available</p>
+          )}
+        </div>
+
+        {/* Policy Level - Pie Chart */}
+        <div className="rounded-2xl border border-ink/10 bg-card p-8">
+          <h2 className="font-display text-2xl font-bold text-ink mb-6">Policy Level</h2>
+          {analytics?.policyByLevel && analytics.policyByLevel.length > 0 ? (
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={analytics.policyByLevel}
+                  dataKey="count"
+                  nameKey="level"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={100}
+                  label={({ name, count }) => `${name}: ${count}`}
+                >
+                  {analytics.policyByLevel.map((_, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={[CHART_COLORS.sand, CHART_COLORS.ocean, CHART_COLORS.coral, CHART_COLORS.oceanDeep][index % 4]}
+                    />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+          ) : (
+            <p className="text-ink/60 text-center py-12">No data available</p>
+          )}
+        </div>
+      </div>
+
+      {/* Recently Added Policies */}
+      <div className="rounded-2xl border border-ink/10 bg-card p-8">
+        <h2 className="font-display text-2xl font-bold text-ink mb-6">Recently Added</h2>
+        <div className="space-y-3 max-h-96 overflow-y-auto">
+          {recentPolicies.length > 0 ? (
+            recentPolicies.map((policy: any) => (
+              <a
+                key={policy.id}
+                href={`/policies/${policy.slug}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block p-4 border border-ink/10 rounded-lg hover:bg-sand/30 transition cursor-pointer"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-fraunces text-sm font-medium text-ink truncate">{policy.title}</h3>
+                    <div className="mt-2 flex flex-wrap items-center gap-2">
+                      <span className="inline-block px-2 py-1 text-[10px] font-mono uppercase rounded bg-sand text-ink">
+                        {policy.instrument_type || 'Unknown'}
+                      </span>
+                      <span className="inline-block px-2 py-1 text-[10px] font-mono text-ink/60">
+                        {COUNTRIES.find((c: any) => c.code === policy.country)?.name || policy.country}
+                      </span>
+                      <span className="inline-block px-2 py-1 text-[10px] font-mono text-ink/60">{policy.year}</span>
                     </div>
                   </div>
-                </a>
-              ))}
-            </div>
-          </div>
+                  <div
+                    className={`inline-block px-2 py-1 rounded text-[10px] font-mono font-semibold shrink-0 ${
+                      policy.status === 'In Force'
+                        ? 'bg-ocean text-white'
+                        : policy.status === 'Proposed'
+                          ? 'bg-coral text-white'
+                          : policy.status === 'Phased'
+                            ? 'bg-sand text-ink'
+                            : 'bg-ink/10 text-ink/60'
+                    }`}
+                  >
+                    {policy.status}
+                  </div>
+                </div>
+              </a>
+            ))
+          ) : (
+            <p className="text-ink/60 text-center py-8">No policies added yet</p>
+          )}
         </div>
       </div>
 
