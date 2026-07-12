@@ -6,6 +6,8 @@ import Link from 'next/link';
 import { Trash2, ExternalLink, Pencil, Loader } from 'lucide-react';
 import type { Policy } from '@/lib/types/policy';
 
+const EXCLUDED_CATEGORIES = ["Plastic Ban", "Circular Economy", "EPR"];
+
 export default function AdminManagePage() {
   const [policies, setPolicies] = useState<Policy[]>([]);
   const [filteredPolicies, setFilteredPolicies] = useState<Policy[]>([]);
@@ -42,6 +44,7 @@ export default function AdminManagePage() {
       .map(p => p.category)
       .filter(Boolean)
       .flatMap(cat => cat.split(',').map(c => c.trim()))
+      .filter(type => !EXCLUDED_CATEGORIES.includes(type))
   )).sort();
   
   const statuses = Array.from(new Set(policies.map(p => p.status)));
