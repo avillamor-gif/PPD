@@ -120,8 +120,8 @@ export default function AdminLayout({
       )}
 
       {/* Admin Navigation */}
-      <div className="hidden md:block border-b border-rule bg-paper sticky top-0 z-40 overflow-x-auto">
-        <div className="mx-auto max-w-7xl px-4 md:px-6 lg:px-10">
+      <div className="hidden md:block border-b border-rule bg-paper sticky top-0 z-40">
+        <div className="mx-auto max-w-7xl px-4 md:px-6 lg:px-10 overflow-x-auto">
           <nav className="flex gap-4 md:gap-8 min-w-min">
             {navItems.map((item) => {
               const isItemActive = isActive(item.href);
@@ -144,7 +144,7 @@ export default function AdminLayout({
                   </Link>
                   
                   {hasSubmenu && (
-                    <div className="absolute left-0 mt-0 w-max bg-paper border border-rule rounded-lg shadow-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
+                    <div className="absolute left-0 top-full mt-0 w-max bg-paper border border-rule rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all pointer-events-none group-hover:pointer-events-auto z-50">
                       {item.submenu.map((subitem) => (
                         <Link
                           key={subitem.href}
