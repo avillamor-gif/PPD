@@ -55,18 +55,38 @@ export function PolicyImplementationStatus({
           return;
         }
 
+        // Try simplified query: just get the role_id or role directly
+        console.log('🔍 Fetching user profile...');
         const { data: profile, error: profileError } = await supabase
           .from('user_profiles')
-          .select('roles(name)')
+          .select('id, roles')  // Get the relationship without nested select
           .eq('id', user.id)
           .single();
 
         console.log('👤 User profile:', profile, 'Error:', profileError);
 
-        const roles = Array.isArray(profile?.roles) ? profile.roles : profile?.roles ? [profile.roles] : [];
-        const userRole = roles?.[0]?.name;
-        console.log('🎯 User role:', userRole);
-        setIsAdmin(userRole === 'admin');
+        // Handle both string and object role formats
+        let isUserAdmin = false;
+        if (profile) {
+          const role = profile.roles;
+          console.log('🔍 Role data:', role, 'Type:', typeof role);
+          
+          // If roles is an object with 'name' property
+          if (typeof role === 'object' && role?.name === 'admin') {
+            isUserAdmin = true;
+          }
+          // If roles is a string
+          else if (typeof role === 'string' && role === 'admin') {
+            isUserAdmin = true;
+          }
+          // If roles is an array
+          else if (Array.isArray(role) && role.some((r: any) => r?.name === 'admin' || r === 'admin')) {
+            isUserAdmin = true;
+          }
+        }
+
+        console.log('🎯 Is admin:', isUserAdmin);
+        setIsAdmin(isUserAdmin);
 
         // Fetch available statuses
         try {
