@@ -16,6 +16,7 @@ export default function AdminLayout({
   
   const navItems = [
     { href: '/admin', label: 'Dashboard' },
+    { href: '/admin/analytics', label: 'Analytics' },
     { href: '/admin/users', label: 'Users' },
     { href: '/admin/moderation', label: 'Moderation' },
     { 
