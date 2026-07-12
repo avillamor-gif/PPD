@@ -67,6 +67,12 @@ export function PolicyImplementationStatus({
 
         // If we got a profile with role_id, check if it's admin (admin id is 1)
         let isUserAdmin = false;
+        if (!profile) {
+          console.error('❌ No user_profiles record found for user:', user.id);
+          setError('User profile not found');
+          return;
+        }
+
         if (profile?.role_id) {
           console.log('🎯 User role_id:', profile.role_id);
           // Query the roles table to get the role name
@@ -77,7 +83,18 @@ export function PolicyImplementationStatus({
             .single();
           
           console.log('🔍 Role lookup:', role, 'Error:', roleError);
+          
+          if (roleError) {
+            console.error('❌ Error looking up role:', roleError);
+            setError(`Failed to look up role: ${roleError.message}`);
+            return;
+          }
+          
           isUserAdmin = role?.name === 'admin';
+        } else {
+          console.warn('⚠️ User has no role_id set');
+          setError('User role not set');
+          return;
         }
 
         console.log('🎯 Is admin:', isUserAdmin);
