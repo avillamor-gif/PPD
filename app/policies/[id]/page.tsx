@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { ArrowLeft, MapPin, Calendar, Building2, Globe, MessageCircle, ThumbsUp, Eye } from 'lucide-react';
 import { PolicyForumSection } from '@/app/components/PolicyForumSection';
 import { AdminEditButton } from '@/app/components/AdminEditButton';
+import { PolicyImplementationStatus } from '@/app/components/PolicyImplementationStatus';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 
 const themeColors: Record<string, string> = {
@@ -203,28 +204,11 @@ export default async function PolicyPage({ params }: { params: Promise<{ id: str
             </div>
 
             {/* Implementation Timeline Card */}
-            <div className="rounded-xl border border-ink/10 bg-white p-6 space-y-4">
-              <h2 className="text-xl font-bold text-ink flex items-center gap-2">
-                <Calendar className="w-5 h-5 text-coral" />
-                Implementation Status
-              </h2>
-              <div className="space-y-3">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-linear-to-br from-coral to-coral/50 flex items-center justify-center">
-                    <span className="text-white font-bold">{policy.year}</span>
-                  </div>
-                  <div>
-                    <p className="text-sm text-ink/60 font-mono">Enacted/Proposed</p>
-                    <p className="font-semibold text-ink">{policy.year}</p>
-                  </div>
-                </div>
-                <div className="mt-4 p-4 rounded-lg bg-ink/5 border-l-4 border-coral">
-                  <p className="text-sm text-ink/70">
-                    Status: <span className="font-semibold text-ink">{policy.status}</span>
-                  </p>
-                </div>
-              </div>
-            </div>
+            <PolicyImplementationStatus 
+              policyId={policy.id} 
+              initialStatus={policy.status} 
+              initialYear={policy.year}
+            />
 
             {/* Community Discussion */}
             <PolicyForumSection policyId={policy.slug} />
