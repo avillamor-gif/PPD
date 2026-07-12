@@ -202,9 +202,9 @@ export default function SearchPage() {
       .filter((p) => (status === "Any status" ? true : p.status === status))
       .filter((p) =>
         s
-          ? p.title.toLowerCase().includes(s) ||
-            p.summary.toLowerCase().includes(s) ||
-            p.instrument.toLowerCase().includes(s)
+          ? (p.title?.toLowerCase().includes(s) ?? false) ||
+            (p.summary?.toLowerCase().includes(s) ?? false) ||
+            (p.instrument?.toLowerCase().includes(s) ?? false)
           : true,
       )
       .sort((a, b) => b.year - a.year);
