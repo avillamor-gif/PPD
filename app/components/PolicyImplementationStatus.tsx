@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Calendar, Check, X } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
 interface PolicyImplementationStatusProps {
   policyId: string;
@@ -19,6 +20,36 @@ export function PolicyImplementationStatus({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [availableStatuses, setAvailableStatuses] = useState<string[]>([]);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    // Check if user is admin
+    const checkAdmin = async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          setIsAdmin(false);
+          return;
+        }
+
+        // Fetch user profile with role
+        const { data: profile } = await supabase
+          .from('user_profiles')
+          .select('roles(name)')
+          .eq('id', user.id)
+          .single();
+
+        const roles = Array.isArray(profile?.roles) ? profile.roles : profile?.roles ? [profile.roles] : [];
+        const userRole = roles?.[0]?.name;
+        setIsAdmin(userRole === 'admin');
+      } catch (err) {
+        console.error('Error checking admin status:', err);
+        setIsAdmin(false);
+      }
+    };
+
+    checkAdmin();
+  }, []);
 
   useEffect(() => {
     // Fetch available statuses from the reference data
@@ -39,13 +70,26 @@ export function PolicyImplementationStatus({
       setIsLoading(true);
       setError(null);
 
+      // Get the current session to get the auth token
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        setError('Authentication required');
+        return;
+      }
+
       const res = await fetch(`/api/policies/${policyId}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
+        },
         body: JSON.stringify({ status: newStatus }),
       });
 
-      if (!res.ok) throw new Error('Failed to update status');
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || 'Failed to update status');
+      }
 
       setStatus(newStatus);
       setIsEditing(false);
@@ -112,12 +156,14 @@ export function PolicyImplementationStatus({
                 Status: <span className="font-semibold text-ink">{status}</span>
               </p>
             </div>
-            <button
-              onClick={() => setIsEditing(true)}
-              className="px-3 py-1 rounded text-xs font-semibold bg-ocean text-white hover:bg-ocean/90 transition"
-            >
-              Edit
-            </button>
+            {isAdmin && (
+              <button
+                onClick={() => setIsEditing(true)}
+                className="px-3 py-1 rounded text-xs font-semibold bg-ocean text-white hover:bg-ocean/90 transition"
+              >
+                Edit
+              </button>
+            )}
           </div>
         )}
       </div>

@@ -2,6 +2,42 @@ import { NextRequest, NextResponse } from 'next/server';
 import { validatePolicy } from '@/lib/utils/validation';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 
+/**
+ * Check if the request is from an admin user
+ */
+async function isAdminUser(request: NextRequest): Promise<boolean> {
+  try {
+    const authHeader = request.headers.get('authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      return false;
+    }
+
+    const token = authHeader.slice(7);
+    
+    // Get user from Supabase using the token
+    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
+    
+    if (authError || !user?.id) {
+      return false;
+    }
+
+    // Check user role
+    const { data: profile } = await supabaseAdmin
+      .from('user_profiles')
+      .select('roles(name)')
+      .eq('id', user.id)
+      .single();
+
+    const roles = Array.isArray(profile?.roles) ? profile.roles : profile?.roles ? [profile.roles] : [];
+    const userRole = roles?.[0]?.name;
+    
+    return userRole === 'admin';
+  } catch (err) {
+    console.error('Error checking admin status:', err);
+    return false;
+  }
+}
+
 function normalizePolicyDateFields(data: Record<string, any>) {
   const normalized: Record<string, any> = { ...data };
 
@@ -126,6 +162,16 @@ export async function PUT(
   try {
     const { id } = await params;
     const body = await request.json();
+
+    // Check if user is admin
+    const isAdmin = await isAdminUser(request);
+    if (!isAdmin) {
+      return NextResponse.json(
+        { success: false, error: 'Only administrators can update policies' },
+        { status: 403 }
+      );
+    }
+
     console.log('✏️ [PUT] Incoming form data:', { 
       id, 
       otherLinks: body.otherLinks,
