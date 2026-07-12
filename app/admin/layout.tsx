@@ -128,7 +128,7 @@ export default function AdminLayout({
               const hasSubmenu = item.submenu && item.submenu.length > 0;
               
               return (
-                <div key={item.href} className="relative group pb-32">
+                <div key={item.href} className="relative group">
                   <Link
                     href={item.href}
                     className={`inline-flex items-center gap-2 border-b-2 transition font-mono text-sm uppercase tracking-widest ${
@@ -144,21 +144,25 @@ export default function AdminLayout({
                   </Link>
                   
                   {hasSubmenu && (
-                    <div className="absolute left-0 top-full mt-2 w-max bg-paper border border-rule rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 pointer-events-none group-hover:pointer-events-auto">
-                      {item.submenu.map((subitem) => (
-                        <Link
-                          key={subitem.href}
-                          href={subitem.href}
-                          className={`block px-4 py-3 font-mono text-xs uppercase tracking-widest transition border-b border-rule last:border-b-0 ${
-                            isActive(subitem.href)
-                              ? 'bg-sand text-coral'
-                              : 'text-ink/70 hover:bg-ink/5 hover:text-ink'
-                          }`}
-                        >
-                          {subitem.label}
-                        </Link>
-                      ))}
-                    </div>
+                    <>
+                      {/* Invisible hover bridge to keep dropdown visible when moving mouse */}
+                      <div className="absolute left-0 top-full h-2 w-32 group-hover:visible invisible" />
+                      <div className="absolute left-0 top-full mt-2 w-max bg-paper border border-rule rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 pointer-events-none group-hover:pointer-events-auto">
+                        {item.submenu.map((subitem) => (
+                          <Link
+                            key={subitem.href}
+                            href={subitem.href}
+                            className={`block px-4 py-3 font-mono text-xs uppercase tracking-widest transition border-b border-rule last:border-b-0 ${
+                              isActive(subitem.href)
+                                ? 'bg-sand text-coral'
+                                : 'text-ink/70 hover:bg-ink/5 hover:text-ink'
+                            }`}
+                          >
+                            {subitem.label}
+                          </Link>
+                        ))}
+                      </div>
+                    </>
                   )}
                 </div>
               );
