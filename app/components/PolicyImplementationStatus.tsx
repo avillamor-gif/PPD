@@ -1,8 +1,18 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Calendar, Check, X } from 'lucide-react';
+import { Calendar, Plus, X, Check } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
+
+interface StatusHistoryEntry {
+  id: string;
+  old_status: string | null;
+  new_status: string;
+  change_date: string;
+  notes: string | null;
+  recorded_at: string;
+  recorded_by: { display_name: string } | null;
+}
 
 interface PolicyImplementationStatusProps {
   policyId: string;
@@ -16,23 +26,30 @@ export function PolicyImplementationStatus({
   initialYear,
 }: PolicyImplementationStatusProps) {
   const [status, setStatus] = useState(initialStatus);
+  const [statusHistory, setStatusHistory] = useState<StatusHistoryEntry[]>([]);
   const [isEditing, setIsEditing] = useState(false);
+  const [isAddingHistory, setIsAddingHistory] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [availableStatuses, setAvailableStatuses] = useState<string[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
 
+  // Form fields
+  const [newStatusForm, setNewStatusForm] = useState('');
+  const [historyChangeDate, setHistoryChangeDate] = useState('');
+  const [historyNotes, setHistoryNotes] = useState('');
+
+  // Check if user is admin and fetch initial data
   useEffect(() => {
-    // Check if user is admin
-    const checkAdmin = async () => {
+    const initializeData = async () => {
       try {
+        // Check if user is admin
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) {
           setIsAdmin(false);
           return;
         }
 
-        // Fetch user profile with role
         const { data: profile } = await supabase
           .from('user_profiles')
           .select('roles(name)')
@@ -42,35 +59,30 @@ export function PolicyImplementationStatus({
         const roles = Array.isArray(profile?.roles) ? profile.roles : profile?.roles ? [profile.roles] : [];
         const userRole = roles?.[0]?.name;
         setIsAdmin(userRole === 'admin');
-      } catch (err) {
-        console.error('Error checking admin status:', err);
-        setIsAdmin(false);
-      }
-    };
 
-    checkAdmin();
-  }, []);
-
-  useEffect(() => {
-    // Fetch available statuses from the reference data
-    const fetchStatuses = async () => {
-      try {
+        // Fetch available statuses
         const res = await fetch('/api/reference-data/statuses');
         const data = await res.json();
         setAvailableStatuses(data.map((s: any) => s.name));
+
+        // Fetch status history
+        const historyRes = await fetch(`/api/policies/${policyId}/status-history`);
+        const historyData = await historyRes.json();
+        setStatusHistory(historyData || []);
       } catch (err) {
-        console.error('Error fetching statuses:', err);
+        console.error('Error initializing:', err);
       }
     };
-    fetchStatuses();
-  }, []);
+
+    initializeData();
+  }, [policyId]);
 
   const handleStatusUpdate = async (newStatus: string) => {
     try {
       setIsLoading(true);
       setError(null);
 
-      // Get the current session to get the auth token
+      // Get the current session
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.access_token) {
         setError('Authentication required');
@@ -91,10 +103,65 @@ export function PolicyImplementationStatus({
         throw new Error(errorData.error || 'Failed to update status');
       }
 
+      // Add to history with today's date
+      const today = new Date().toISOString().split('T')[0];
+      await addStatusToHistory(status, newStatus, today, 'Status updated');
+
       setStatus(newStatus);
+      setNewStatusForm('');
       setIsEditing(false);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update status');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const addStatusToHistory = async (oldStatus: string, newStatus: string, changeDate: string, notes: string) => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) return;
+
+      const historyRes = await fetch(`/api/policies/${policyId}/status-history`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`
+        },
+        body: JSON.stringify({
+          oldStatus,
+          newStatus,
+          changeDate,
+          notes,
+        }),
+      });
+
+      if (historyRes.ok) {
+        const newEntry = await historyRes.json();
+        setStatusHistory([newEntry, ...statusHistory]);
+      }
+    } catch (err) {
+      console.error('Error adding to history:', err);
+    }
+  };
+
+  const handleAddHistoricalStatus = async () => {
+    if (!historyChangeDate || !newStatusForm) {
+      setError('Please select a status and date');
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      await addStatusToHistory(status, newStatusForm, historyChangeDate, historyNotes);
+      setHistoryChangeDate('');
+      setNewStatusForm('');
+      setHistoryNotes('');
+      setIsAddingHistory(false);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to add to history');
     } finally {
       setIsLoading(false);
     }
@@ -106,6 +173,8 @@ export function PolicyImplementationStatus({
         <Calendar className="w-5 h-5 text-coral" />
         Implementation Status
       </h2>
+      
+      {/* Current Status */}
       <div className="space-y-3">
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 rounded-full bg-gradient-to-br from-coral to-coral/50 flex items-center justify-center">
@@ -167,6 +236,123 @@ export function PolicyImplementationStatus({
           </div>
         )}
       </div>
+
+      {/* Timeline History Section */}
+      {statusHistory.length > 0 && (
+        <div className="mt-6 pt-6 border-t border-ink/10">
+          <h3 className="text-sm font-bold text-ink uppercase tracking-wider mb-4">Status Timeline</h3>
+          <div className="space-y-3">
+            {statusHistory.map((entry, index) => (
+              <div key={entry.id} className="flex gap-3">
+                {/* Timeline dot and line */}
+                <div className="flex flex-col items-center">
+                  <div className="w-3 h-3 rounded-full bg-ocean mt-1.5" />
+                  {index < statusHistory.length - 1 && (
+                    <div className="w-0.5 h-12 bg-ink/10 my-1" />
+                  )}
+                </div>
+                {/* Content */}
+                <div className="flex-1 pb-3">
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <p className="text-sm font-semibold text-ink">
+                        {entry.old_status && `${entry.old_status} → `}
+                        <span className="text-ocean">{entry.new_status}</span>
+                      </p>
+                      <p className="text-xs text-ink/60 mt-1">
+                        {new Date(entry.change_date).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric',
+                        })}
+                      </p>
+                      {entry.notes && (
+                        <p className="text-xs text-ink/50 mt-2 italic">{entry.notes}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Add Historical Status */}
+      {isAdmin && (
+        <div className="mt-6 pt-6 border-t border-ink/10">
+          {!isAddingHistory ? (
+            <button
+              onClick={() => setIsAddingHistory(true)}
+              className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-ocean/10 text-ocean hover:bg-ocean/20 transition font-semibold text-sm"
+            >
+              <Plus className="w-4 h-4" />
+              Add Historical Status
+            </button>
+          ) : (
+            <div className="p-4 rounded-lg bg-sand/10 border border-sand/30 space-y-3">
+              <p className="text-sm font-mono text-ink/60 uppercase tracking-wider">Add Status Change</p>
+              
+              <div>
+                <label className="text-xs font-medium text-ink/60">Status</label>
+                <select
+                  value={newStatusForm}
+                  onChange={(e) => setNewStatusForm(e.target.value)}
+                  className="w-full mt-1 px-3 py-2 rounded border border-ink/20 text-sm"
+                >
+                  <option value="">Select Status</option>
+                  {availableStatuses.map((s) => (
+                    <option key={s} value={s}>{s}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="text-xs font-medium text-ink/60">Date of Change</label>
+                <input
+                  type="date"
+                  value={historyChangeDate}
+                  onChange={(e) => setHistoryChangeDate(e.target.value)}
+                  className="w-full mt-1 px-3 py-2 rounded border border-ink/20 text-sm"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-medium text-ink/60">Notes (Optional)</label>
+                <input
+                  type="text"
+                  placeholder="e.g., Policy amendments..."
+                  value={historyNotes}
+                  onChange={(e) => setHistoryNotes(e.target.value)}
+                  className="w-full mt-1 px-3 py-2 rounded border border-ink/20 text-sm"
+                />
+              </div>
+
+              <div className="flex gap-2 pt-2">
+                <button
+                  onClick={handleAddHistoricalStatus}
+                  disabled={isLoading}
+                  className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded text-sm font-semibold bg-ocean text-white hover:bg-ocean/90 transition disabled:opacity-50"
+                >
+                  <Check className="w-4 h-4" />
+                  Add
+                </button>
+                <button
+                  onClick={() => {
+                    setIsAddingHistory(false);
+                    setHistoryChangeDate('');
+                    setNewStatusForm('');
+                    setHistoryNotes('');
+                  }}
+                  className="flex-1 px-3 py-2 rounded text-sm font-semibold bg-ink/10 text-ink hover:bg-ink/20 transition"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
