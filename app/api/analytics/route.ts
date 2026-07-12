@@ -71,7 +71,7 @@ function getPolicyByStatus(policies: any[]) {
   }, {} as Record<string, number>);
 
   return Object.entries(grouped)
-    .map(([status, count]) => ({ status, count }))
+    .map(([status, count]) => ({ status, count: count as number }))
     .sort((a, b) => b.count - a.count);
 }
 
@@ -83,7 +83,7 @@ function getPolicyByCountry(policies: any[]) {
   }, {} as Record<string, number>);
 
   return Object.entries(grouped)
-    .map(([country, count]) => ({ country, count }))
+    .map(([country, count]) => ({ country, count: count as number }))
     .sort((a, b) => b.count - a.count)
     .slice(0, 15);
 }
@@ -96,7 +96,7 @@ function getPolicyByCategory(policies: any[]) {
   }, {} as Record<string, number>);
 
   return Object.entries(grouped)
-    .map(([category, count]) => ({ category, count }))
+    .map(([category, count]) => ({ category, count: count as number }))
     .sort((a, b) => b.count - a.count);
 }
 
@@ -108,7 +108,7 @@ function getPolicyByYear(policies: any[]) {
   }, {} as Record<number, number>);
 
   return Object.entries(grouped)
-    .map(([year, count]) => ({ year: parseInt(year), count }))
+    .map(([year, count]) => ({ year: parseInt(year), count: count as number }))
     .sort((a, b) => a.year - b.year);
 }
 
@@ -120,7 +120,7 @@ function getPolicyByLifecycleStage(policies: any[]) {
   }, {} as Record<string, number>);
 
   return Object.entries(grouped)
-    .map(([stage, count]) => ({ stage, count }))
+    .map(([stage, count]) => ({ stage, count: count as number }))
     .sort((a, b) => b.count - a.count);
 }
 
@@ -132,7 +132,7 @@ function getPolicyByLevel(policies: any[]) {
   }, {} as Record<string, number>);
 
   return Object.entries(grouped)
-    .map(([level, count]) => ({ level, count }))
+    .map(([level, count]) => ({ level, count: count as number }))
     .sort((a, b) => b.count - a.count);
 }
 
@@ -144,7 +144,7 @@ function getStatusTrends(statusHistory: any[]) {
   }, {} as Record<number, number>);
 
   return Object.entries(grouped)
-    .map(([year, count]) => ({ year: parseInt(year), count }))
+    .map(([year, count]) => ({ year: parseInt(year), count: count as number }))
     .sort((a, b) => a.year - b.year);
 }
 
@@ -156,7 +156,7 @@ function getTopCountries(policies: any[]) {
   }, {} as Record<string, number>);
 
   return Object.entries(grouped)
-    .map(([country, count]) => ({ country, count }))
+    .map(([country, count]) => ({ country, count: count as number }))
     .sort((a, b) => b.count - a.count)
     .slice(0, 5);
 }
@@ -169,7 +169,7 @@ function getTopCategories(policies: any[]) {
   }, {} as Record<string, number>);
 
   return Object.entries(grouped)
-    .map(([category, count]) => ({ category, count }))
+    .map(([category, count]) => ({ category, count: count as number }))
     .sort((a, b) => b.count - a.count)
     .slice(0, 5);
 }
