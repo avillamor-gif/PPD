@@ -95,9 +95,6 @@ export default async function PolicyPage({ params }: { params: Promise<{ id: str
                 <span className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold border ${statusColors[policy.status].badge}`}>
                   {policy.status}
                 </span>
-                <span className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold border ${themeColors[policy.category]}`}>
-                  {policy.category}
-                </span>
               </div>
               <div>
                 <h1 className="text-4xl font-bold text-ink leading-tight">
