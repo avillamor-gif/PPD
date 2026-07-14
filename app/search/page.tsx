@@ -274,7 +274,7 @@ export default function SearchPage() {
           </div>
         </div>
         {/* Filters - row 2 */}
-        <div className="flex w-full items-center flex-wrap gap-3 px-6 py-5 pt-0 lg:px-10">
+        <div className="flex w-full items-center gap-3 px-6 py-5 pt-0 lg:px-10">
           <Select 
             label="Region" 
             value={region} 
@@ -299,7 +299,7 @@ export default function SearchPage() {
             onChange={setStatus} 
             options={STATUSES.map((s) => [s, s] as [string, string])} 
           />
-          <div className="ml-auto font-mono text-[11px] uppercase tracking-[0.18em] text-ink/60">
+          <div className="flex-1 flex justify-center font-mono text-[11px] uppercase tracking-[0.18em] text-ink/60">
             {rows.length} result{rows.length === 1 ? "" : "s"}
           </div>
         </div>
