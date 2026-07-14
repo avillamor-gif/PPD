@@ -80,7 +80,7 @@ export default async function CountryPage({ params }: { params: Promise<{ code: 
           >
             ← All countries
           </Link>
-          <div className="mt-8 grid gap-4 lg:grid-cols-[1.4fr_1fr] lg:items-end">
+          <div className="mt-8 grid gap-4 lg:grid-cols-[2fr_0.8fr] lg:items-end">
             <div>
               <div className="font-mono text-[11px] uppercase tracking-[0.22em] text-coral">{country.region}</div>
               <h1 className="mt-3 font-fraunces text-[clamp(2.5rem,6vw,4.5rem)] font-semibold leading-[0.92] tracking-[-0.03em]">
