@@ -3,6 +3,7 @@ import { COUNTRIES } from '@/lib/constants';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import type { Policy } from '@/lib/types/policy';
 import { CountryGridRealtime } from '@/app/components/CountryGridRealtime';
+import { ThemesSection } from '@/app/components/ThemesSection';
 
 export const metadata = {
   title: "Plastic Policy Database — Asia Pacific",
@@ -161,20 +162,7 @@ export default async function Home() {
             first wave; circular economy remains growing.
           </SectionHeading>
 
-          <div className="space-y-3">
-            {themeCounts.map((c) => (
-              <div key={c.name} className="grid grid-cols-[200px_1fr_3ch] items-center gap-4 border-t border-rule py-4 md:grid-cols-[260px_1fr_3ch]">
-                <div className="font-fraunces text-lg font-medium">{c.name}</div>
-                <div className="relative h-2 overflow-hidden rounded-full bg-sand">
-                  <div
-                    className="absolute inset-y-0 left-0 rounded-full bg-ocean-deep transition-all"
-                    style={{ width: `${(c.count / maxCat) * 100}%` }}
-                  />
-                </div>
-                <div className="text-right font-mono text-sm tabular-nums text-ink/70">{c.count}</div>
-              </div>
-            ))}
-          </div>
+          <ThemesSection themeCounts={themeCounts} maxCat={maxCat} />
         </div>
       </section>
 
