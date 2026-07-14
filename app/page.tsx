@@ -4,6 +4,7 @@ import { supabaseAdmin } from '@/lib/supabase-admin';
 import type { Policy } from '@/lib/types/policy';
 import { CountriesSection } from '@/app/components/CountriesSection';
 import { ThemesSection } from '@/app/components/ThemesSection';
+import { RecentlyIndexedSection } from '@/app/components/RecentlyIndexedSection';
 
 export const metadata = {
   title: "Plastic Policy Database — Asia Pacific",
@@ -197,34 +198,7 @@ export default async function Home() {
             </Link>
           </div>
 
-          <ul className="divide-y divide-rule border-y border-rule">
-            {recent.map((p) => {
-              const country = COUNTRIES.find((c) => c.code === p.country)!;
-              return (
-                <li key={p.id} className="group grid gap-3 py-6 md:grid-cols-[120px_60px_1fr_auto] md:items-center md:gap-6">
-                  <div className="font-mono text-sm tabular-nums text-ink/60">{p.year}</div>
-                  <div className="font-mono text-[11px] uppercase tracking-[0.18em] text-coral">{p.country}</div>
-                  <div>
-                    <div className="font-fraunces text-xl font-medium leading-snug text-ink group-hover:text-ocean">
-                      {p.title}
-                    </div>
-                    <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-ink/60">
-                      <span>{country.name}</span>
-                      <span className="text-ink/30">·</span>
-                      <span>{p.instrument}</span>
-                      <span className="text-ink/30">·</span>
-                      <span className={`inline-block rounded-full px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.12em] font-semibold ${themeColors[p.category] || 'bg-sand text-ink'}`}>
-                        {p.category}
-                      </span>
-                    </div>
-                  </div>
-                  <div className={`inline-block rounded-full px-3 py-1 font-mono text-[10px] uppercase tracking-[0.14em] font-semibold whitespace-nowrap ${statusColors[p.status] || statusColors["In Force"]}`}>
-                    {p.status}
-                  </div>
-                </li>
-              );
-            })}
-          </ul>
+          <RecentlyIndexedSection policies={recent} themeColors={themeColors} statusColors={statusColors} />
         </div>
       </section>
 
