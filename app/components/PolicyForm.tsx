@@ -192,7 +192,14 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
       });
 
       if (!response.ok) {
-        const data = await response.json();
+        let data;
+        try {
+          data = await response.json();
+        } catch (parseError) {
+          // Response is not JSON, likely an HTML error page
+          const text = await response.text();
+          throw new Error(`Server error (${response.status}): ${text.slice(0, 100)}`);
+        }
         
         // Handle validation errors from API
         if (data.errors && Array.isArray(data.errors)) {

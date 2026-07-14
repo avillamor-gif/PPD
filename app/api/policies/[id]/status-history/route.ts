@@ -73,7 +73,10 @@ export async function POST(
   } catch (err) {
     console.error('Error creating status history:', err);
     return NextResponse.json(
-      { error: 'Failed to create status history' },
+      { 
+        error: 'Failed to create status history',
+        details: err instanceof Error ? err.message : String(err)
+      },
       { status: 500 }
     );
   }

@@ -166,7 +166,13 @@ export function PolicyImplementationStatus({
       });
 
       if (!res.ok) {
-        const errorData = await res.json();
+        let errorData;
+        try {
+          errorData = await res.json();
+        } catch (parseError) {
+          const text = await res.text();
+          throw new Error(`Server error (${res.status}): ${text.slice(0, 100)}`);
+        }
         throw new Error(errorData.error || 'Failed to update status');
       }
 
@@ -206,6 +212,8 @@ export function PolicyImplementationStatus({
       if (historyRes.ok) {
         const newEntry = await historyRes.json();
         setStatusHistory([newEntry, ...statusHistory]);
+      } else {
+        console.error('Failed to add status to history:', historyRes.status);
       }
     } catch (err) {
       console.error('Error adding to history:', err);
