@@ -21,17 +21,25 @@ async function isAdminUser(request: NextRequest): Promise<boolean> {
       return false;
     }
 
-    // Check user role
+    // Check user role - get profile with role_id
     const { data: profile } = await supabaseAdmin
       .from('user_profiles')
-      .select('roles(name)')
+      .select('role_id')
       .eq('id', user.id)
       .single();
 
-    const roles = Array.isArray(profile?.roles) ? profile.roles : profile?.roles ? [profile.roles] : [];
-    const userRole = roles?.[0]?.name;
+    if (!profile?.role_id) {
+      return false;
+    }
+
+    // Get role name from roles table
+    const { data: role } = await supabaseAdmin
+      .from('roles')
+      .select('name')
+      .eq('id', profile.role_id)
+      .single();
     
-    return userRole === 'admin';
+    return role?.name === 'admin';
   } catch (err) {
     console.error('Error checking admin status:', err);
     return false;
