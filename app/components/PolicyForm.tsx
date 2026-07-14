@@ -300,6 +300,7 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
               rows={4}
               className="w-full rounded-lg border border-ink/20 bg-paper px-4 py-2 text-ink placeholder:text-ink/40 focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20"
             />
+            <p className="text-xs text-ink/50 mt-1">{formData.summary.length} / 5000 characters</p>
           </div>
         </div>
       </div>

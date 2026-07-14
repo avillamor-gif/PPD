@@ -58,8 +58,8 @@ export function validatePolicy(data: Partial<Policy>): ValidationError[] {
   }
 
   // Summary validation (optional but validate if provided)
-  if (data.summary && data.summary.length > 1000) {
-    errors.push({ field: 'summary', message: 'Summary cannot exceed 1000 characters' });
+  if (data.summary && data.summary.length > 5000) {
+    errors.push({ field: 'summary', message: 'Summary cannot exceed 5000 characters' });
   }
 
   return errors;
