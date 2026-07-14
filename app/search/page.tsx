@@ -253,9 +253,9 @@ export default function SearchPage() {
 
       {/* Sticky Controls */}
       <section className="sticky top-14 z-20 border-b border-rule bg-paper">
-        {/* Search bar - full width */}
+        {/* Search bar with Sort - row 1 */}
         <div className="flex w-full items-center gap-3 px-6 py-5 pb-2 lg:px-10">
-          <div className="relative w-full">
+          <div className="relative w-[90%]">
             <input
               value={q}
               onChange={(e) => setQ(e.target.value)}
@@ -264,8 +264,16 @@ export default function SearchPage() {
             />
             <Search className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-ink/40" />
           </div>
+          <div className="w-[10%]">
+            <Select 
+              label="Sort" 
+              value={sortBy} 
+              onChange={setSortBy} 
+              options={SORT_OPTIONS} 
+            />
+          </div>
         </div>
-        {/* Filters - single line */}
+        {/* Filters - row 2 */}
         <div className="flex w-full items-center flex-wrap gap-3 px-6 py-5 pt-0 lg:px-10">
           <Select 
             label="Region" 
@@ -290,12 +298,6 @@ export default function SearchPage() {
             value={status} 
             onChange={setStatus} 
             options={STATUSES.map((s) => [s, s] as [string, string])} 
-          />
-          <Select 
-            label="Sort" 
-            value={sortBy} 
-            onChange={setSortBy} 
-            options={SORT_OPTIONS} 
           />
           <div className="ml-auto font-mono text-[11px] uppercase tracking-[0.18em] text-ink/60">
             {rows.length} result{rows.length === 1 ? "" : "s"}
