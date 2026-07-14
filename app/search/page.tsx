@@ -44,20 +44,22 @@ function Select({
   label, 
   value, 
   onChange, 
-  options 
+  options,
+  className
 }: { 
   label: string; 
   value: string; 
   onChange: (v: string) => void; 
   options: Array<[string, string]>; 
+  className?: string;
 }) {
   return (
-    <label className="inline-flex items-center gap-2 rounded-full border border-ink/20 bg-paper px-4 py-2 text-sm">
+    <label className={`inline-flex items-center gap-2 rounded-full border border-ink/20 bg-paper px-4 py-2 text-sm ${className || ""}`}>
       <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-ink/60">{label}</span>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="rounded-full bg-transparent pr-2 py-1 text-sm focus:outline-none appearance-none cursor-pointer"
+        className="rounded-full bg-transparent pr-2 py-1 text-sm focus:outline-none appearance-none cursor-pointer max-w-xs"
       >
         {options.map(([v, l]) => (
           <option key={v} value={v}>{l}</option>
@@ -281,7 +283,8 @@ export default function SearchPage() {
             label="Instrument Type" 
             value={theme} 
             onChange={setTheme} 
-            options={availableThemes.map((c) => [c, c] as [string, string])} 
+            options={availableThemes.map((c) => [c, c] as [string, string])}
+            className="max-w-[180px]"
           />
           <Select 
             label="Status" 
