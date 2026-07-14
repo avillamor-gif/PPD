@@ -210,13 +210,18 @@ export async function PUT(
     });
     const normalizedBody = normalizePolicyDateFields(body);
 
-    // Validate input
-    const errors = validatePolicy(normalizedBody);
-    if (errors.length > 0) {
-      return NextResponse.json(
-        { success: false, errors },
-        { status: 400 }
-      );
+    // Check if this is a status-only update (from PolicyImplementationStatus)
+    const isStatusOnlyUpdate = Object.keys(body).length === 1 && (body.status || body.status === undefined);
+    
+    // Validate input only if it's a full policy update, not status-only
+    if (!isStatusOnlyUpdate) {
+      const errors = validatePolicy(normalizedBody);
+      if (errors.length > 0) {
+        return NextResponse.json(
+          { success: false, errors },
+          { status: 400 }
+        );
+      }
     }
 
     // Convert form data to database format (camelCase → snake_case)
