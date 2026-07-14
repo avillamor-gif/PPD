@@ -87,10 +87,9 @@ export default async function CountryPage({ params }: { params: Promise<{ code: 
                 {country.name}
               </h1>
             </div>
-            <div className="grid grid-cols-3 gap-6 border-t border-ink/15 pt-6">
+            <div className="grid grid-cols-2 gap-6 border-t border-ink/15 pt-6">
               <Mini n={policies.length} label="Indexed" />
               <Mini n={policies.filter((p: any) => p?.status === "In Force").length} label="In force" />
-              <Mini n={byTheme.reduce((sum: number, t: any) => sum + t.count, 0)} label="Instrument Type" />
             </div>
           </div>
 
