@@ -264,7 +264,7 @@ export default function SearchPage() {
             />
             <Search className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-ink/40" />
           </div>
-          <div className="flex-shrink-0">
+          <div className="min-w-[160px] flex justify-center">
             <Select 
               label="Sort" 
               value={sortBy} 
@@ -299,7 +299,7 @@ export default function SearchPage() {
             onChange={setStatus} 
             options={STATUSES.map((s) => [s, s] as [string, string])} 
           />
-          <div className="flex-1 flex justify-center font-mono text-[11px] uppercase tracking-[0.18em] text-ink/60">
+          <div className="min-w-[160px] flex justify-center font-mono text-[11px] uppercase tracking-[0.18em] text-ink/60">
             {rows.length} result{rows.length === 1 ? "" : "s"}
           </div>
         </div>
