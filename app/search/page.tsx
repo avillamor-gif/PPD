@@ -59,7 +59,7 @@ function Select({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="rounded-full bg-transparent pr-2 py-1 text-sm focus:outline-none appearance-none cursor-pointer max-w-xs"
+        className="rounded-full bg-transparent pr-2 py-1 text-sm focus:outline-none appearance-none cursor-pointer"
       >
         {options.map(([v, l]) => (
           <option key={v} value={v}>{l}</option>
@@ -255,7 +255,7 @@ export default function SearchPage() {
       <section className="sticky top-14 z-20 border-b border-rule bg-paper">
         {/* Search bar with Sort - row 1 */}
         <div className="flex w-full items-center gap-3 px-6 py-5 pb-2 lg:px-10">
-          <div className="relative w-[90%]">
+          <div className="relative flex-1">
             <input
               value={q}
               onChange={(e) => setQ(e.target.value)}
@@ -264,7 +264,7 @@ export default function SearchPage() {
             />
             <Search className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-ink/40" />
           </div>
-          <div className="w-[10%]">
+          <div className="flex-shrink-0">
             <Select 
               label="Sort" 
               value={sortBy} 
