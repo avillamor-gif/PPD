@@ -118,12 +118,15 @@ export default function SearchPage() {
   // Categories to exclude from the dropdown filter
   const EXCLUDED_CATEGORIES = ["Plastic Ban", "Circular Economy", "EPR"];
 
-  // Get available themes from policies with usage count (instrument types)
-  const availableThemes = useMemo(() => {
+  // Combine all filter computations into a single pass for better performance
+  const { availableThemes, availableRegions, countriesWithEntries } = useMemo(() => {
     const themeCounts = new Map<string, number>();
+    const regionCounts = new Map<string, number>();
+    const countryCounts = new Map<string, number>();
+
     POLICIES.forEach(p => {
+      // Count themes
       if (p?.category) {
-        // Split comma-separated categories and count each individually
         p.category.split(',').forEach((cat: string) => {
           const trimmed = cat?.trim?.() || '';
           if (trimmed && !EXCLUDED_CATEGORIES.includes(trimmed)) {
@@ -131,41 +134,39 @@ export default function SearchPage() {
           }
         });
       }
-    });
-    // Sort by name and format with count
-    const sorted = Array.from(themeCounts.entries())
-      .sort((a, b) => (a[0] || '').localeCompare(b[0] || ''))
-      .map(([name, count]) => `${name} (${count})`);
-    return ["All Instrument Types", ...sorted];
-  }, [POLICIES]);
 
-  // Get available regions from policies with usage count (only show regions with entries)
-  const availableRegions = useMemo(() => {
-    const regionCounts = new Map<string, number>();
-    POLICIES.forEach(p => {
+      // Count regions
       const countryData = COUNTRIES.find(c => c.code === p?.countryCode);
       const region = countryData?.region;
       if (region) {
         regionCounts.set(region, (regionCounts.get(region) || 0) + 1);
       }
-    });
-    // Sort by name and format with count
-    const sorted = Array.from(regionCounts.entries())
-      .sort((a, b) => (a[0] || '').localeCompare(b[0] || ''))
-      .map(([name, count]) => `${name} (${count})`);
-    return ["All regions", ...sorted];
-  }, [POLICIES]);
 
-  // Get available countries from policies with usage count (only show countries with entries)
-  const countriesWithEntries = useMemo(() => {
-    const countryCounts = new Map<string, number>();
-    POLICIES.forEach(p => {
+      // Count countries
       countryCounts.set(p.countryCode, (countryCounts.get(p.countryCode) || 0) + 1);
     });
-    return COUNTRIES.filter(c => countryCounts.has(c.code)).map(c => ({
+
+    // Format themes
+    const themes = Array.from(themeCounts.entries())
+      .sort((a, b) => (a[0] || '').localeCompare(b[0] || ''))
+      .map(([name, count]) => `${name} (${count})`);
+
+    // Format regions
+    const regions = Array.from(regionCounts.entries())
+      .sort((a, b) => (a[0] || '').localeCompare(b[0] || ''))
+      .map(([name, count]) => `${name} (${count})`);
+
+    // Format countries
+    const countries = COUNTRIES.filter(c => countryCounts.has(c.code)).map(c => ({
       ...c,
       displayName: `${c.name} (${countryCounts.get(c.code) || 0})`
     }));
+
+    return {
+      availableThemes: ["All Instrument Types", ...themes],
+      availableRegions: ["All regions", ...regions],
+      countriesWithEntries: countries
+    };
   }, [POLICIES]);
 
   // Filter countries by selected region - same logic as PolicyForm
