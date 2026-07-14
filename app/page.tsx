@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { COUNTRIES } from '@/lib/constants';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import type { Policy } from '@/lib/types/policy';
-import { CountryGridRealtime } from '@/app/components/CountryGridRealtime';
+import { CountriesSection } from '@/app/components/CountriesSection';
 import { ThemesSection } from '@/app/components/ThemesSection';
 
 export const metadata = {
@@ -177,7 +177,7 @@ export default async function Home() {
             lists the full text of indexed regulations, their status, and instrument type.
           </SectionHeading>
 
-          <CountryGridRealtime variant="home" initialCounts={initialCountryCounts} />
+          <CountriesSection initialCounts={initialCountryCounts} />
         </div>
       </section>
 
