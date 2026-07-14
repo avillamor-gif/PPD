@@ -254,13 +254,13 @@ export default function SearchPage() {
       {/* Sticky Controls */}
       <section className="sticky top-14 z-20 border-b border-rule bg-paper">
         {/* Search bar with Sort - row 1 */}
-        <div className="flex w-full items-center gap-3 px-6 py-4 pb-0 lg:px-10">
+        <div className="flex w-full items-center gap-3 px-6 py-2 lg:px-10">
           <div className="relative flex-1">
             <input
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder="Search title, summary, instrument…"
-              className="w-full rounded-full border border-ink/20 bg-paper px-5 py-2 pr-10 text-sm placeholder:text-ink/40 focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20"
+              className="w-full rounded-full border border-ink/20 bg-paper px-5 py-1.5 pr-10 text-sm placeholder:text-ink/40 focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20"
             />
             <Search className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-ink/40" />
           </div>
@@ -274,7 +274,7 @@ export default function SearchPage() {
           </div>
         </div>
         {/* Filters - row 2 */}
-        <div className="flex w-full items-center gap-3 px-6 py-4 lg:px-10">
+        <div className="flex w-full items-center gap-3 px-6 py-2 lg:px-10">
           <Select 
             label="Region" 
             value={region} 
