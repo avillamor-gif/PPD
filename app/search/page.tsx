@@ -266,7 +266,7 @@ export default function SearchPage() {
           </div>
         </div>
         {/* Filters - single line */}
-        <div className="flex w-full items-center gap-3 px-6 py-5 pt-0 lg:px-10">
+        <div className="flex w-full items-center justify-between gap-3 px-6 py-5 pt-0 lg:px-10">
           <Select 
             label="Region" 
             value={region} 
