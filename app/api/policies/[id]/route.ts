@@ -9,39 +9,53 @@ async function isAdminUser(request: NextRequest): Promise<boolean> {
   try {
     const authHeader = request.headers.get('authorization');
     if (!authHeader?.startsWith('Bearer ')) {
+      console.log('❌ [ADMIN CHECK] No auth header');
       return false;
     }
 
     const token = authHeader.slice(7);
+    console.log('✓ [ADMIN CHECK] Token present');
     
     // Get user from Supabase using the token
     const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
     
     if (authError || !user?.id) {
+      console.log('❌ [ADMIN CHECK] Auth error or no user:', { authError: authError?.message, userId: user?.id });
       return false;
     }
 
+    console.log('✓ [ADMIN CHECK] User found:', user.id);
+
     // Check user role - get profile with role_id
-    const { data: profile } = await supabaseAdmin
+    const { data: profile, error: profileError } = await supabaseAdmin
       .from('user_profiles')
       .select('role_id')
       .eq('id', user.id)
       .single();
 
-    if (!profile?.role_id) {
+    if (profileError || !profile?.role_id) {
+      console.log('❌ [ADMIN CHECK] Profile error or no role_id:', { profileError: profileError?.message, roleId: profile?.role_id });
       return false;
     }
 
+    console.log('✓ [ADMIN CHECK] Role ID found:', profile.role_id);
+
     // Get role name from roles table
-    const { data: role } = await supabaseAdmin
+    const { data: role, error: roleError } = await supabaseAdmin
       .from('roles')
       .select('name')
       .eq('id', profile.role_id)
       .single();
     
-    return role?.name === 'admin';
+    if (roleError || !role) {
+      console.log('❌ [ADMIN CHECK] Role error or not found:', { roleError: roleError?.message, role });
+      return false;
+    }
+
+    console.log('✓ [ADMIN CHECK] Role check:', { roleId: profile.role_id, roleName: role.name, isAdmin: role.name === 'admin' });
+    return role.name === 'admin';
   } catch (err) {
-    console.error('Error checking admin status:', err);
+    console.error('❌ [ADMIN CHECK] Exception:', err);
     return false;
   }
 }
@@ -171,9 +185,14 @@ export async function PUT(
     const { id } = await params;
     const body = await request.json();
 
+    console.log('📝 [PUT] Request to update policy:', { id, bodyKeys: Object.keys(body) });
+
     // Check if user is admin
     const isAdmin = await isAdminUser(request);
+    console.log('📝 [PUT] Admin check result:', isAdmin);
+    
     if (!isAdmin) {
+      console.log('❌ [PUT] Not admin - rejecting request');
       return NextResponse.json(
         { success: false, error: 'Only administrators can update policies' },
         { status: 403 }

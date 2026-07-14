@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { COUNTRIES, REGIONS } from '@/lib/constants';
 import { useReferenceData } from '@/lib/hooks/useReferenceData';
+import { supabase } from '@/lib/supabase';
 import { MultiSelectDropdown } from './MultiSelectDropdown';
 import type { Policy, PolicyLevel, PolicyStatus } from '@/lib/types';
 
@@ -175,9 +176,18 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
         fullApiData: JSON.stringify(apiData, null, 2)
       });
       
+      // Get auth token for admin operations
+      let headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (isEditing) {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.access_token) {
+          headers['Authorization'] = `Bearer ${session.access_token}`;
+        }
+      }
+      
       const response = await fetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify(apiData),
       });
 
