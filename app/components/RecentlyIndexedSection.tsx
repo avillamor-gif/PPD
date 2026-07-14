@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
+import Link from 'next/link';
 import { COUNTRIES } from '@/lib/constants';
 import type { Policy } from '@/lib/types/policy';
 
@@ -25,27 +26,30 @@ export function RecentlyIndexedSection({
       <ul className="divide-y divide-rule border-y border-rule">
         {displayedPolicies.map((p) => {
           const country = COUNTRIES.find((c) => c.code === p.country)!;
+          const href = `/policies/${p.slug || p.id}`;
           return (
-            <li key={p.id} className="group grid gap-3 py-6 md:grid-cols-[120px_60px_1fr_auto] md:items-center md:gap-6">
-              <div className="font-mono text-sm tabular-nums text-ink/60">{p.year}</div>
-              <div className="font-mono text-[11px] uppercase tracking-[0.18em] text-coral">{p.country}</div>
-              <div>
-                <div className="font-fraunces text-xl font-medium leading-snug text-ink group-hover:text-ocean">
-                  {p.title}
+            <li key={p.id}>
+              <Link href={href} className="group grid gap-3 py-6 md:grid-cols-[120px_60px_1fr_auto] md:items-center md:gap-6 hover:bg-sand/30 transition px-4 -mx-4 w-full">
+                <div className="font-mono text-sm tabular-nums text-ink/60">{p.year}</div>
+                <div className="font-mono text-[11px] uppercase tracking-[0.18em] text-coral">{p.country}</div>
+                <div>
+                  <div className="font-fraunces text-xl font-medium leading-snug text-ink group-hover:text-ocean">
+                    {p.title}
+                  </div>
+                  <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-ink/60">
+                    <span>{country.name}</span>
+                    <span className="text-ink/30">·</span>
+                    <span>{p.instrument}</span>
+                    <span className="text-ink/30">·</span>
+                    <span className={`inline-block rounded-full px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.12em] font-semibold ${themeColors[p.category] || 'bg-sand text-ink'}`}>
+                      {p.category}
+                    </span>
+                  </div>
                 </div>
-                <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-ink/60">
-                  <span>{country.name}</span>
-                  <span className="text-ink/30">·</span>
-                  <span>{p.instrument}</span>
-                  <span className="text-ink/30">·</span>
-                  <span className={`inline-block rounded-full px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.12em] font-semibold ${themeColors[p.category] || 'bg-sand text-ink'}`}>
-                    {p.category}
-                  </span>
+                <div className={`inline-block rounded-full px-3 py-1 font-mono text-[10px] uppercase tracking-[0.14em] font-semibold whitespace-nowrap ${statusColors[p.status] || statusColors["In Force"]}`}>
+                  {p.status}
                 </div>
-              </div>
-              <div className={`inline-block rounded-full px-3 py-1 font-mono text-[10px] uppercase tracking-[0.14em] font-semibold whitespace-nowrap ${statusColors[p.status] || statusColors["In Force"]}`}>
-                {p.status}
-              </div>
+              </Link>
             </li>
           );
         })}
