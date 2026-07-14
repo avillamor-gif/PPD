@@ -55,7 +55,7 @@ export default async function CountryPage({ params }: { params: Promise<{ code: 
   const THEMES = availableThemes.length > 0 ? availableThemes : ['Waste Management Regulation'];
   const byTheme = THEMES.map((c) => ({
     name: c,
-    count: policies.filter((p: any) => p?.category === c).length,
+    count: policies.filter((p: any) => p?.category && p.category.includes(c)).length,
   })).filter((c) => c.count > 0);
 
   const themeColors: Record<string, string> = {
