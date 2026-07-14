@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 import { COUNTRIES } from '@/lib/constants';
@@ -50,7 +50,17 @@ export function CountriesSection({ initialCounts }: CountriesSectionProps) {
     loadCounts();
   }, [initialCounts]);
 
-  const displayedCountries = isExpanded ? COUNTRIES : COUNTRIES.slice(0, 4);
+  // Sort countries by policy count (descending), then by name
+  const sortedCountries = useMemo(() => {
+    return [...COUNTRIES].sort((a, b) => {
+      const countA = counts[a.code]?.total || 0;
+      const countB = counts[b.code]?.total || 0;
+      if (countB !== countA) return countB - countA;
+      return a.name.localeCompare(b.name);
+    });
+  }, [counts]);
+
+  const displayedCountries = isExpanded ? sortedCountries : sortedCountries.slice(0, 4);
 
   return (
     <div className="space-y-4">
