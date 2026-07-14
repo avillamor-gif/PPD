@@ -27,14 +27,14 @@ export function CountriesSection({ initialCounts }: CountriesSectionProps) {
 
     // Load counts if not provided
     const loadCounts = async () => {
-      const { data } = await supabase.from('policies').select('country,status');
+      const { data } = await supabase.from('policies').select('country,status') as { data: Array<{ country: string | null; status: string | null }> | null };
       if (data) {
         const newCounts: CountryCounts = {};
         COUNTRIES.forEach(c => {
           newCounts[c.code] = { total: 0, inForce: 0 };
         });
         
-        data.forEach(row => {
+        data.forEach((row: { country: string | null; status: string | null }) => {
           if (row.country && newCounts[row.country]) {
             newCounts[row.country].total += 1;
             if (row.status === 'In Force') {
