@@ -77,11 +77,20 @@ export default function SearchPage() {
   const [country, setCountry] = useState("all");
   const [theme, setTheme] = useState("All Instrument Types");
   const [status, setStatus] = useState("Any status");
+  const [sortBy, setSortBy] = useState("Year: Newest");
 
   // Statuses from reference data with "Any status" option
   const STATUSES = referenceData?.statuses 
     ? ["Any status", ...referenceData.statuses]
     : ["Any status", "In Force", "Proposed", "Phased", "Repealed"];
+
+  // Sort options
+  const SORT_OPTIONS = [
+    ["Year: Newest", "Year: Newest"],
+    ["Year: Oldest", "Year: Oldest"],
+    ["Title: A-Z", "Title: A-Z"],
+    ["Title: Z-A", "Title: Z-A"],
+  ] as Array<[string, string]>;
 
   // Fetch policies from API
   useEffect(() => {
@@ -207,8 +216,20 @@ export default function SearchPage() {
             (p.instrument?.toLowerCase().includes(s) ?? false)
           : true,
       )
-      .sort((a, b) => b.year - a.year);
-  }, [POLICIES, q, region, country, theme, status]);
+      .sort((a, b) => {
+        switch (sortBy) {
+          case "Year: Oldest":
+            return a.year - b.year;
+          case "Title: A-Z":
+            return (a.title || "").localeCompare(b.title || "");
+          case "Title: Z-A":
+            return (b.title || "").localeCompare(a.title || "");
+          case "Year: Newest":
+          default:
+            return b.year - a.year;
+        }
+      });
+  }, [POLICIES, q, region, country, theme, status, sortBy]);
 
   return (
     <div className="w-full">
@@ -267,6 +288,12 @@ export default function SearchPage() {
             value={status} 
             onChange={setStatus} 
             options={STATUSES.map((s) => [s, s] as [string, string])} 
+          />
+          <Select 
+            label="Sort" 
+            value={sortBy} 
+            onChange={setSortBy} 
+            options={SORT_OPTIONS} 
           />
           <div className="ml-auto font-mono text-[11px] uppercase tracking-[0.18em] text-ink/60">
             {rows.length} result{rows.length === 1 ? "" : "s"}
