@@ -359,7 +359,7 @@ export function PolicyImplementationStatus({
       {statusHistory.length > 0 && (
         <div className="mt-6 pt-6 border-t border-ink/10">
           <h3 className="text-sm font-bold text-ink uppercase tracking-wider mb-4">Status Timeline</h3>
-          <div className="space-y-4">
+          <div className="space-y-2">
             {statusHistory.map((entry, index) => (
               <div key={entry.id} className="flex gap-3 group">
                 {/* Timeline year circle and line */}
@@ -370,11 +370,11 @@ export function PolicyImplementationStatus({
                     </span>
                   </div>
                   {index < statusHistory.length - 1 && (
-                    <div className="w-0.5 h-16 bg-ink/10 my-1" />
+                    <div className="w-0.5 h-10 bg-ink/10" />
                   )}
                 </div>
                 {/* Content with delete button */}
-                <div className="flex-1 pb-4">
+                <div className="flex-1 pb-2">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1">
                       <p className="text-sm font-semibold text-ink">
