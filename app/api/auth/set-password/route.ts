@@ -140,11 +140,45 @@ export async function POST(req: NextRequest) {
       console.log('✅ [SET-PASSWORD] User profile marked as verified');
     }
 
-    return NextResponse.json({
-      success: true,
-      message: 'Password set successfully. You can now login.',
-      email: user.email,
-    });
+    // Generate a session for auto-login
+    console.log('🔐 [SET-PASSWORD] Generating session for auto-login...');
+    try {
+      const { data: signInData, error: signInError } = await supabaseAdmin.auth.admin.signInAsUser(
+        user.id,
+        {
+          autoConfirmFirstFactor: true,
+        }
+      );
+
+      if (signInError) {
+        console.warn('⚠️ [SET-PASSWORD] Session generation warning (non-blocking):', signInError.message);
+        // Return without session - user will need to login manually
+        return NextResponse.json({
+          success: true,
+          message: 'Password set successfully. Please login with your new credentials.',
+          email: user.email,
+          session: null,
+        });
+      }
+
+      console.log('✅ [SET-PASSWORD] Session created successfully for user:', user.id);
+
+      return NextResponse.json({
+        success: true,
+        message: 'Password set successfully. Logging you in...',
+        email: user.email,
+        session: signInData?.session,
+      }, { status: 201 });
+    } catch (sessionError) {
+      console.error('🔐 [SET-PASSWORD] Session creation error:', sessionError);
+      // Return success but without session
+      return NextResponse.json({
+        success: true,
+        message: 'Password set successfully. Please login with your new credentials.',
+        email: user.email,
+        session: null,
+      });
+    }
   } catch (error) {
     console.error('🔐 [SET-PASSWORD] Error:', error);
     return NextResponse.json(

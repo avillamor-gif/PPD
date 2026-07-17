@@ -94,16 +94,30 @@ function SetPasswordContent() {
         throw new Error(data.error || 'Failed to set password');
       }
 
-      console.log('✅ [SET-PASSWORD] Password set successfully, logging in...');
+      console.log('✅ [SET-PASSWORD] Password set successfully');
       setSuccess(true);
 
       // Auto-login with the session data if available
       if (data.session) {
-        // Session was set by the API
-        setTimeout(() => {
-          router.push('/');
-        }, 2000);
+        console.log('🔐 [SET-PASSWORD] Session available, setting session and redirecting to dashboard...');
+        try {
+          // Set the session in the Supabase client
+          await supabase.auth.setSession(data.session);
+          console.log('✅ [SET-PASSWORD] Session set successfully');
+          
+          // Redirect to dashboard
+          setTimeout(() => {
+            router.push('/');
+          }, 1000);
+        } catch (sessionError) {
+          console.error('⚠️ [SET-PASSWORD] Session setup error:', sessionError);
+          // Fallback to login page
+          setTimeout(() => {
+            router.push('/auth/login');
+          }, 2000);
+        }
       } else {
+        console.log('🔐 [SET-PASSWORD] No session available, redirecting to login...');
         // Redirect to login
         setTimeout(() => {
           router.push('/auth/login');
@@ -153,8 +167,8 @@ function SetPasswordContent() {
           <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto">
             <CheckCircle className="w-8 h-8 text-green-600" />
           </div>
-          <h2 className="text-2xl font-bold text-ink">Password Set Successfully</h2>
-          <p className="text-ink/60">Your account is now active. You're being logged in...</p>
+          <h2 className="text-2xl font-bold text-ink">Welcome!</h2>
+          <p className="text-ink/60">Your account is now active. Redirecting to your dashboard...</p>
         </div>
       </div>
     );
