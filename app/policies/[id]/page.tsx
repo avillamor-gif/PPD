@@ -7,6 +7,7 @@ import { AdminEditButton } from '@/app/components/AdminEditButton';
 import { PolicyImplementationStatus } from '@/app/components/PolicyImplementationStatus';
 import { PolicyShareCard } from '@/app/components/PolicyShareCard';
 import { PolicyEngagementCard } from '@/app/components/PolicyEngagementCard';
+import { BookmarkButton } from '@/app/components/BookmarkButton';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 
 const statusColors: Record<string, { bg: string; badge: string }> = {
@@ -117,6 +118,7 @@ export default async function PolicyPage({ params }: { params: Promise<{ id: str
                   <p className="text-lg font-semibold text-ink mt-1">{policy.year}</p>
                 </div>
               </div>
+              <BookmarkButton policyId={policy.id} className="w-full" />
             </div>
           </div>
         </div>

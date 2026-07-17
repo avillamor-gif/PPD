@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabase';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { Mail, MapPin, Building2, Edit2, ArrowLeft, Shield } from 'lucide-react';
+import { FollowButton } from '@/app/components/FollowButton';
 
 interface UserProfile {
   id: string;
@@ -117,15 +118,20 @@ export default function ProfilePage() {
               </Link>
               <h1 className="text-2xl font-bold text-ink">Profile</h1>
             </div>
-            {isOwnProfile && (
-              <Link
-                href={`/profile/${profileId}/edit`}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-ocean text-white hover:bg-ocean/90 transition font-medium text-sm"
-              >
-                <Edit2 className="w-4 h-4" />
-                Edit Profile
-              </Link>
-            )}
+            <div className="flex items-center gap-3">
+              {!isOwnProfile && profile && (
+                <FollowButton userId={profile.id} displayName={profile.display_name} />
+              )}
+              {isOwnProfile && (
+                <Link
+                  href={`/profile/${profileId}/edit`}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-ocean text-white hover:bg-ocean/90 transition font-medium text-sm"
+                >
+                  <Edit2 className="w-4 h-4" />
+                  Edit Profile
+                </Link>
+              )}
+            </div>
           </div>
         </div>
       </section>

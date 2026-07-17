@@ -197,16 +197,53 @@ export function SiteHeader() {
                         onClick={() => setDropdownOpen(false)}
                       >
                         <LayoutDashboard className="w-4 h-4" />
-                        Dashboard
+                        Admin Dashboard
                       </Link>
                     )}
                     <Link
-                      href={`/profile/edit`}
+                      href="/dashboard"
+                      className="px-4 py-2 text-sm text-ink hover:bg-sand transition flex items-center gap-2 border-t border-rule font-medium"
+                      onClick={() => setDropdownOpen(false)}
+                    >
+                      <LayoutDashboard className="w-4 h-4" />
+                      My Dashboard
+                    </Link>
+                    <Link
+                      href={`/profile/${user?.id}`}
+                      className="px-4 py-2 text-sm text-ink hover:bg-sand transition flex items-center gap-2"
+                      onClick={() => setDropdownOpen(false)}
+                    >
+                      <User className="w-4 h-4" />
+                      My Profile
+                    </Link>
+                    <Link
+                      href={`/profile/${user?.id}/followers`}
+                      className="px-4 py-2 text-sm text-ink hover:bg-sand transition flex items-center gap-2"
+                      onClick={() => setDropdownOpen(false)}
+                    >
+                      👥 Network
+                    </Link>
+                    <Link
+                      href={`/profile/${user?.id}/bookmarks`}
+                      className="px-4 py-2 text-sm text-ink hover:bg-sand transition flex items-center gap-2"
+                      onClick={() => setDropdownOpen(false)}
+                    >
+                      📌 Bookmarks
+                    </Link>
+                    <Link
+                      href="/settings"
                       className="px-4 py-2 text-sm text-ink hover:bg-sand transition flex items-center gap-2"
                       onClick={() => setDropdownOpen(false)}
                     >
                       <Settings className="w-4 h-4" />
-                      Edit Profile
+                      Settings
+                    </Link>
+                    <Link
+                      href={`/profile/${user?.id}/edit`}
+                      className="px-4 py-2 text-sm text-ink hover:bg-sand transition flex items-center gap-2"
+                      onClick={() => setDropdownOpen(false)}
+                    >
+                      ✏️ Edit Profile
                     </Link>
                     <button
                       onClick={handleLogout}
