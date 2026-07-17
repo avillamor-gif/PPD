@@ -28,7 +28,7 @@ A fully functional Next.js website for the Plastic Policy Database Project, buil
 - **Region Organization**: Countries grouped by 4 subregions:
   - Southeast Asia: Indonesia, Philippines, Vietnam, Thailand, Malaysia, Singapore
   - South Asia: India
-  - East Asia: Japan, South Korea, China
+  - East Asia: Japan, South Korea, Mainland China
   - Oceania: Australia, New Zealand
 - **Coverage/Scope Section**: What's included and excluded in Phase 1
 - **Phase Information**: Details about scope and future phases
@@ -104,7 +104,7 @@ The search page includes 12 sample policies across different countries and categ
 - Disposable Carrier Bag Charge (Singapore)
 - Extended Producer Responsibility Act (Indonesia)
 - Plastic Waste Management Rules (India)
-- And 6 more across Thailand, China, Australia, South Korea, Malaysia, New Zealand
+- And 6 more across Thailand, Mainland China, Australia, South Korea, Malaysia, New Zealand
 
 ## Getting Started
 

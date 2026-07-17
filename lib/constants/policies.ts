@@ -22,7 +22,7 @@ export const COUNTRIES: Country[] = [
   // East Asia
   { code: "JP", name: "Japan", region: "East Asia" },
   { code: "KR", name: "South Korea", region: "East Asia" },
-  { code: "CN", name: "China", region: "East Asia" },
+  { code: "CN", name: "Mainland China", region: "East Asia" },
   { code: "TW", name: "Taiwan", region: "East Asia" },
   { code: "MN", name: "Mongolia", region: "East Asia" },
   // Oceania
