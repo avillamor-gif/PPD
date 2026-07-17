@@ -11,8 +11,16 @@ function getResend() {
   if (!resendClient) {
     const apiKey = process.env.RESEND_API_KEY;
     if (!apiKey) {
-      console.error('Missing Resend API key');
-      throw new Error('Missing Resend configuration');
+      console.error('❌ [RESEND] Missing RESEND_API_KEY environment variable');
+      console.error('📋 Setup required:');
+      console.error('   1. Go to https://resend.com');
+      console.error('   2. Create free account');
+      console.error('   3. Get API key (starts with "re_")');
+      console.error('   4. Add to .env.local: RESEND_API_KEY=re_YOUR_KEY');
+      console.error('   5. Restart dev server: npm run dev');
+      throw new Error(
+        'Missing Resend API key. See EMAIL_SETUP_GUIDE.md for setup instructions.'
+      );
     }
     resendClient = new Resend(apiKey);
   }

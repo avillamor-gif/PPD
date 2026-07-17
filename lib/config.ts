@@ -1,13 +1,20 @@
 /**
  * Application Configuration
  * All hardcoded values should be defined here and loaded from environment variables
+ * 
+ * Environment Setup:
+ * 1. For Email: Set RESEND_API_KEY at https://resend.com
+ * 2. Copy .env.example to .env.local and fill in your values
+ * 3. Run: npm run dev
  */
 
 // Get values from environment variables with fallbacks for development
 const config = {
   // Email Configuration
   email: {
-    from: process.env.NEXT_PUBLIC_EMAIL_FROM || 'noreply@plasticpolicydatabase.com',
+    // Use onboarding@resend.dev for development/testing (no domain verification needed)
+    // Use verified domain for production
+    from: process.env.NEXT_PUBLIC_EMAIL_FROM || 'onboarding@resend.dev',
     appName: process.env.NEXT_PUBLIC_APP_NAME || 'Plastic Policy Database',
     adminNotificationEmail: process.env.ADMIN_NOTIFICATION_EMAIL || 'admin@plasticpolicydatabase.com',
   },
