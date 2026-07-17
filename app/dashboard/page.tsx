@@ -122,13 +122,13 @@ export default function DashboardPage() {
     <div className="w-full min-h-screen bg-paper">
       {/* Header */}
       <div className="border-b border-border bg-white sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-6 py-8">
+        <div className="mx-auto max-w-350 px-6 py-8 lg:px-10">
           <h1 className="text-3xl font-bold text-ink">Dashboard</h1>
           <p className="text-ink/60 mt-2">Welcome back! Here's your community activity overview.</p>
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-6 py-12 space-y-12">
+      <div className="mx-auto max-w-350 px-6 py-12 lg:px-10 space-y-12">
         {/* Stats Grid */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           <div className="bg-white rounded-lg border border-border p-6 text-center">

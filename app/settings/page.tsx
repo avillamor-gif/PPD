@@ -101,13 +101,13 @@ export default function SettingsPage() {
     <div className="w-full min-h-screen bg-paper">
       {/* Header */}
       <div className="border-b border-border bg-white sticky top-0 z-10">
-        <div className="max-w-2xl mx-auto px-6 py-8">
+        <div className="mx-auto max-w-350 px-6 py-8 lg:px-10">
           <h1 className="text-3xl font-bold text-ink">Settings</h1>
           <p className="text-ink/60 mt-2">Manage your preferences and account settings</p>
         </div>
       </div>
 
-      <div className="max-w-2xl mx-auto px-6 py-12">
+      <div className="mx-auto max-w-350 px-6 py-12 lg:px-10">
         {success && (
           <div className="mb-8 p-4 rounded-lg bg-green-50 border border-green-200 text-green-700 text-sm">
             ✓ Settings saved successfully

@@ -66,7 +66,7 @@ export default function ActivityPage() {
     <div className="w-full min-h-screen bg-paper">
       {/* Header */}
       <div className="border-b border-border bg-white">
-        <div className="max-w-4xl mx-auto px-6 py-8">
+        <div className="mx-auto max-w-350 px-6 py-8 lg:px-10">
           <div className="flex items-center gap-3 mb-2">
             <Calendar className="w-6 h-6 text-ocean" />
             <h1 className="text-2xl font-bold text-ink">{userName}'s Activity</h1>
@@ -75,7 +75,7 @@ export default function ActivityPage() {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-6 py-12">
+      <div className="mx-auto max-w-350 px-6 py-12 lg:px-10">
         {activity.length === 0 ? (
           <div className="text-center py-12">
             <MessageSquare className="w-12 h-12 mx-auto mb-4 text-ink/20" />
