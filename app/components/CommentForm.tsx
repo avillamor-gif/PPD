@@ -10,10 +10,12 @@ export function CommentForm({
   threadId,
   policyId,
   onCommentAdded,
+  onCommentPosted,
 }: {
   threadId?: string;
   policyId?: string;
   onCommentAdded?: () => void;
+  onCommentPosted?: (comment: any) => void;
 }) {
   const [content, setContent] = useState('');
   const [loading, setLoading] = useState(false);
@@ -116,11 +118,16 @@ export function CommentForm({
         throw new Error(data.error || 'Failed to post comment');
       }
 
+      const result = await response.json();
       setSuccess(true);
       setContent('');
       setTimeout(() => setSuccess(false), 2000);
 
-      if (onCommentAdded) {
+      // Notify parent with new comment data for immediate UI update
+      if (onCommentPosted && result.comment) {
+        onCommentPosted(result.comment);
+      } else if (onCommentAdded) {
+        // Fallback to reload if onCommentPosted not provided
         onCommentAdded();
       }
     } catch (err) {

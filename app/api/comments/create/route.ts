@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
       policyId = thread.policy_id;
     }
 
-    // Insert comment
+    // Insert comment and select all fields needed for display
     const { data, error: insertError } = await supabase
       .from('comments')
       .insert({
@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
         author_id: user.id,
         content: content.trim(),
       })
-      .select('id')
+      .select('id, thread_id, policy_id, author_id, content, created_at, vote_count, reply_count, is_deleted, deleted_at, parent_comment_id')
       .single();
 
     if (insertError) {
@@ -71,7 +71,21 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: insertError.message }, { status: 400 });
     }
 
-    return NextResponse.json({ commentId: data.id });
+    // Fetch author profile
+    const { data: profile } = await supabase
+      .from('user_profiles')
+      .select('id, display_name, avatar_url')
+      .eq('id', user.id)
+      .single();
+
+    return NextResponse.json({
+      commentId: data.id,
+      comment: {
+        ...data,
+        author: profile ? { display_name: profile.display_name || 'Unknown User', avatar_url: profile.avatar_url } : { display_name: 'Unknown User', avatar_url: null },
+        reactions: [],
+      },
+    });
   } catch (error) {
     console.error('Create comment error:', error);
     return NextResponse.json(

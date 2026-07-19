@@ -102,6 +102,11 @@ export default function ThreadDetail({
     }
   };
 
+  const handleCommentPosted = (newComment: any) => {
+    // Add the new comment to the state immediately
+    setComments((prev) => [...prev, newComment]);
+  };
+
   const loadComments = async () => {
     try {
       const { data, error } = await supabase
@@ -233,7 +238,7 @@ export default function ThreadDetail({
         {/* Reply form */}
         {canReply && thread.status !== 'closed' && (
           <div className="p-6 rounded-lg border border-ink/10 bg-sand/5">
-            <CommentForm threadId={threadId} onCommentAdded={loadComments} />
+            <CommentForm threadId={threadId} onCommentPosted={handleCommentPosted} onCommentAdded={loadComments} />
           </div>
         )}
 
