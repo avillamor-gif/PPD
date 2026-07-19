@@ -72,8 +72,7 @@ export async function GET(request: NextRequest) {
 
     console.log('[API] Executing comments query with range:', offset, '-', offset + limit - 1);
     const { data: comments, error, count } = await query
-      .range(offset, offset + limit - 1)
-      .limit(limit);
+      .range(offset, offset + limit - 1);
 
     console.log('[API] Query result - Error:', error?.message, 'Count:', count, 'Comments returned:', comments?.length);
     if (error) {
