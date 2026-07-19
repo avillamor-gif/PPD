@@ -58,12 +58,16 @@ export default function DashboardPage() {
             .eq('id', session.user.id)
             .single();
 
+          console.log('User stats query result:', { userStats, statsError, userId: session.user.id });
+
           if (userStats && !statsError) {
             setStats((prev) => ({
               ...prev,
               thread_count: userStats.thread_count || 0,
               comment_count: userStats.comment_count || 0,
             }));
+          } else if (statsError) {
+            console.error('Stats error:', statsError);
           }
 
           // Fetch activity
