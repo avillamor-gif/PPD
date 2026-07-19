@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
   Trash2,
@@ -25,6 +26,7 @@ interface Comment {
 
 interface Thread {
   id: string;
+  policy_id: string;
   title: string;
   comment_count: number;
   created_at: string;
@@ -120,7 +122,7 @@ export default function ForumModerationPage() {
     try {
       const { data, error } = await supabase
         .from('discussion_threads')
-        .select('*')
+        .select('id, policy_id, title, comment_count, created_at, status')
         .order('created_at', { ascending: false })
         .limit(100);
 
@@ -367,7 +369,12 @@ export default function ForumModerationPage() {
               <div key={thread.id} className="p-4 rounded-lg border border-ink/20 bg-white">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <h3 className="font-medium text-ink mb-1">{thread.title}</h3>
+                    <Link
+                      href={`/policies/${thread.policy_id}/discuss/${thread.id}`}
+                      className="font-medium text-ocean hover:text-ocean-deep hover:underline transition mb-1 block"
+                    >
+                      {thread.title}
+                    </Link>
                     <div className="flex gap-4 text-xs text-ink/50">
                       <span className="flex items-center gap-1">
                         <MessageSquare className="w-3 h-3" />
