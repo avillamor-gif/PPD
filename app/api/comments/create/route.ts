@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
 
     // Parse request body
     const body = await request.json();
-    const { threadId, policyId, content } = body;
+    let { threadId, policyId, content } = body;
 
     // Validate required fields
     if (!threadId) {
@@ -39,12 +39,27 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Comment must be at least 3 characters' }, { status: 400 });
     }
 
+    // Get policy_id from thread if not provided
+    if (!policyId) {
+      const { data: thread, error: threadError } = await supabase
+        .from('discussion_threads')
+        .select('policy_id')
+        .eq('id', threadId)
+        .single();
+
+      if (threadError || !thread) {
+        return NextResponse.json({ error: 'Thread not found' }, { status: 404 });
+      }
+
+      policyId = thread.policy_id;
+    }
+
     // Insert comment
     const { data, error: insertError } = await supabase
       .from('comments')
       .insert({
         thread_id: threadId,
-        policy_id: policyId || null,
+        policy_id: policyId,
         author_id: user.id,
         content: content.trim(),
       })
