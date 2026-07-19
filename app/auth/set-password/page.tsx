@@ -38,6 +38,18 @@ function SetPasswordContent() {
     init();
   }, [token]);
 
+  // Handle redirect after successful password set
+  useEffect(() => {
+    if (success) {
+      console.log('🔐 [SET-PASSWORD] Success state detected, redirecting to dashboard...');
+      const redirectTimer = setTimeout(() => {
+        console.log('🔐 [SET-PASSWORD] Executing redirect to dashboard');
+        router.push('/dashboard');
+      }, 1500);
+      return () => clearTimeout(redirectTimer);
+    }
+  }, [success, router]);
+
   const validateToken = async () => {
     if (!token) {
       setError('Invalid verification link. Please signup again.');
@@ -95,33 +107,24 @@ function SetPasswordContent() {
       }
 
       console.log('✅ [SET-PASSWORD] Password set successfully');
-      setSuccess(true);
-
+      
       // Auto-login with the session data if available
       if (data.session) {
-        console.log('🔐 [SET-PASSWORD] Session available, setting session and redirecting to dashboard...');
+        console.log('🔐 [SET-PASSWORD] Session available, setting session...');
         try {
           // Set the session in the Supabase client
           await supabase.auth.setSession(data.session);
           console.log('✅ [SET-PASSWORD] Session set successfully');
-          
-          // Redirect to dashboard
-          setTimeout(() => {
-            router.push('/');
-          }, 1000);
+          setSuccess(true);
         } catch (sessionError) {
           console.error('⚠️ [SET-PASSWORD] Session setup error:', sessionError);
           // Fallback to login page
-          setTimeout(() => {
-            router.push('/auth/login');
-          }, 2000);
+          router.push('/auth/login');
         }
       } else {
         console.log('🔐 [SET-PASSWORD] No session available, redirecting to login...');
-        // Redirect to login
-        setTimeout(() => {
-          router.push('/auth/login');
-        }, 2000);
+        // Redirect to login immediately
+        router.push('/auth/login');
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
