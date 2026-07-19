@@ -69,12 +69,19 @@ export default function SettingsPage() {
         throw new Error('Not authenticated');
       }
 
-      const { error: updateError } = await supabase
+      // Upsert: insert if not exists, update if exists
+      const { error: upsertError } = await supabase
         .from('user_preferences')
-        .update(preferences)
-        .eq('user_id', session.user.id);
+        .upsert(
+          {
+            user_id: session.user.id,
+            ...preferences,
+            updated_at: new Date().toISOString(),
+          },
+          { onConflict: 'user_id' }
+        );
 
-      if (updateError) throw updateError;
+      if (upsertError) throw upsertError;
 
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
