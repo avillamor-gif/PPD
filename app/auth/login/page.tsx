@@ -45,7 +45,11 @@ function LoginContent() {
 
           const roleId = profile?.role_id || 4; // Default to USER (4)
 
-          if (roleId === 1) {
+          // Check if there's a redirect parameter
+          const redirectUrl = searchParams.get('redirect');
+          if (redirectUrl) {
+            router.push(redirectUrl);
+          } else if (roleId === 1) {
             router.push('/admin');
           } else if (roleId === 2) {
             router.push('/admin/moderation');
@@ -125,7 +129,12 @@ function LoginContent() {
       const roleId = profile?.role_id || 4; // Default to USER (4)
 
       setRedirected(true);
-      if (roleId === 1) {
+      
+      // Check if there's a redirect parameter
+      const redirectUrl = searchParams.get('redirect');
+      if (redirectUrl) {
+        router.push(redirectUrl);
+      } else if (roleId === 1) {
         router.push('/admin');
       } else if (roleId === 2) {
         router.push('/admin/moderation');

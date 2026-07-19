@@ -149,7 +149,7 @@ export default function PolicyDiscussionsPage({
           )}
           {!user && (
             <Link
-              href="/auth/login"
+              href={`/auth/login?redirect=${encodeURIComponent(`/policies/${params.id}/discuss`)}`}
               className="inline-block mt-4 text-ocean hover:text-ocean-deep font-medium"
             >
               Log in to join the discussion

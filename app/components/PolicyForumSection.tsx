@@ -138,7 +138,7 @@ export function PolicyForumSection({ policyId }: { policyId: string }) {
         <div className="text-center py-8">
           <p className="text-ink/60 mb-4">Sign in to view and participate in community discussions</p>
           <Link
-            href="/auth/login"
+            href={`/auth/login?redirect=${encodeURIComponent(typeof window !== 'undefined' ? window.location.pathname : '')}`}
             className="inline-flex px-6 py-2 rounded-lg bg-coral text-white font-semibold hover:bg-coral/90 transition"
           >
             Sign In to Join Discussion

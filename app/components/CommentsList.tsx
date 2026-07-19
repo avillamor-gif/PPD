@@ -113,7 +113,7 @@ export function CommentsList({
         <MessageCircle className="w-12 h-12 text-ink/30 mx-auto mb-3" />
         <p className="text-ink/60 mb-4">Sign in to view comments and join the discussion</p>
         <Link
-          href="/auth/login"
+          href={`/auth/login?redirect=${encodeURIComponent(typeof window !== 'undefined' ? window.location.pathname + window.location.search : '')}`}
           className="inline-flex px-6 py-2 rounded-lg bg-ocean text-white font-semibold hover:bg-ocean/90 transition"
         >
           Sign In
