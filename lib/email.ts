@@ -61,12 +61,20 @@ export async function sendVerificationEmail(email: string, token: string) {
 
   try {
     const html = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #E88860;">Welcome to ${config.email.appName}</h2>
-        <p>Click the button below to verify your email address:</p>
-        <a href="${verificationUrl}" style="display: inline-block; padding: 12px 24px; background-color: #E88860; color: white; text-decoration: none; border-radius: 8px; margin: 20px 0;">Verify Email</a>
-        <p style="color: #666; font-size: 14px;">Or paste this link in your browser: ${verificationUrl}</p>
-        <p style="color: #999; font-size: 12px;">This link expires in 24 hours.</p>
+      <div style="font-family: 'Inter', Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #F9F7F4; padding: 40px 20px;">
+        <div style="background-color: #FFFFFF; border-radius: 8px; padding: 40px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+          <h2 style="color: #E88860; font-size: 28px; font-weight: bold; margin: 0 0 20px 0; font-family: 'Fraunces', Georgia, serif;">Welcome to ${config.email.appName}</h2>
+          <p style="color: #2D3436; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">Click the button below to verify your email address:</p>
+          
+          <a href="${verificationUrl}" style="display: inline-block; padding: 14px 32px; background-color: #E88860; color: white; text-decoration: none; border-radius: 6px; margin: 24px 0; font-weight: 600; font-size: 16px;">Verify Email</a>
+          
+          <p style="color: #666666; font-size: 14px; line-height: 1.6; margin: 24px 0;">Or paste this link in your browser:</p>
+          <p style="background-color: #F9F7F4; padding: 12px 16px; border-radius: 4px; font-size: 12px; word-break: break-all; color: #666666; border-left: 4px solid #E88860; margin: 16px 0;">${verificationUrl}</p>
+          
+          <div style="border-top: 1px solid #E0E0E0; padding-top: 24px; margin-top: 32px;">
+            <p style="color: #999999; font-size: 12px; line-height: 1.6; margin: 0;">This link expires in 24 hours.</p>
+          </div>
+        </div>
       </div>
     `;
 
@@ -86,12 +94,20 @@ export async function sendPasswordResetEmail(email: string, token: string) {
 
   try {
     const html = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #1B72A8;">Password Reset Request</h2>
-        <p>Click the button below to reset your password:</p>
-        <a href="${resetUrl}" style="display: inline-block; padding: 12px 24px; background-color: #1B72A8; color: white; text-decoration: none; border-radius: 8px; margin: 20px 0;">Reset Password</a>
-        <p style="color: #666; font-size: 14px;">Or paste this link in your browser: ${resetUrl}</p>
-        <p style="color: #999; font-size: 12px;">This link expires in 1 hour. If you didn't request a password reset, ignore this email.</p>
+      <div style="font-family: 'Inter', Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #F9F7F4; padding: 40px 20px;">
+        <div style="background-color: #FFFFFF; border-radius: 8px; padding: 40px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+          <h2 style="color: #E88860; font-size: 28px; font-weight: bold; margin: 0 0 20px 0; font-family: 'Fraunces', Georgia, serif;">Password Reset Request</h2>
+          <p style="color: #2D3436; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">Click the button below to reset your password:</p>
+          
+          <a href="${resetUrl}" style="display: inline-block; padding: 14px 32px; background-color: #4A90A8; color: white; text-decoration: none; border-radius: 6px; margin: 24px 0; font-weight: 600; font-size: 16px;">Reset Password</a>
+          
+          <p style="color: #666666; font-size: 14px; line-height: 1.6; margin: 24px 0;">Or paste this link in your browser:</p>
+          <p style="background-color: #F9F7F4; padding: 12px 16px; border-radius: 4px; font-size: 12px; word-break: break-all; color: #666666; border-left: 4px solid #4A90A8; margin: 16px 0;">${resetUrl}</p>
+          
+          <div style="border-top: 1px solid #E0E0E0; padding-top: 24px; margin-top: 32px;">
+            <p style="color: #999999; font-size: 12px; line-height: 1.6; margin: 0;">This link expires in 1 hour. If you didn't request a password reset, ignore this email.</p>
+          </div>
+        </div>
       </div>
     `;
 
@@ -118,15 +134,24 @@ export async function sendCommentNotificationEmail(
 
   try {
     const html = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #1B72A8;">New Reply to Your Comment</h2>
-        <p>Hi ${recipientName},</p>
-        <p><strong>${authorName}</strong> replied to your comment on:</p>
-        <p style="background-color: #f5f5f5; padding: 12px; border-left: 4px solid #1B72A8; margin: 16px 0;">
-          <strong>${policyTitle}</strong>
-        </p>
-        <p style="color: #666; font-size: 14px; margin: 12px 0;"><em>"${commentPreview.substring(0, 150)}..."</em></p>
-        <a href="${policyUrl}" style="display: inline-block; padding: 12px 24px; background-color: #1B72A8; color: white; text-decoration: none; border-radius: 8px; margin: 20px 0;">View Conversation</a>
+      <div style="font-family: 'Inter', Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #F9F7F4; padding: 40px 20px;">
+        <div style="background-color: #FFFFFF; border-radius: 8px; padding: 40px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+          <h2 style="color: #E88860; font-size: 28px; font-weight: bold; margin: 0 0 20px 0; font-family: 'Fraunces', Georgia, serif;">New Reply to Your Comment</h2>
+          <p style="color: #2D3436; font-size: 16px; line-height: 1.6; margin: 0 0 8px 0;">Hi ${recipientName},</p>
+          <p style="color: #2D3436; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;"><strong>${authorName}</strong> replied to your comment on:</p>
+          
+          <div style="background-color: #F9F7F4; padding: 16px; border-left: 4px solid #E88860; border-radius: 4px; margin: 20px 0;">
+            <p style="color: #2D3436; font-weight: 600; margin: 0;">${policyTitle}</p>
+          </div>
+          
+          <p style="color: #666666; font-size: 14px; line-height: 1.6; margin: 20px 0;"><em>"${commentPreview.substring(0, 150)}..."</em></p>
+          
+          <a href="${policyUrl}" style="display: inline-block; padding: 14px 32px; background-color: #4A90A8; color: white; text-decoration: none; border-radius: 6px; margin: 24px 0; font-weight: 600; font-size: 16px;">View Conversation</a>
+          
+          <div style="border-top: 1px solid #E0E0E0; padding-top: 24px; margin-top: 32px;">
+            <p style="color: #999999; font-size: 12px; line-height: 1.6; margin: 0;">You received this email because you participated in this discussion.</p>
+          </div>
+        </div>
       </div>
     `;
 
@@ -200,25 +225,29 @@ export async function sendNewUserWelcomeEmail(email: string, displayName: string
 
   try {
     const html = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #1B72A8;">Welcome to ${config.email.appName}</h2>
-        <p>Hi ${displayName},</p>
-        <p>Your account has been created by an administrator. Here are your login credentials:</p>
-        
-        <div style="background-color: #f5f5f5; padding: 16px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #1B72A8;">
-          <p style="margin: 0;"><strong>Email:</strong> ${email}</p>
-          <p style="margin: 8px 0 0 0;"><strong>Temporary Password:</strong> ${password}</p>
+      <div style="font-family: 'Inter', Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #F9F7F4; padding: 40px 20px;">
+        <div style="background-color: #FFFFFF; border-radius: 8px; padding: 40px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+          <h2 style="color: #E88860; font-size: 28px; font-weight: bold; margin: 0 0 8px 0; font-family: 'Fraunces', Georgia, serif;">Welcome to ${config.email.appName}</h2>
+          <p style="color: #2D3436; font-size: 16px; line-height: 1.6; margin: 0 0 24px 0;">Hi ${displayName},</p>
+          <p style="color: #2D3436; font-size: 16px; line-height: 1.6; margin: 0 0 24px 0;">Your account has been created by an administrator. Here are your login credentials:</p>
+          
+          <div style="background-color: #F9F7F4; padding: 16px; border-radius: 4px; margin: 20px 0; border-left: 4px solid #E88860;">
+            <p style="color: #2D3436; margin: 0 0 12px 0;"><strong>Email:</strong> ${email}</p>
+            <p style="color: #2D3436; margin: 0;"><strong>Temporary Password:</strong> ${password}</p>
+          </div>
+
+          <p style="color: #666666; font-size: 14px; line-height: 1.6; margin: 24px 0;">
+            Please change your password after your first login for security.
+          </p>
+
+          <a href="${loginUrl}" style="display: inline-block; padding: 14px 32px; background-color: #4A90A8; color: white; text-decoration: none; border-radius: 6px; margin: 24px 0; font-weight: 600; font-size: 16px;">Login to Your Account</a>
+
+          <div style="border-top: 1px solid #E0E0E0; padding-top: 24px; margin-top: 32px;">
+            <p style="color: #999999; font-size: 12px; line-height: 1.6; margin: 0;">
+              If you did not request this account creation, please contact support immediately.
+            </p>
+          </div>
         </div>
-
-        <p style="color: #666; font-size: 14px;">
-          Please change your password after your first login for security.
-        </p>
-
-        <a href="${loginUrl}" style="display: inline-block; padding: 12px 24px; background-color: #1B72A8; color: white; text-decoration: none; border-radius: 8px; margin: 20px 0;">Login to Your Account</a>
-
-        <p style="color: #999; font-size: 12px; margin-top: 30px;">
-          If you did not request this account creation, please contact support immediately.
-        </p>
       </div>
     `;
 
@@ -239,33 +268,34 @@ export async function sendNewUserAdminNotification(email: string, displayName: s
 
   try {
     const html = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #E88860;">New User Registration</h2>
-        
-        <p>A new user has been added to ${config.email.appName}:</p>
+      <div style="font-family: 'Inter', Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #F9F7F4; padding: 40px 20px;">
+        <div style="background-color: #FFFFFF; border-radius: 8px; padding: 40px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+          <h2 style="color: #E88860; font-size: 28px; font-weight: bold; margin: 0 0 20px 0; font-family: 'Fraunces', Georgia, serif;">New User Registration</h2>
+          
+          <p style="color: #2D3436; font-size: 16px; line-height: 1.6; margin: 0 0 24px 0;">A new user has been added to ${config.email.appName}:</p>
 
-        <div style="background-color: #f5f5f5; padding: 16px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #E88860;">
-          <p style="margin: 0;"><strong>Name:</strong> ${displayName}</p>
-          <p style="margin: 8px 0 0 0;"><strong>Email:</strong> ${email}</p>
-          <p style="margin: 8px 0 0 0;"><strong>Role:</strong> ${role}</p>
-          <p style="margin: 8px 0 0 0;"><strong>Created:</strong> ${new Date().toLocaleString()}</p>
+          <div style="background-color: #F9F7F4; padding: 16px; border-radius: 4px; margin: 20px 0; border-left: 4px solid #E88860;">
+            <p style="color: #2D3436; margin: 0 0 12px 0;"><strong>Name:</strong> ${displayName}</p>
+            <p style="color: #2D3436; margin: 0 0 12px 0;"><strong>Email:</strong> ${email}</p>
+            <p style="color: #2D3436; margin: 0;"><strong>Role:</strong> ${role}</p>
+          </div>
+
+          <a href="${adminUrl}" style="display: inline-block; padding: 14px 32px; background-color: #4A90A8; color: white; text-decoration: none; border-radius: 6px; margin: 24px 0; font-weight: 600; font-size: 16px;">View in Admin Panel</a>
+
+          <div style="border-top: 1px solid #E0E0E0; padding-top: 24px; margin-top: 32px;">
+            <p style="color: #999999; font-size: 12px; line-height: 1.6; margin: 0;">This is an automated notification from ${config.email.appName}.</p>
+          </div>
         </div>
-
-        <a href="${adminUrl}" style="display: inline-block; padding: 12px 24px; background-color: #E88860; color: white; text-decoration: none; border-radius: 8px; margin: 20px 0;">View User Management</a>
-
-        <p style="color: #999; font-size: 12px; margin-top: 30px;">
-          This is an automated notification from your admin panel.
-        </p>
       </div>
     `;
 
     return await sendViaMailgun(
       adminEmail,
-      `New User Created: ${displayName} (${role})`,
+      `New User Registration - ${displayName}`,
       html
     );
   } catch (error) {
-    console.error('Admin notification email error:', error);
+    console.error('New user admin notification email error:', error);
     throw error;
   }
 }
@@ -286,21 +316,21 @@ export async function sendSetPasswordEmail(email: string, displayName: string, t
     console.log('📧 [EMAIL] Sending via Mailgun...');
     
     const html = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #1B72A8;">Welcome to ${config.email.appName}</h2>
-        <p>Hi ${displayName},</p>
-        
-        <p>Thanks for signing up! To complete your account setup, click the button below to verify your email and set your password.</p>
+      <div style="font-family: 'Inter', Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #F9F7F4; padding: 40px 20px;">
+        <div style="background-color: #FFFFFF; border-radius: 8px; padding: 40px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+          <h2 style="color: #E88860; font-size: 28px; font-weight: bold; margin: 0 0 8px 0; font-family: 'Fraunces', Georgia, serif;">Welcome to ${config.email.appName}</h2>
+          <p style="color: #2D3436; font-size: 16px; line-height: 1.6; margin: 0 0 24px 0;">Hi ${displayName},</p>
+          
+          <p style="color: #2D3436; font-size: 16px; line-height: 1.6; margin: 0 0 24px 0;">Thanks for signing up! To complete your account setup, click the button below to verify your email and set your password.</p>
 
-        <a href="${setPasswordUrl}" style="display: inline-block; padding: 12px 24px; background-color: #1B72A8; color: white; text-decoration: none; border-radius: 8px; margin: 20px 0; font-weight: bold;">Verify Email & Set Password</a>
+          <a href="${setPasswordUrl}" style="display: inline-block; padding: 14px 32px; background-color: #E88860; color: white; text-decoration: none; border-radius: 6px; margin: 24px 0; font-weight: 600; font-size: 16px; text-align: center;">Verify Email & Set Password</a>
 
-        <p style="color: #666; font-size: 14px;">Or paste this link in your browser:</p>
-        <p style="background-color: #f5f5f5; padding: 12px; border-radius: 4px; font-size: 12px; word-break: break-all; color: #666;">${setPasswordUrl}</p>
+          <p style="color: #666666; font-size: 14px; line-height: 1.6; margin: 24px 0;">Or paste this link in your browser:</p>
+          <p style="background-color: #F9F7F4; padding: 12px 16px; border-radius: 4px; font-size: 12px; word-break: break-all; color: #666666; border-left: 4px solid #E88860; margin: 16px 0;">${setPasswordUrl}</p>
 
-        <div style="border-top: 1px solid #e0e0e0; padding-top: 20px; margin-top: 30px;">
-          <p style="color: #999; font-size: 12px;">
-            This link will expire in 24 hours. If you didn't sign up for this account, please ignore this email.
-          </p>
+          <div style="border-top: 1px solid #E0E0E0; padding-top: 24px; margin-top: 32px;">
+            <p style="color: #999999; font-size: 12px; line-height: 1.6; margin: 0;">This link will expire in 24 hours. If you didn't sign up for this account, please ignore this email.</p>
+          </div>
         </div>
       </div>
     `;
