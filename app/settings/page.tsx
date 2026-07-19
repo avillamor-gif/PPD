@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import { Bell, Mail, Eye, Globe, AlertCircle } from 'lucide-react';
+import { Mail, AlertCircle } from 'lucide-react';
 import config from '@/lib/config';
 
 interface Preferences {
@@ -11,8 +11,6 @@ interface Preferences {
   email_on_mention: boolean;
   email_weekly_digest: boolean;
   email_policy_updates: boolean;
-  theme_preference: 'light' | 'dark' | 'auto';
-  language_preference: string;
   marketing_emails: boolean;
 }
 
@@ -22,8 +20,6 @@ export default function SettingsPage() {
     email_on_mention: true,
     email_weekly_digest: false,
     email_policy_updates: true,
-    theme_preference: 'light',
-    language_preference: 'en',
     marketing_emails: false,
   });
 
@@ -204,51 +200,6 @@ export default function SettingsPage() {
                   <p className="text-sm text-ink/60">Receive news and updates from {config.email.appName}</p>
                 </div>
               </label>
-            </div>
-          </section>
-
-          {/* Display Preferences */}
-          <section className="bg-white rounded-lg border border-border p-8">
-            <div className="flex items-center gap-3 mb-6">
-              <Eye className="w-6 h-6 text-ocean" />
-              <h2 className="text-xl font-bold text-ink">Display</h2>
-            </div>
-
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-ink mb-2">Theme</label>
-                <select
-                  value={preferences.theme_preference}
-                  onChange={(e) =>
-                    setPreferences({
-                      ...preferences,
-                      theme_preference: e.target.value as 'light' | 'dark' | 'auto',
-                    })
-                  }
-                  className="w-full px-4 py-2 rounded-lg border border-border bg-white focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20 transition"
-                >
-                  <option value="light">Light</option>
-                  <option value="dark">Dark</option>
-                  <option value="auto">Auto (System preference)</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-ink mb-2">Language</label>
-                <select
-                  value={preferences.language_preference}
-                  onChange={(e) =>
-                    setPreferences({ ...preferences, language_preference: e.target.value })
-                  }
-                  className="w-full px-4 py-2 rounded-lg border border-border bg-white focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20 transition"
-                >
-                  <option value="en">English</option>
-                  <option value="es">Spanish</option>
-                  <option value="fr">French</option>
-                  <option value="de">German</option>
-                  <option value="zh">Chinese</option>
-                </select>
-              </div>
             </div>
           </section>
 
