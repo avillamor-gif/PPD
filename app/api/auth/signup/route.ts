@@ -93,7 +93,7 @@ export async function POST(req: NextRequest) {
         console.log('🔐 [SIGNUP] User preferences created successfully');
       }
 
-      // Send verification email with set-password link
+      // Send verification email with set-password link via Resend
       console.log('🔐 [SIGNUP] Sending set-password email to:', email);
       try {
         const emailResult = await sendSetPasswordEmail(email, displayName, verificationToken);
