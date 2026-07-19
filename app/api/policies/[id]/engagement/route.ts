@@ -3,15 +3,15 @@ import { supabaseAdmin } from '@/lib/supabase-admin';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ policyId: string }> }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { policyId } = await params;
+    const { id } = await params;
 
     const { data, error } = await supabaseAdmin
       .from('policy_engagement')
       .select('engagement_type')
-      .eq('policy_id', policyId);
+      .eq('policy_id', id);
 
     // If table doesn't exist (error 42P01), return empty stats
     if (error?.code === '42P01') {
@@ -44,10 +44,10 @@ async function createEngagementTable() {
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ policyId: string }> }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { policyId } = await params;
+    const { id } = await params;
     const body = await request.json();
     const { engagementType, userId, sessionId } = body;
 
@@ -62,7 +62,7 @@ export async function POST(
     let { data, error } = await supabaseAdmin
       .from('policy_engagement')
       .insert({
-        policy_id: policyId,
+        policy_id: id,
         engagement_type: engagementType,
         user_id: userId || null,
         session_id: sessionId || null,
@@ -78,7 +78,7 @@ export async function POST(
       const retryResult = await supabaseAdmin
         .from('policy_engagement')
         .insert({
-          policy_id: policyId,
+          policy_id: id,
           engagement_type: engagementType,
           user_id: userId || null,
           session_id: sessionId || null,
@@ -94,7 +94,7 @@ export async function POST(
         const stats = await supabaseAdmin
           .from('policy_engagement')
           .select('engagement_type')
-          .eq('policy_id', policyId);
+          .eq('policy_id', id);
 
         const counts = {
           views: stats.data?.filter((e: any) => e.engagement_type === 'view').length || 0,
@@ -115,7 +115,7 @@ export async function POST(
     const statsData = await supabaseAdmin
       .from('policy_engagement')
       .select('engagement_type')
-      .eq('policy_id', policyId);
+      .eq('policy_id', id);
 
     const stats = {
       views: statsData.data?.filter((e: any) => e.engagement_type === 'view').length || 0,
