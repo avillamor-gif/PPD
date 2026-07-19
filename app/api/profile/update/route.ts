@@ -1,10 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@supabase/ssr';
 import { supabaseAdmin } from '@/lib/supabase-admin';
+import { createServerClient } from '@supabase/ssr';
 
 export async function POST(req: NextRequest) {
   try {
-    // Create server client to verify session from cookies
+    // Extract Authorization header
+    const authHeader = req.headers.get('authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const token = authHeader.slice(7); // Remove 'Bearer ' prefix
+
+    // Create server client to verify the token
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL || '',
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
@@ -17,16 +25,15 @@ export async function POST(req: NextRequest) {
       }
     );
 
-    // Get session from cookies
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
+    // Set the auth token to verify the session
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
 
-    if (!session?.user?.id) {
+    if (authError || !user?.id) {
+      console.error('Auth error:', authError);
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const userId = session.user.id;
+    const userId = user.id;
     const body = await req.json();
     const { displayName, bio, organization, countryCode, socialLinks } = body;
 
