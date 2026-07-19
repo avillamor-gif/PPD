@@ -21,17 +21,26 @@ export function BookmarkButton({ policyId, className = '' }: BookmarkButtonProps
       if (session?.user) {
         setUser(session.user);
         // Check if bookmarked
-        const { data } = await supabase
-          .from('policy_bookmarks')
-          .select('id')
-          .eq('user_id', session.user.id)
-          .eq('policy_id', policyId)
-          .single();
-        setIsBookmarked(!!data);
+        checkBookmarkStatus(session.user.id);
       }
     };
     init();
   }, [policyId]);
+
+  const checkBookmarkStatus = async (userId: string) => {
+    try {
+      const response = await fetch('/api/bookmarks', {
+        headers: { 'x-user-id': userId },
+      });
+      if (response.ok) {
+        const { bookmarks } = await response.json();
+        const isCurrentBookmarked = bookmarks.some((b: any) => b.policy_id === policyId);
+        setIsBookmarked(isCurrentBookmarked);
+      }
+    } catch (error) {
+      console.error('Error checking bookmark status:', error);
+    }
+  };
 
   const handleBookmark = async () => {
     if (!user) {
@@ -43,18 +52,26 @@ export function BookmarkButton({ policyId, className = '' }: BookmarkButtonProps
     try {
       if (isBookmarked) {
         // Remove bookmark
-        await supabase
-          .from('policy_bookmarks')
-          .delete()
-          .eq('user_id', user.id)
-          .eq('policy_id', policyId);
-        setIsBookmarked(false);
+        const response = await fetch(`/api/bookmarks?policyId=${policyId}`, {
+          method: 'DELETE',
+          headers: { 'x-user-id': user.id },
+        });
+        if (response.ok) {
+          setIsBookmarked(false);
+        }
       } else {
         // Add bookmark
-        await supabase
-          .from('policy_bookmarks')
-          .insert({ user_id: user.id, policy_id: policyId });
-        setIsBookmarked(true);
+        const response = await fetch('/api/bookmarks', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-user-id': user.id,
+          },
+          body: JSON.stringify({ policyId }),
+        });
+        if (response.ok || response.status === 200) {
+          setIsBookmarked(true);
+        }
       }
     } catch (error) {
       console.error('Bookmark error:', error);

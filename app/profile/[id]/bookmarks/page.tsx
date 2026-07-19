@@ -37,17 +37,47 @@ export default function BookmarksPage() {
               .eq('user_id', userId)
               .order('created_at', { ascending: false });
 
-            if (bookmarkData) {
-              // In a real app, you'd fetch policy details from your policies table
-              setBookmarks(
-                bookmarkData.map((b: any) => ({
-                  id: b.policy_id,
-                  title: `Policy ${b.policy_id}`,
-                  country: 'N/A',
-                  category: 'N/A',
-                  created_at: b.created_at,
-                }))
-              );
+            if (bookmarkData && bookmarkData.length > 0) {
+              // Fetch full policy details for each bookmark
+              const policyIds = bookmarkData.map((b: any) => b.policy_id);
+              
+              const { data: policiesData } = await supabase
+                .from('policies')
+                .select('id, title, country, category');
+
+              if (policiesData && policiesData.length > 0) {
+                // Create a map of policies by ID for quick lookup
+                const policiesMap = new Map(
+                  policiesData.map((p: any) => [
+                    p.id,
+                    { title: p.title, country: p.country, category: p.category },
+                  ])
+                );
+                
+                // Combine bookmark metadata with policy details
+                const bookmarksWithDetails = bookmarkData.map((b: any) => {
+                  const policy = policiesMap.get(b.policy_id) || { title: '', country: '', category: '' };
+                  return {
+                    id: b.policy_id,
+                    title: (policy as any)?.title || `Policy ${b.policy_id}`,
+                    country: (policy as any)?.country || 'N/A',
+                    category: (policy as any)?.category || 'N/A',
+                    created_at: b.created_at,
+                  };
+                });
+                
+                setBookmarks(bookmarksWithDetails);
+              } else {
+                setBookmarks(
+                  bookmarkData.map((b: any) => ({
+                    id: b.policy_id,
+                    title: `Policy ${b.policy_id}`,
+                    country: 'N/A',
+                    category: 'N/A',
+                    created_at: b.created_at,
+                  }))
+                );
+              }
             }
           }
         }
