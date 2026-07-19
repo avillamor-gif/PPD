@@ -48,6 +48,15 @@ export default function ForumModerationPage() {
     checkAdminAccess();
   }, []);
 
+  // Load initial data after admin check passes
+  useEffect(() => {
+    if (!loading) {
+      // Load both comments and threads on initial mount
+      loadComments();
+      loadThreads();
+    }
+  }, []);
+
   useEffect(() => {
     if (!loading) {
       console.log('[MODERATION PAGE] useEffect triggered - loading:', loading, 'activeTab:', activeTab, 'filterStatus:', filterStatus);
