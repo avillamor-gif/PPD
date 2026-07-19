@@ -9,6 +9,22 @@
  */
 
 // Get values from environment variables with fallbacks for development
+const getAppUrl = () => {
+  // Check for explicit NEXT_PUBLIC_APP_URL first (highest priority)
+  if (process.env.NEXT_PUBLIC_APP_URL) {
+    return process.env.NEXT_PUBLIC_APP_URL;
+  }
+
+  // Check for Vercel deployment URL (automatic in Vercel)
+  if (process.env.VERCEL_URL) {
+    // Vercel provides VERCEL_URL without protocol, so add https://
+    return `https://${process.env.VERCEL_URL}`;
+  }
+
+  // Fallback to localhost for local development
+  return 'http://localhost:3000';
+};
+
 const config = {
   // Email Configuration
   email: {
@@ -21,7 +37,7 @@ const config = {
 
   // App URLs
   app: {
-    url: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+    url: getAppUrl(),
   },
 
   // Auth Configuration
