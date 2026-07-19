@@ -81,6 +81,8 @@ export async function GET(request: NextRequest) {
 
     if (error) throw error;
 
+    console.log('[API] Admin comments - Total in DB:', count, '| Returned:', comments?.length || 0, '| First comment:', comments?.[0]);
+
     return NextResponse.json({
       comments: comments || [],
       total: count || 0,

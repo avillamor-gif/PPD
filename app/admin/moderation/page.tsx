@@ -50,6 +50,7 @@ export default function ForumModerationPage() {
 
   useEffect(() => {
     if (!loading) {
+      console.log('[MODERATION PAGE] useEffect triggered - loading:', loading, 'activeTab:', activeTab, 'filterStatus:', filterStatus);
       if (activeTab === 'comments') {
         loadComments();
       } else {
@@ -58,7 +59,7 @@ export default function ForumModerationPage() {
     }
   }, [loading, activeTab, filterStatus]);
 
-  const checkAdminAccess = async () => {
+      const checkAdminAccess = async () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
@@ -74,11 +75,12 @@ export default function ForumModerationPage() {
 
       // Check if role_id is 1 (admin) or 2 (moderator)
       if (profile?.role_id !== 1 && profile?.role_id !== 2) {
-        console.log('User role_id:', profile?.role_id, '(not admin/moderator)');
+        console.log('[MODERATION PAGE] User role_id:', profile?.role_id, '(not admin/moderator)');
         router.push('/');
         return;
       }
 
+      console.log('[MODERATION PAGE] Admin access granted - loading comments');
       setLoading(false);
     } catch (error) {
       console.error('Access check error:', error);
@@ -104,13 +106,19 @@ export default function ForumModerationPage() {
       });
 
       const data = await response.json();
+      console.log('[MODERATION PAGE] API response:', data);
+      
       let filteredComments = data.comments || [];
+      console.log('[MODERATION PAGE] Total comments from API:', filteredComments.length);
 
       if (filterStatus === 'deleted') {
         filteredComments = filteredComments.filter((c: Comment) => c.is_deleted);
       } else if (filterStatus === 'all') {
         filteredComments = filteredComments.filter((c: Comment) => !c.is_deleted);
       }
+
+      console.log('[MODERATION PAGE] Filtered comments (filterStatus=' + filterStatus + '):', filteredComments.length);
+      console.log('[MODERATION PAGE] Comments to display:', filteredComments);
 
       setComments(filteredComments);
     } catch (error) {
