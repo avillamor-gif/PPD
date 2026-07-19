@@ -43,10 +43,22 @@ export default function ThreadDetail({
     loadComments();
   }, [threadId]);
 
+  useEffect(() => {
+    // Scroll to comments section if hash matches
+    if (typeof window !== 'undefined' && window.location.hash === '#discussion-comments' && !loading) {
+      setTimeout(() => {
+        const element = document.getElementById('discussion-comments');
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 100);
+    }
+  }, [loading]);
+
   const checkAuth = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
-      router.push(`/auth/login?redirect=/policies/${policyId}/discuss/${threadId}`);
+      router.push(`/auth/login?redirect=/policies/${policyId}/discuss/${threadId}%23discussion-comments`);
       return;
     }
     setUser(user);

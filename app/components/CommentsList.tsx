@@ -113,7 +113,7 @@ export function CommentsList({
         <MessageCircle className="w-12 h-12 text-ink/30 mx-auto mb-3" />
         <p className="text-ink/60 mb-4">Sign in to view comments and join the discussion</p>
         <Link
-          href={`/auth/login?redirect=${encodeURIComponent(typeof window !== 'undefined' ? window.location.pathname + window.location.search : '')}`}
+          href={`/auth/login?redirect=${encodeURIComponent((typeof window !== 'undefined' ? (window.location.pathname + window.location.search) : '') + '#discussion-comments')}`}
           className="inline-flex px-6 py-2 rounded-lg bg-ocean text-white font-semibold hover:bg-ocean/90 transition"
         >
           Sign In
@@ -145,7 +145,7 @@ export function CommentsList({
   }
 
   return (
-    <div className="space-y-4">
+    <div id="discussion-comments" className="space-y-4">
       {comments.map((comment) => (
         <div key={comment.id} className="rounded-lg border border-ink/10 bg-white p-6">
           <div className="flex items-start gap-4">

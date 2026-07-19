@@ -31,6 +31,18 @@ export default function PolicyDiscussionsPage({
   const router = useRouter();
 
   useEffect(() => {
+    // Scroll to hash if present
+    if (typeof window !== 'undefined' && window.location.hash) {
+      const element = document.querySelector(window.location.hash);
+      if (element) {
+        setTimeout(() => {
+          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
+      }
+    }
+  }, [loading]);
+
+  useEffect(() => {
     checkAuth();
     loadPolicy();
     loadThreads();
@@ -149,7 +161,7 @@ export default function PolicyDiscussionsPage({
           )}
           {!user && (
             <Link
-              href={`/auth/login?redirect=${encodeURIComponent(`/policies/${params.id}/discuss`)}`}
+              href={`/auth/login?redirect=${encodeURIComponent(`/policies/${params.id}/discuss#community-discussion`)}`}
               className="inline-block mt-4 text-ocean hover:text-ocean-deep font-medium"
             >
               Log in to join the discussion
