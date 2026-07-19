@@ -58,17 +58,17 @@ export default function FollowersPage() {
         // Fetch followers
         const { data: followersData } = await supabase
           .from('user_follows')
-          .select('follower_id, user_profiles!user_follows_follower_id(id, display_name, avatar_url)')
+          .select('follower_id, follower:user_profiles!follower_id(id, display_name, avatar_url)')
           .eq('following_id', userId);
 
         // Fetch following
         const { data: followingData } = await supabase
           .from('user_follows')
-          .select('following_id, user_profiles!user_follows_following_id(id, display_name, avatar_url)')
+          .select('following_id, following:user_profiles!following_id(id, display_name, avatar_url)')
           .eq('follower_id', userId);
 
-        const followers = followersData?.map((f: any) => f.user_profiles) || [];
-        const following = followingData?.map((f: any) => f.user_profiles) || [];
+        const followers = followersData?.map((f: any) => f.follower) || [];
+        const following = followingData?.map((f: any) => f.following) || [];
 
         setState((prev) => ({
           ...prev,
