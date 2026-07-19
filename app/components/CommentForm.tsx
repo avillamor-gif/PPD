@@ -59,19 +59,31 @@ export function CommentForm({
           .single();
 
         if (!thread) {
-          const { data: newThread, error: threadError } = await supabase
-            .from('discussion_threads')
-            .insert({
-              policy_id: policyId,
-              title: `Discussion on Policy`,
-              author_id: currentUser.id,
-              status: 'open',
-            })
-            .select()
-            .single();
+          const { data: { session } } = await supabase.auth.getSession();
+          if (!session?.access_token) {
+            throw new Error('Not authenticated');
+          }
 
-          if (threadError) throw threadError;
-          thread = newThread;
+          const response = await fetch('/api/discussions/create', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${session.access_token}`,
+            },
+            body: JSON.stringify({
+              policyId,
+              title: 'Discussion on Policy',
+              description: null,
+            }),
+          });
+
+          if (!response.ok) {
+            const data = await response.json();
+            throw new Error(data.error || 'Failed to create discussion');
+          }
+
+          const result = await response.json();
+          thread = { id: result.threadId };
         }
         commentThreadId = thread.id;
       }
@@ -80,17 +92,29 @@ export function CommentForm({
         throw new Error('No thread or policy provided');
       }
 
-      // Insert comment
-      const { error: commentError } = await supabase
-        .from('comments')
-        .insert({
-          thread_id: commentThreadId,
-          policy_id: policyId,
-          author_id: currentUser.id,
-          content: content.trim(),
-        });
+      // Post comment via API endpoint
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        throw new Error('Not authenticated');
+      }
 
-      if (commentError) throw commentError;
+      const response = await fetch('/api/comments/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          threadId: commentThreadId,
+          policyId: policyId || null,
+          content: content.trim(),
+        }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to post comment');
+      }
 
       setSuccess(true);
       setContent('');
