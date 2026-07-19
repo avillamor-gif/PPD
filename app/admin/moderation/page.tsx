@@ -54,7 +54,7 @@ export default function ForumModerationPage() {
         loadThreads();
       }
     }
-  }, [activeTab, filterStatus]);
+  }, [loading, activeTab, filterStatus]);
 
   const checkAdminAccess = async () => {
     try {
