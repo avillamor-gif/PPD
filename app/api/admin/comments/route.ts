@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+import { supabaseAdmin } from '@/lib/supabase-admin';
 
 export async function GET(request: NextRequest) {
   try {
@@ -20,7 +16,7 @@ export async function GET(request: NextRequest) {
     console.log('[API] Extracted token (first 20 chars):', token.substring(0, 20) + '...');
 
     // Verify the token
-    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
     console.log('[API] User verification - Error:', authError, 'User:', user?.id);
     if (authError || !user) {
       console.log('[API] Auth failed:', authError?.message);
@@ -28,7 +24,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Verify admin role - check role_id directly (1 = admin, 2 = moderator)
-    const { data: profile, error: profileError } = await supabase
+    const { data: profile, error: profileError } = await supabaseAdmin
       .from('user_profiles')
       .select('role_id')
       .eq('id', user.id)
@@ -55,7 +51,7 @@ export async function GET(request: NextRequest) {
     const offset = parseInt(url.searchParams.get('offset') || '0');
 
     // Build query
-    let query = supabase
+    let query = supabaseAdmin
       .from('comments')
       .select(`
         id,
