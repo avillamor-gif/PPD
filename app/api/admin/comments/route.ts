@@ -1,50 +1,40 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@supabase/ssr';
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 export async function GET(request: NextRequest) {
   try {
-    // Create Supabase client
-    let response = NextResponse.next();
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        cookies: {
-          getAll() {
-            const cookieHeader = request.headers.get('cookie') || '';
-            const cookies = cookieHeader.split(';').map(c => {
-              const [name, ...rest] = c.trim().split('=');
-              return {
-                name: name.trim(),
-                value: decodeURIComponent(rest.join('=').trim()),
-              };
-            });
-            return cookies;
-          },
-          setAll(cookiesToSet) {
-            cookiesToSet.forEach(({ name, value, options }) => {
-              response.cookies.set(name, value, options as any);
-            });
-          },
-        },
-      }
-    );
-
-    // Check admin auth
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session?.user) {
+    // Get the authorization header
+    const authHeader = request.headers.get('authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Verify admin role
-    const { data: profile } = await supabase
+    const token = authHeader.substring(7);
+
+    // Verify the token
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    if (authError || !user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Verify admin role - check role_id directly (1 = admin, 2 = moderator)
+    const { data: profile, error: profileError } = await supabase
       .from('user_profiles')
-      .select('role:roles(name)')
-      .eq('id', session.user.id)
+      .select('role_id')
+      .eq('id', user.id)
       .single();
 
-    const profileData = profile as any;
-    if (profileData?.role?.name !== 'admin' && profileData?.role?.name !== 'moderator') {
+    if (profileError || !profile) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // role_id 1 = admin, 2 = moderator
+    if (profile.role_id !== 1 && profile.role_id !== 2) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
