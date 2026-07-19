@@ -29,6 +29,10 @@ export type Database = {
           organization: string | null;
           role_id: number;
           email_verified: boolean;
+          expertise_areas: string[] | null;
+          social_links: Record<string, string>;
+          follower_count: number;
+          following_count: number;
           created_at: string;
           updated_at: string;
         };
@@ -42,6 +46,10 @@ export type Database = {
           organization?: string;
           role_id?: number;
           email_verified?: boolean;
+          expertise_areas?: string[];
+          social_links?: Record<string, string>;
+          follower_count?: number;
+          following_count?: number;
         };
         Update: {
           full_name?: string;
@@ -52,6 +60,10 @@ export type Database = {
           organization?: string;
           role_id?: number;
           email_verified?: boolean;
+          expertise_areas?: string[];
+          social_links?: Record<string, string>;
+          follower_count?: number;
+          following_count?: number;
         };
       };
       user_preferences: {
