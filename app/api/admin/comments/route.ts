@@ -50,14 +50,13 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(url.searchParams.get('limit') || '50');
     const offset = parseInt(url.searchParams.get('offset') || '0');
 
-    // Build query
+    // Build query - simplified without relationship expansion first
     let query = supabaseAdmin
       .from('comments')
       .select(`
         id,
         content,
         author_id,
-        author:user_profiles(display_name),
         thread_id,
         created_at,
         is_deleted,
@@ -80,10 +79,33 @@ export async function GET(request: NextRequest) {
       throw error;
     }
 
-    console.log('[API] Admin comments - Total in DB:', count, '| Returned:', comments?.length || 0, '| First comment:', comments?.[0]);
+    // Fetch author data for each comment
+    const commentsWithAuthors = await Promise.all(
+      (comments || []).map(async (comment: any) => {
+        try {
+          const { data: author } = await supabaseAdmin
+            .from('user_profiles')
+            .select('display_name')
+            .eq('id', comment.author_id)
+            .single();
+          return {
+            ...comment,
+            author: author ? { display_name: author.display_name } : { display_name: 'Unknown User' },
+          };
+        } catch (err) {
+          console.warn('[API] Error fetching author for comment:', comment.id, err);
+          return {
+            ...comment,
+            author: { display_name: 'Unknown User' },
+          };
+        }
+      })
+    );
+
+    console.log('[API] Admin comments - Total in DB:', count, '| Returned:', commentsWithAuthors?.length || 0, '| First comment:', commentsWithAuthors?.[0]);
 
     return NextResponse.json({
-      comments: comments || [],
+      comments: commentsWithAuthors || [],
       total: count || 0,
       limit,
       offset,
