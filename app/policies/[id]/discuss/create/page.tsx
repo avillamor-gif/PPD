@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { supabaseAdmin } from '@/lib/supabase-admin';
 import { MessageSquare, ArrowLeft, AlertCircle } from 'lucide-react';
 
 export default function CreateThreadPage({
@@ -46,34 +45,31 @@ export default function CreateThreadPage({
         throw new Error('You must be logged in');
       }
 
-      // Create thread
-      const { data, error: insertError } = await supabase
-        .from('discussion_threads')
-        .insert({
-          policy_id: params.id,
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        throw new Error('Not authenticated');
+      }
+
+      const response = await fetch('/api/discussions/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          policyId: params.id,
           title: title.trim(),
           description: description.trim() || null,
-          author_id: user.id,
-          status: 'open',
-        })
-        .select('id')
-        .single();
+        }),
+      });
 
-      if (insertError) throw insertError;
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to create discussion');
+      }
 
-      // Log audit event
-      await supabaseAdmin
-        .from('audit_logs')
-        .insert({
-          actor_id: user.id,
-          action: 'thread_created',
-          resource_type: 'thread',
-          resource_id: data.id,
-        });
-
-      router.push(
-        `/policies/${params.id}/discuss/${data.id}`
-      );
+      const result = await response.json();
+      router.push(`/policies/${params.id}/discuss/${result.threadId}`);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : 'Failed to create thread'

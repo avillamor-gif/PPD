@@ -95,17 +95,28 @@ export function PolicyForumSection({ policyId }: { policyId: string }) {
         throw new Error('You must be logged in');
       }
 
-      const { error: insertError } = await supabase
-        .from('discussion_threads')
-        .insert({
-          policy_id: policyId,
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        throw new Error('Not authenticated');
+      }
+
+      const response = await fetch('/api/discussions/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          policyId,
           title: formData.title.trim(),
           description: formData.description.trim() || null,
-          author_id: user.id,
-          status: 'open',
-        });
+        }),
+      });
 
-      if (insertError) throw insertError;
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to create discussion');
+      }
 
       setFormData({ title: '', description: '' });
       setShowCreateForm(false);
