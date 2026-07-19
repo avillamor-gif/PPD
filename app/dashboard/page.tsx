@@ -67,11 +67,13 @@ export default function DashboardPage() {
           }
 
           // Fetch activity
-          const activityRes = await fetch('/api/activity', {
-            headers: { 'x-user-id': session.user.id },
+          const activityRes = await fetch(`/api/activity?type=user&userId=${session.user.id}`, {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            },
           });
           if (activityRes.ok) {
-            const { activity: data } = await activityRes.json();
+            const { activities: data } = await activityRes.json();
             setActivity(data || []);
           }
 

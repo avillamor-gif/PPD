@@ -8,22 +8,20 @@ const supabase = createClient(
 
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
-    const userId = searchParams.get('userId');
-
+    const userId = request.headers.get('x-user-id');
     if (!userId) {
-      return NextResponse.json({ error: 'userId is required' }, { status: 400 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // Get follower count
     const { count: followerCount } = await supabase
-      .from('user_follows')
+      .from('user_followers')
       .select('*', { count: 'exact' })
       .eq('following_id', userId);
 
     // Get following count
     const { count: followingCount } = await supabase
-      .from('user_follows')
+      .from('user_followers')
       .select('*', { count: 'exact' })
       .eq('follower_id', userId);
 
@@ -61,7 +59,7 @@ export async function POST(request: NextRequest) {
 
     // Add follow
     const { error } = await supabase
-      .from('user_follows')
+      .from('user_followers')
       .insert({
         follower_id: user.id,
         following_id: targetUserId,
@@ -94,15 +92,14 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { searchParams } = new URL(request.url);
-    const targetUserId = searchParams.get('targetUserId');
+    const { targetUserId } = await request.json();
     if (!targetUserId) {
       return NextResponse.json({ error: 'targetUserId is required' }, { status: 400 });
     }
 
     // Remove follow
     const { error } = await supabase
-      .from('user_follows')
+      .from('user_followers')
       .delete()
       .eq('follower_id', user.id)
       .eq('following_id', targetUserId);
