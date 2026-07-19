@@ -299,6 +299,12 @@ export type Database = {
           id: string;
           email: string;
           display_name: string;
+          full_name: string | null;
+          avatar_url: string | null;
+          bio: string | null;
+          country_code: string | null;
+          organization: string | null;
+          social_links: Record<string, string>;
           role: string;
           thread_count: number;
           comment_count: number;

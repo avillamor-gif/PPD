@@ -271,6 +271,12 @@ SELECT
   u.id,
   u.email,
   up.display_name,
+  up.full_name,
+  up.avatar_url,
+  up.bio,
+  up.country_code,
+  up.organization,
+  up.social_links,
   r.name as role,
   COUNT(DISTINCT t.id) as thread_count,
   COUNT(DISTINCT c.id) as comment_count,
@@ -281,7 +287,7 @@ LEFT JOIN user_profiles up ON u.id = up.id
 LEFT JOIN roles r ON up.role_id = r.id
 LEFT JOIN discussion_threads t ON u.id = t.author_id AND t.deleted_at IS NULL
 LEFT JOIN comments c ON u.id = c.author_id AND c.is_deleted = FALSE
-GROUP BY u.id, u.email, up.display_name, up.id, r.name;
+GROUP BY u.id, u.email, up.display_name, up.full_name, up.avatar_url, up.bio, up.country_code, up.organization, up.social_links, up.id, r.name, up.created_at;
 
 -- ============================================
 -- 13. ROW LEVEL SECURITY (RLS)
