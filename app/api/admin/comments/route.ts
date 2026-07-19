@@ -68,13 +68,8 @@ export async function GET(request: NextRequest) {
         is_deleted,
         vote_count,
         reply_count
-      `)
+      `, { count: 'exact' })
       .order('created_at', { ascending: false });
-
-    if (flaggedOnly) {
-      // Join with flags
-      query = query.eq('flagged', true);
-    }
 
     if (threadId) {
       query = query.eq('thread_id', threadId);
