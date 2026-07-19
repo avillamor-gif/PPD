@@ -86,18 +86,30 @@ export default function EditProfilePage() {
         throw new Error('Display name is required');
       }
 
-      const { error: updateError } = await supabase
-        .from('user_profiles')
-        .update({
-          display_name: displayName,
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) {
+        throw new Error('Not authenticated');
+      }
+
+      const response = await fetch('/api/profile/update', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          displayName: displayName.trim(),
           bio: bio || null,
           organization: organization || null,
-          country_code: countryCode || null,
-          social_links: socialLinks,
-        })
-        .eq('id', user.id);
+          countryCode: countryCode || null,
+          socialLinks: socialLinks || {},
+        }),
+      });
 
-      if (updateError) throw updateError;
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to save profile');
+      }
 
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
@@ -334,14 +346,15 @@ export default function EditProfilePage() {
 
                 {/* Social Links */}
                 <div className="border-t border-ink/10 pt-4 mt-4">
-                  <h3 className="text-sm font-semibold text-ink mb-3">Social Links</h3>
+                  <h3 className="text-sm font-semibold text-ink mb-1">Social Links</h3>
+                  <p className="text-xs text-ink/50 mb-3">Optional - Add your social media profiles</p>
                   <div className="space-y-3">
-                    {['twitter', 'linkedin', 'github', 'website'].map((platform) => (
+                    {['twitter', 'linkedin', 'facebook', 'website'].map((platform) => (
                       <div key={platform}>
                         <label className="block text-sm font-medium text-ink mb-1 capitalize">{platform}</label>
                         <input
                           type="url"
-                          placeholder={`https://${platform}.com/yourprofile`}
+                          placeholder={`https://${platform === 'facebook' ? 'facebook.com' : platform}.com/yourprofile`}
                           value={socialLinks[platform] || ''}
                           onChange={(e) => setSocialLinks({ ...socialLinks, [platform]: e.target.value })}
                           className="w-full rounded-lg border border-ink/20 bg-paper px-4 py-2 text-ink placeholder:text-ink/40 focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20 transition"
