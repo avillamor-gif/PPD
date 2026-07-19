@@ -128,6 +128,26 @@ export function PolicyForumSection({ policyId }: { policyId: string }) {
     }
   };
 
+  if (!user) {
+    return (
+      <div className="rounded-xl border border-coral/20 bg-white p-8 space-y-6">
+        <h2 className="text-2xl font-bold text-ink flex items-center gap-2">
+          <MessageCircle className="w-6 h-6 text-coral" />
+          Community Discussion
+        </h2>
+        <div className="text-center py-8">
+          <p className="text-ink/60 mb-4">Sign in to view and participate in community discussions</p>
+          <Link
+            href="/auth/login"
+            className="inline-flex px-6 py-2 rounded-lg bg-coral text-white font-semibold hover:bg-coral/90 transition"
+          >
+            Sign In to Join Discussion
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="rounded-xl border border-coral/20 bg-white p-8 space-y-6">
       <h2 className="text-2xl font-bold text-ink flex items-center gap-2">

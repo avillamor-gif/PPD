@@ -45,6 +45,10 @@ export default function ThreadDetail({
 
   const checkAuth = async () => {
     const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      router.push(`/auth/login?redirect=/policies/${policyId}/discuss/${threadId}`);
+      return;
+    }
     setUser(user);
     setCanReply(!!user);
   };

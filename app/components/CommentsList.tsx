@@ -18,6 +18,7 @@ export function CommentsList({
   const [comments, setComments] = useState<any[]>(initialComments || []);
   const [loading, setLoading] = useState(!initialComments);
   const [currentUser, setCurrentUser] = useState<any>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
     if (!initialComments) {
@@ -29,6 +30,7 @@ export function CommentsList({
   const getCurrentUser = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     setCurrentUser(user);
+    setIsAuthenticated(!!user);
   };
 
   const loadComments = async () => {
@@ -104,6 +106,21 @@ export function CommentsList({
       console.error('Error voting:', err);
     }
   };
+
+  if (!isAuthenticated) {
+    return (
+      <div className="rounded-lg border border-ink/10 bg-paper p-8 text-center">
+        <MessageCircle className="w-12 h-12 text-ink/30 mx-auto mb-3" />
+        <p className="text-ink/60 mb-4">Sign in to view comments and join the discussion</p>
+        <Link
+          href="/auth/login"
+          className="inline-flex px-6 py-2 rounded-lg bg-ocean text-white font-semibold hover:bg-ocean/90 transition"
+        >
+          Sign In
+        </Link>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
