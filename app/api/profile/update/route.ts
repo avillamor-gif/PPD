@@ -1,15 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { createServerClient } from '@supabase/ssr';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 
 export async function POST(req: NextRequest) {
   try {
-    const { data: { user } } = await supabase.auth.getUser();
+    // Create server client to verify session from cookies
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
+      {
+        cookies: {
+          get(name: string) {
+            return req.cookies.get(name)?.value;
+          },
+        },
+      }
+    );
 
-    if (!user) {
+    // Get session from cookies
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const userId = session.user.id;
     const body = await req.json();
     const { displayName, bio, organization, countryCode, socialLinks } = body;
 
@@ -28,7 +45,7 @@ export async function POST(req: NextRequest) {
         social_links: socialLinks || {},
         updated_at: new Date().toISOString(),
       })
-      .eq('id', user.id)
+      .eq('id', userId)
       .select()
       .single();
 
