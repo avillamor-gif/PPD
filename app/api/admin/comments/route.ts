@@ -10,15 +10,20 @@ export async function GET(request: NextRequest) {
   try {
     // Get the authorization header
     const authHeader = request.headers.get('authorization');
+    console.log('[API] Auth header present:', !!authHeader);
     if (!authHeader?.startsWith('Bearer ')) {
+      console.log('[API] Invalid auth header format');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const token = authHeader.substring(7);
+    console.log('[API] Extracted token (first 20 chars):', token.substring(0, 20) + '...');
 
     // Verify the token
     const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    console.log('[API] User verification - Error:', authError, 'User:', user?.id);
     if (authError || !user) {
+      console.log('[API] Auth failed:', authError?.message);
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -29,14 +34,18 @@ export async function GET(request: NextRequest) {
       .eq('id', user.id)
       .single();
 
+    console.log('[API] Profile query - Error:', profileError, 'Role ID:', profile?.role_id);
     if (profileError || !profile) {
+      console.log('[API] Profile fetch failed:', profileError?.message);
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // role_id 1 = admin, 2 = moderator
     if (profile.role_id !== 1 && profile.role_id !== 2) {
+      console.log('[API] Insufficient permissions - role_id:', profile.role_id);
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
+    console.log('[API] Authorization successful for user:', user.id);
 
     // Query parameters
     const url = new URL(request.url);
@@ -65,11 +74,16 @@ export async function GET(request: NextRequest) {
       query = query.eq('thread_id', threadId);
     }
 
+    console.log('[API] Executing comments query with range:', offset, '-', offset + limit - 1);
     const { data: comments, error, count } = await query
       .range(offset, offset + limit - 1)
       .limit(limit);
 
-    if (error) throw error;
+    console.log('[API] Query result - Error:', error?.message, 'Count:', count, 'Comments returned:', comments?.length);
+    if (error) {
+      console.log('[API] Query error details:', error);
+      throw error;
+    }
 
     console.log('[API] Admin comments - Total in DB:', count, '| Returned:', comments?.length || 0, '| First comment:', comments?.[0]);
 
