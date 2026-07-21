@@ -6,7 +6,6 @@ import { PolicyForumSection } from '@/app/components/PolicyForumSection';
 import { AdminEditButton } from '@/app/components/AdminEditButton';
 import { PolicyImplementationStatus } from '@/app/components/PolicyImplementationStatus';
 import { PolicyShareCard } from '@/app/components/PolicyShareCard';
-import { PolicyEngagementCard } from '@/app/components/PolicyEngagementCard';
 import { BookmarkButton } from '@/app/components/BookmarkButton';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 
@@ -242,9 +241,6 @@ export default async function PolicyPage({ params }: { params: Promise<{ id: str
               title={policy.title}
               url={`https://ppd-pink.vercel.app/policies/${policy.slug}`}
             />
-
-            {/* Engagement Card */}
-            <PolicyEngagementCard policyId={policy.id} />
 
             {/* Key Words Card */}
             <div className="rounded-xl border border-ink/10 bg-white p-6 space-y-3">

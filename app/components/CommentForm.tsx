@@ -186,7 +186,7 @@ export function CommentForm({
           <button
             type="submit"
             disabled={loading || !content.trim()}
-            className="inline-flex items-center gap-2 px-6 py-2 rounded-lg bg-ocean text-white font-semibold hover:bg-ocean/90 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="inline-flex items-center gap-2 px-6 py-2 rounded-lg bg-ink text-paper font-semibold hover:bg-ink/90 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? 'Posting...' : 'Post Comment'}
             {!loading && <Send className="w-4 h-4" />}
