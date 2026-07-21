@@ -24,18 +24,21 @@ export const metadata = {
 
 export default async function PolicyPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  console.log(`[POLICY PAGE] Received id parameter: "${id}" (length: ${id.length})`);
   
   // Fetch policy from Supabase using admin client
   // Try to find by slug first, then by id (for backwards compatibility)
   try {
+    console.log(`[POLICY PAGE] Attempting to find policy with slug: "${id}"`);
     let { data: policy, error } = await supabaseAdmin
       .from('policies')
       .select()
       .eq('slug', id)
       .single();
 
-    // If not found by slug, try by id
+    console.log(`[POLICY PAGE] Slug query result - Error: ${error?.message}, Found: ${!!policy}`);
     if (error || !policy) {
+      console.log(`[POLICY PAGE] Slug not found, trying by id: "${id}"`);
       const result = await supabaseAdmin
         .from('policies')
         .select()
@@ -43,9 +46,11 @@ export default async function PolicyPage({ params }: { params: Promise<{ id: str
         .single();
       policy = result.data;
       error = result.error;
+      console.log(`[POLICY PAGE] ID query result - Error: ${error?.message}, Found: ${!!policy}`);
     }
 
     if (error || !policy) {
+      console.log(`[POLICY PAGE] Policy not found! Returning 404`);
       return notFound();
     }
 
