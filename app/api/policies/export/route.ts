@@ -96,9 +96,11 @@ export async function GET(req: NextRequest) {
 
     console.log(`📥 [EXPORT] Found ${filteredPolicies.length} policies, generating Excel...`);
 
-    // Format policies for export - convert country codes to full names
+    // Format policies for export - convert country codes to full names and add region
     const exportData: PolicyExportData[] = filteredPolicies.map((p: any) => {
-      const countryName = COUNTRIES.find(c => c.code === p.country)?.name || p.country;
+      const countryData = COUNTRIES.find(c => c.code === p.country);
+      const countryName = countryData?.name || p.country;
+      const region = countryData?.region || '';
       
       // Format date as "June 6, 2023"
       let formattedDate = '';
@@ -115,9 +117,10 @@ export async function GET(req: NextRequest) {
         id: p.id,
         slug: p.slug,
         title: p.title,
-        commencement_date: formattedDate,
         country: countryName,
+        region: region,
         level: p.level,
+        commencement_date: formattedDate,
         category: p.category,
         status: p.status,
         lifecycle_stage: p.lifecycle_stage,
