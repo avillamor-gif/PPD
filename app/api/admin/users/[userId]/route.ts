@@ -158,7 +158,7 @@ export async function DELETE(
     if (deleteError) {
       console.error('🗑️ [DELETE] Auth deletion error:', deleteError);
       return NextResponse.json(
-        { error: `Failed to delete user: ${deleteError.message}` },
+        { error: `Auth deletion failed: ${deleteError.message || JSON.stringify(deleteError)}` },
         { status: 400 }
       );
     }

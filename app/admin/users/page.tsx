@@ -216,11 +216,16 @@ export default function UserManagementPage() {
         },
       });
 
-      const data = await response.json();
+      let data;
+      try {
+        data = await response.json();
+      } catch {
+        data = {};
+      }
       console.log('🗑️ Delete response:', { status: response.status, data });
 
       if (!response.ok) {
-        const errorMsg = data.error || data.message || 'Failed to delete user';
+        const errorMsg = data?.error || data?.message || `Server error (${response.status})`;
         console.error('🗑️ Delete failed:', errorMsg);
         setErrorMessage(`✗ ${errorMsg}`);
         return;
