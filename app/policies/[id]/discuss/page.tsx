@@ -45,16 +45,12 @@ export default function PolicyDiscussionsPage({
   useEffect(() => {
     checkAuth();
     loadPolicy();
-    loadThreads();
   }, [params.id]);
 
   const checkAuth = async () => {
     const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      router.push('/auth/login');
-      return;
-    }
     setUser(user);
+    // Don't redirect - discussions are public, login only needed to post
   };
 
   const loadPolicy = async () => {
@@ -63,32 +59,28 @@ export default function PolicyDiscussionsPage({
       if (res.ok) {
         const data = await res.json();
         setPolicy(data);
+        // Now load threads with the actual policy ID
+        loadThreads(data.id);
       }
     } catch (error) {
       console.error('Error loading policy:', error);
     }
   };
 
-  const loadThreads = async () => {
+  const loadThreads = async (policyId?: string) => {
     try {
-      const { data, error } = await supabase
-        .from('discussion_threads')
-        .select(`
-          *,
-          author:user_profiles(display_name)
-        `)
-        .eq('policy_id', params.id)
-        .is('deleted_at', null)
-        .order('is_pinned', { ascending: false })
-        .order('created_at', { ascending: false });
+      // Use the actual policy ID, not the slug
+      const actualPolicyId = policyId || policy?.id || params.id;
+      
+      const response = await fetch(`/api/discussions?policyId=${actualPolicyId}`, {
+        cache: 'no-store',
+      });
 
-      if (error) throw error;
+      if (!response.ok) {
+        throw new Error('Failed to fetch discussions');
+      }
 
-      const threadsWithAuthor = (data || []).map((t: any) => ({
-        ...t,
-        display_name: t.author?.display_name || 'Unknown User',
-      }));
-
+      const threadsWithAuthor = await response.json();
       setThreads(threadsWithAuthor);
     } catch (error) {
       console.error('Load threads error:', error);

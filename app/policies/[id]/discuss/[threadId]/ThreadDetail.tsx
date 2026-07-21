@@ -175,88 +175,118 @@ export default function ThreadDetail({
   }
 
   return (
-    <div className="space-y-8 max-w-3xl mx-auto px-6 py-8 lg:px-0">
-      {/* Back link */}
-      <Link
-        href={`/policies/${policyId}/discuss`}
-        className="inline-flex items-center gap-2 text-ocean hover:text-ocean-deep transition"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        Back to discussions
-      </Link>
-
-      {/* Thread header */}
-      <div className="space-y-4">
-        <div className="flex items-center gap-2 flex-wrap">
-          {thread.is_pinned && (
-            <span className="px-2 py-1 rounded text-xs font-mono bg-coral/10 text-coral">
-              PINNED
-            </span>
-          )}
-          <span
-            className={`px-2 py-1 rounded text-xs font-mono ${
-              thread.status === 'closed'
-                ? 'bg-ink/10 text-ink/60'
-                : 'bg-ocean/10 text-ocean'
-            }`}
+    <div className="w-full">
+      {/* Header Navigation */}
+      <div className="border-b border-rule bg-paper">
+        <div className="mx-auto max-w-350 px-6 py-4 lg:px-10">
+          <Link 
+            href={`/policies/${policyId}/discuss`}
+            className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em] text-ink/60 hover:text-coral transition"
           >
-            {thread.status}
-          </span>
-        </div>
-        <h1 className="text-4xl font-bold text-ink">{thread.title}</h1>
-        {thread.description && (
-          <p className="text-lg text-ink/60">{thread.description}</p>
-        )}
-        <div className="flex items-center gap-3 pt-4 border-t border-ink/10">
-          {thread.avatar_url && (
-            <img
-              src={thread.avatar_url}
-              alt={thread.display_name}
-              className="w-10 h-10 rounded-full"
-            />
-          )}
-          <div>
-            <p className="font-medium text-ink">{thread.display_name}</p>
-            <p className="text-sm text-ink/50">
-              {new Date(thread.created_at).toLocaleDateString()} at{' '}
-              {new Date(thread.created_at).toLocaleTimeString()}
-            </p>
-          </div>
+            <ArrowLeft className="w-4 h-4" />
+            Back to discussions
+          </Link>
         </div>
       </div>
 
-      <hr className="border-ink/10" />
+      {/* Thread Hero Section */}
+      <section className="border-b border-rule bg-paper">
+        <div className="mx-auto max-w-350 px-6 py-12 lg:px-10">
+          <div className="space-y-8">
+            {/* Status & Title */}
+            <div className="space-y-6">
+              <div className="flex flex-wrap items-center gap-3">
+                {thread.is_pinned && (
+                  <span className="inline-flex px-3 py-1 rounded-full text-xs font-semibold border bg-coral/10 text-coral border-coral/20">
+                    PINNED
+                  </span>
+                )}
+                <span
+                  className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold border ${
+                    thread.status === 'closed'
+                      ? 'bg-ink/5 text-ink/60 border-ink/10'
+                      : 'bg-ocean/10 text-ocean border-ocean/20'
+                  }`}
+                >
+                  {thread.status.toUpperCase()}
+                </span>
+              </div>
+              
+              <div>
+                <h1 className="text-4xl font-bold text-ink leading-tight">
+                  {thread.title}
+                </h1>
+              </div>
 
-      {/* Comments section */}
-      <div className="space-y-6">
-        <div>
-          <h2 className="text-2xl font-bold text-ink">
-            {thread.comment_count} {thread.comment_count === 1 ? 'Comment' : 'Comments'}
-          </h2>
+              {thread.description && (
+                <p className="text-lg text-ink/70 max-w-2xl">
+                  {thread.description}
+                </p>
+              )}
+
+              {/* Author Info */}
+              <div className="flex items-center gap-4 pt-6 border-t border-ink/10">
+                {thread.avatar_url && (
+                  <img
+                    src={thread.avatar_url}
+                    alt={thread.display_name}
+                    className="w-12 h-12 rounded-full object-cover"
+                  />
+                )}
+                <div>
+                  <p className="font-semibold text-ink">{thread.display_name}</p>
+                  <p className="text-xs uppercase tracking-wider text-ink/60 font-mono">
+                    {new Date(thread.created_at).toLocaleDateString()} at{' '}
+                    {new Date(thread.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+      </section>
 
-        {/* Reply form */}
-        {canReply && thread.status !== 'closed' && (
-          <div className="p-6 rounded-lg border border-ink/10 bg-sand/5">
-            <CommentForm threadId={threadId} onCommentPosted={handleCommentPosted} onCommentAdded={loadComments} />
-          </div>
-        )}
+      {/* Comments Section */}
+      <section className="border-b border-rule">
+        <div className="mx-auto max-w-350 px-6 py-12 lg:px-10">
+          <div className="space-y-8">
+            {/* Comments Count */}
+            <div>
+              <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+                Discussion
+              </div>
+              <h2 className="mt-2 font-fraunces text-3xl font-semibold text-ink">
+                {thread.comment_count} {thread.comment_count === 1 ? 'Comment' : 'Comments'}
+              </h2>
+            </div>
 
-        {thread.status === 'closed' && (
-          <div className="p-4 rounded-lg bg-ink/5 border border-ink/10 text-ink/60 text-sm">
-            This thread is closed. No new comments can be added.
-          </div>
-        )}
+            {/* Status message for closed threads */}
+            {thread.status === 'closed' && (
+              <div className="p-6 rounded-xl border border-ink/10 bg-ink/5">
+                <p className="text-sm text-ink/60 font-medium">
+                  This thread is closed. No new comments can be added.
+                </p>
+              </div>
+            )}
 
-        {/* Comments list */}
-        {comments.length > 0 ? (
-          <CommentsList comments={comments} threadId={threadId} />
-        ) : (
-          <div className="text-center py-12 text-ink/60">
-            No comments yet. Be the first to comment!
+            {/* Reply form */}
+            {canReply && thread.status !== 'closed' && (
+              <div className="p-6 rounded-xl border border-ink/10 bg-white/50">
+                <CommentForm threadId={threadId} onCommentPosted={handleCommentPosted} onCommentAdded={loadComments} />
+              </div>
+            )}
+
+            {/* Comments list */}
+            {comments.length > 0 ? (
+              <CommentsList comments={comments} threadId={threadId} />
+            ) : (
+              <div className="text-center py-12 text-ink/60">
+                <p>No comments yet. Be the first to comment!</p>
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        </div>
+      </section>
     </div>
   );
 }

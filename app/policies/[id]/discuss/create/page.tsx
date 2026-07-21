@@ -16,11 +16,25 @@ export default function CreateThreadPage({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [user, setUser] = useState<any>(null);
+  const [policyId, setPolicyId] = useState<string>('');
   const router = useRouter();
 
   useEffect(() => {
     checkAuth();
+    fetchPolicyId();
   }, []);
+
+  const fetchPolicyId = async () => {
+    try {
+      const response = await fetch(`/api/policies/${params.id}`);
+      if (response.ok) {
+        const policy = await response.json();
+        setPolicyId(policy.id);
+      }
+    } catch (err) {
+      console.error('Failed to fetch policy:', err);
+    }
+  };
 
   const checkAuth = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -45,6 +59,10 @@ export default function CreateThreadPage({
         throw new Error('You must be logged in');
       }
 
+      if (!policyId) {
+        throw new Error('Policy not found');
+      }
+
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.access_token) {
         throw new Error('Not authenticated');
@@ -57,7 +75,7 @@ export default function CreateThreadPage({
           'Authorization': `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({
-          policyId: params.id,
+          policyId: policyId,
           title: title.trim(),
           description: description.trim() || null,
         }),
