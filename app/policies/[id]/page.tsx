@@ -22,6 +22,25 @@ export const metadata = {
   description: "View detailed information about plastic policy regulations.",
 };
 
+export const dynamicParams = true; // Enable on-demand ISR for new policies
+export const revalidate = 3600; // Revalidate every hour
+
+export async function generateStaticParams() {
+  try {
+    const { data: policies } = await supabaseAdmin
+      .from('policies')
+      .select('slug')
+      .limit(100); // Fetch up to 100 policies for pre-generation
+
+    return (policies || []).map((policy: { slug: string }) => ({
+      id: policy.slug,
+    }));
+  } catch (error) {
+    console.error('Error generating static params:', error);
+    return [];
+  }
+}
+
 export default async function PolicyPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   console.log(`[POLICY PAGE] Received id parameter: "${id}" (length: ${id.length})`);
