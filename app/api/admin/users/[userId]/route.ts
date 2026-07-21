@@ -190,21 +190,50 @@ export async function DELETE(
 
     if (deleteError || !deleteSuccess) {
       console.error('🗑️ [DELETE] Delete failed. Error:', deleteError);
-      console.error('🗑️ [DELETE] Error is object:', deleteError && typeof deleteError === 'object');
+      console.error('🗑️ [DELETE] Attempting soft-delete as fallback...');
       
-      // If error is empty object, try to get more info
-      if (deleteError && Object.keys(deleteError).length === 0) {
-        console.error('🗑️ [DELETE] Error is empty object - likely a Supabase permission or auth issue');
+      // Fallback: soft delete in database by marking as deleted
+      try {
+        const { error: softDeleteError } = await supabaseAdmin
+          .from('user_profiles')
+          .update({ 
+            display_name: '[Deleted User]',
+            bio: null,
+            avatar_url: null 
+          })
+          .eq('id', userId);
+
+        if (softDeleteError) {
+          console.error('🗑️ [DELETE] Soft delete also failed:', softDeleteError);
+          return NextResponse.json(
+            { error: 'Could not delete user via auth or database' },
+            { status: 400 }
+          );
+        }
+
+        console.log('🗑️ [DELETE] Successfully soft-deleted user profile');
+        
+        // Log audit event
+        await supabaseAdmin
+          .from('audit_logs')
+          .insert({
+            resource_type: 'user',
+            resource_id: userId,
+            action: 'user_soft_deleted',
+          });
+
+        return NextResponse.json({ 
+          success: true, 
+          message: 'User profile deleted successfully (soft delete)',
+          note: 'Auth account still exists but profile data cleared'
+        });
+      } catch (softErr) {
+        console.error('🗑️ [DELETE] Soft delete exception:', softErr);
         return NextResponse.json(
-          { error: 'Failed to delete user - check Supabase permissions or user status' },
+          { error: 'Failed to delete user' },
           { status: 400 }
         );
       }
-      
-      return NextResponse.json(
-        { error: `Auth deletion failed: ${JSON.stringify(deleteError) || 'unknown error'}` },
-        { status: 400 }
-      );
     }
 
     console.log('🗑️ [DELETE] User deleted from auth successfully');
