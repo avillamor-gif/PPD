@@ -9,36 +9,39 @@ export async function GET() {
     const { data: countriesData, error: countriesError } = await supabaseAdmin
       .from('policies')
       .select('country')
-      .eq('status', 'Enacted')
       .order('country');
 
     // Get distinct regions/levels
     const { data: levelsData, error: levelsError } = await supabaseAdmin
       .from('policies')
       .select('level')
-      .eq('status', 'Enacted')
       .order('level');
 
     // Get distinct categories
     const { data: categoriesData, error: categoriesError } = await supabaseAdmin
       .from('policies')
       .select('category')
-      .eq('status', 'Enacted')
       .order('category');
 
     // Get distinct lifecycle stages
     const { data: lifecyclesData, error: lifecyclesError } = await supabaseAdmin
       .from('policies')
       .select('lifecycle_stage')
-      .eq('status', 'Enacted')
       .order('lifecycle_stage');
 
-    if (countriesError || levelsError || categoriesError || lifecyclesError) {
+    // Get distinct statuses
+    const { data: statusesData, error: statusesError } = await supabaseAdmin
+      .from('policies')
+      .select('status')
+      .order('status');
+
+    if (countriesError || levelsError || categoriesError || lifecyclesError || statusesError) {
       console.error('Database errors:', {
         countriesError,
         levelsError,
         categoriesError,
         lifecyclesError,
+        statusesError,
       });
       return NextResponse.json(
         { error: 'Failed to fetch export options' },
@@ -65,11 +68,14 @@ export async function GET() {
       )
     ).sort();
 
+    const statuses = Array.from(
+      new Set(statusesData?.map((p: any) => p.status).filter(Boolean) || [])
+    ).sort();
+
     // Get year range
     const { data: yearsData, error: yearsError } = await supabaseAdmin
       .from('policies')
       .select('year')
-      .eq('status', 'Enacted')
       .order('year', { ascending: false })
       .limit(1);
 
@@ -85,6 +91,7 @@ export async function GET() {
       levels,
       categories,
       lifecycles,
+      statuses,
       years,
     });
   } catch (error) {

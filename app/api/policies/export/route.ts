@@ -38,6 +38,7 @@ export async function GET(req: NextRequest) {
     const levels = searchParams.getAll('levels');
     const categories = searchParams.getAll('categories');
     const lifecycles = searchParams.getAll('lifecycles');
+    const statuses = searchParams.getAll('statuses');
     const years = searchParams.getAll('years').map((y) => parseInt(y)).filter((y) => !isNaN(y));
     const search = searchParams.get('search');
 
@@ -46,6 +47,7 @@ export async function GET(req: NextRequest) {
       levels,
       categories,
       lifecycles,
+      statuses,
       years,
       search,
     });
@@ -53,10 +55,13 @@ export async function GET(req: NextRequest) {
     // Build query
     let query = supabaseAdmin
       .from('policies')
-      .select('id, slug, title, year, country, level, category, status, lifecycle_stage, authority, link, summary, keywords, language')
-      .eq('status', 'Enacted'); // Only export enacted policies
+      .select('id, slug, title, year, country, level, category, status, lifecycle_stage, authority, link, summary, keywords, language');
 
     // Apply filters - use 'in' for multiple values
+    if (statuses.length > 0) {
+      query = query.in('status', statuses);
+    }
+
     if (countries.length > 0) {
       query = query.in('country', countries);
     }

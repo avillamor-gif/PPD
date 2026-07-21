@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Download, X, Loader } from 'lucide-react';
+import { Download, X, Loader, ChevronDown } from 'lucide-react';
 
 interface ExportFiltersProps {
   onClose: () => void;
@@ -12,6 +12,7 @@ interface ExportOptions {
   levels: string[];
   categories: string[];
   lifecycles: string[];
+  statuses: string[];
   years: number[];
 }
 
@@ -24,6 +25,7 @@ export function ExportModal({ onClose }: ExportFiltersProps) {
     levels: [],
     categories: [],
     lifecycles: [],
+    statuses: [],
     years: [],
   });
 
@@ -40,8 +42,22 @@ export function ExportModal({ onClose }: ExportFiltersProps) {
   const [selectedLifecycles, setSelectedLifecycles] = useState<Set<string>>(
     new Set()
   );
+  const [selectedStatuses, setSelectedStatuses] = useState<Set<string>>(
+    new Set()
+  );
   const [selectedYears, setSelectedYears] = useState<Set<number>>(new Set());
   const [search, setSearch] = useState('');
+
+  // Dropdown open state
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [searchFilters, setSearchFilters] = useState({
+    countries: '',
+    levels: '',
+    categories: '',
+    lifecycles: '',
+    statuses: '',
+    years: '',
+  });
 
   // Fetch available options from database
   useEffect(() => {
@@ -62,55 +78,14 @@ export function ExportModal({ onClose }: ExportFiltersProps) {
     fetchOptions();
   }, []);
 
-  const toggleCountry = (country: string | number) => {
-    const newSet = new Set(selectedCountries);
-    if (newSet.has(country as string)) {
-      newSet.delete(country as string);
+  const toggle = (set: Set<any>, value: any) => {
+    const newSet = new Set(set);
+    if (newSet.has(value)) {
+      newSet.delete(value);
     } else {
-      newSet.add(country as string);
+      newSet.add(value);
     }
-    setSelectedCountries(newSet);
-  };
-
-  const toggleLevel = (level: string | number) => {
-    const newSet = new Set(selectedLevels);
-    if (newSet.has(level as string)) {
-      newSet.delete(level as string);
-    } else {
-      newSet.add(level as string);
-    }
-    setSelectedLevels(newSet);
-  };
-
-  const toggleCategory = (category: string | number) => {
-    const newSet = new Set(selectedCategories);
-    if (newSet.has(category as string)) {
-      newSet.delete(category as string);
-    } else {
-      newSet.add(category as string);
-    }
-    setSelectedCategories(newSet);
-  };
-
-  const toggleLifecycle = (lifecycle: string | number) => {
-    const newSet = new Set(selectedLifecycles);
-    if (newSet.has(lifecycle as string)) {
-      newSet.delete(lifecycle as string);
-    } else {
-      newSet.add(lifecycle as string);
-    }
-    setSelectedLifecycles(newSet);
-  };
-
-  const toggleYear = (year: string | number) => {
-    const numYear = typeof year === 'string' ? parseInt(year) : year;
-    const newSet = new Set(selectedYears);
-    if (newSet.has(numYear)) {
-      newSet.delete(numYear);
-    } else {
-      newSet.add(numYear);
-    }
-    setSelectedYears(newSet);
+    return newSet;
   };
 
   const handleExport = async () => {
@@ -139,6 +114,11 @@ export function ExportModal({ onClose }: ExportFiltersProps) {
       // Add multiple lifecycles
       if (selectedLifecycles.size > 0) {
         selectedLifecycles.forEach((l) => params.append('lifecycles', l));
+      }
+
+      // Add multiple statuses
+      if (selectedStatuses.size > 0) {
+        selectedStatuses.forEach((s) => params.append('statuses', s));
       }
 
       // Add multiple years
@@ -182,43 +162,84 @@ export function ExportModal({ onClose }: ExportFiltersProps) {
     }
   };
 
-  const CheckboxGroup = ({
-    title,
+  const MultiSelect = ({
+    label,
     items,
     selected,
     onToggle,
+    searchKey,
   }: {
-    title: string;
+    label: string;
     items: (string | number)[];
     selected: Set<string | number>;
-    onToggle: (item: string | number) => void;
-  }) => (
-    <div>
-      <label className="block text-sm font-medium text-ink mb-3">
-        {title} {selected.size > 0 && <span className="text-ocean">({selected.size})</span>}
-      </label>
-      <div className="space-y-2 max-h-48 overflow-y-auto p-3 rounded-lg border border-ink/10 bg-white">
-        {items.length === 0 ? (
-          <p className="text-sm text-ink/60">No options available</p>
-        ) : (
-          items.map((item) => (
-            <label
-              key={item}
-              className="flex items-center gap-2 cursor-pointer hover:bg-sand/20 p-2 rounded transition"
-            >
-              <input
-                type="checkbox"
-                checked={selected.has(item)}
-                onChange={() => onToggle(item)}
-                className="w-4 h-4 cursor-pointer accent-ocean rounded"
-              />
-              <span className="text-sm text-ink">{item}</span>
-            </label>
-          ))
+    onToggle: (value: string | number) => void;
+    searchKey: keyof typeof searchFilters;
+  }) => {
+    const isOpen = openDropdown === searchKey;
+    const searchValue = searchFilters[searchKey];
+    const filtered = items.filter((item) =>
+      item.toString().toLowerCase().includes(searchValue.toLowerCase())
+    );
+
+    return (
+      <div className="relative">
+        <button
+          onClick={() => setOpenDropdown(isOpen ? null : searchKey)}
+          className="w-full px-3 py-2 rounded-lg border border-ink/20 bg-white text-left text-sm flex items-center justify-between hover:border-ocean focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20 transition"
+        >
+          <span className="text-ink">
+            {selected.size > 0 ? (
+              <span className="font-medium">
+                {label} <span className="text-ocean">({selected.size})</span>
+              </span>
+            ) : (
+              <span className="text-ink/60">{label}</span>
+            )}
+          </span>
+          <ChevronDown
+            className={`w-4 h-4 text-ink/40 transition ${
+              isOpen ? 'rotate-180' : ''
+            }`}
+          />
+        </button>
+
+        {isOpen && (
+          <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-ink/20 rounded-lg shadow-lg z-50">
+            <input
+              type="text"
+              placeholder="Search..."
+              value={searchValue}
+              onChange={(e) =>
+                setSearchFilters({ ...searchFilters, [searchKey]: e.target.value })
+              }
+              className="w-full px-3 py-2 border-b border-ink/10 focus:outline-none text-sm"
+              autoFocus
+            />
+            <div className="max-h-40 overflow-y-auto">
+              {filtered.length === 0 ? (
+                <div className="px-3 py-2 text-sm text-ink/60">No options</div>
+              ) : (
+                filtered.map((item) => (
+                  <label
+                    key={item}
+                    className="flex items-center gap-2 px-3 py-2 hover:bg-sand/20 cursor-pointer transition text-sm"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selected.has(item)}
+                      onChange={() => onToggle(item)}
+                      className="w-4 h-4 cursor-pointer accent-ocean rounded"
+                    />
+                    <span>{item}</span>
+                  </label>
+                ))
+              )}
+            </div>
+          </div>
         )}
       </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -238,7 +259,7 @@ export function ExportModal({ onClose }: ExportFiltersProps) {
         </div>
 
         {/* Content */}
-        <div className="p-6 space-y-6">
+        <div className="p-6 space-y-4">
           {error && (
             <div className="p-4 rounded-lg bg-coral/10 border border-coral/20 text-coral text-sm">
               {error}
@@ -261,75 +282,87 @@ export function ExportModal({ onClose }: ExportFiltersProps) {
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Search by title, summary, or keywords…"
-                  className="w-full px-3 py-2 rounded-lg border border-ink/20 bg-white focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20 transition"
+                  className="w-full px-3 py-2 rounded-lg border border-ink/20 bg-white focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20 transition text-sm"
                 />
               </div>
 
-              {/* Filters Grid */}
-              <div className="grid grid-cols-2 gap-6">
-                {/* Countries */}
-                {options.countries.length > 0 && (
-                  <CheckboxGroup
-                    title="Countries"
-                    items={options.countries}
-                    selected={selectedCountries}
-                    onToggle={toggleCountry}
-                  />
-                )}
+              {/* Filters - Multi-select dropdowns */}
+              {options.countries.length > 0 && (
+                <MultiSelect
+                  label="Countries"
+                  items={options.countries}
+                  selected={selectedCountries}
+                  onToggle={(val) => setSelectedCountries(toggle(selectedCountries, val))}
+                  searchKey="countries"
+                />
+              )}
 
-                {/* Levels */}
-                {options.levels.length > 0 && (
-                  <CheckboxGroup
-                    title="Region/Level"
-                    items={options.levels}
-                    selected={selectedLevels}
-                    onToggle={toggleLevel}
-                  />
-                )}
+              {options.levels.length > 0 && (
+                <MultiSelect
+                  label="Region/Level"
+                  items={options.levels}
+                  selected={selectedLevels}
+                  onToggle={(val) => setSelectedLevels(toggle(selectedLevels, val))}
+                  searchKey="levels"
+                />
+              )}
 
-                {/* Categories */}
-                {options.categories.length > 0 && (
-                  <CheckboxGroup
-                    title="Instrument Type"
-                    items={options.categories}
-                    selected={selectedCategories}
-                    onToggle={toggleCategory}
-                  />
-                )}
+              {options.categories.length > 0 && (
+                <MultiSelect
+                  label="Instrument Type"
+                  items={options.categories}
+                  selected={selectedCategories}
+                  onToggle={(val) => setSelectedCategories(toggle(selectedCategories, val))}
+                  searchKey="categories"
+                />
+              )}
 
-                {/* Lifecycles */}
-                {options.lifecycles.length > 0 && (
-                  <CheckboxGroup
-                    title="Lifecycle Stage"
-                    items={options.lifecycles}
-                    selected={selectedLifecycles}
-                    onToggle={toggleLifecycle}
-                  />
-                )}
+              {options.lifecycles.length > 0 && (
+                <MultiSelect
+                  label="Lifecycle Stage"
+                  items={options.lifecycles}
+                  selected={selectedLifecycles}
+                  onToggle={(val) => setSelectedLifecycles(toggle(selectedLifecycles, val))}
+                  searchKey="lifecycles"
+                />
+              )}
 
-                {/* Years */}
-                {options.years.length > 0 && (
-                  <CheckboxGroup
-                    title="Year"
-                    items={options.years}
-                    selected={selectedYears}
-                    onToggle={toggleYear}
-                  />
-                )}
-              </div>
+              {options.statuses.length > 0 && (
+                <MultiSelect
+                  label="Status"
+                  items={options.statuses}
+                  selected={selectedStatuses}
+                  onToggle={(val) => setSelectedStatuses(toggle(selectedStatuses, val))}
+                  searchKey="statuses"
+                />
+              )}
+
+              {options.years.length > 0 && (
+                <MultiSelect
+                  label="Year"
+                  items={options.years}
+                  selected={selectedYears}
+                  onToggle={(val) => setSelectedYears(toggle(selectedYears, val as number))}
+                  searchKey="years"
+                />
+              )}
 
               {/* Summary */}
               {(selectedCountries.size > 0 ||
                 selectedLevels.size > 0 ||
                 selectedCategories.size > 0 ||
                 selectedLifecycles.size > 0 ||
+                selectedStatuses.size > 0 ||
                 selectedYears.size > 0 ||
                 search) && (
                 <div className="p-3 rounded-lg bg-ocean/10 border border-ocean/20 text-sm text-ink">
-                  <strong>Filters selected:</strong> {selectedCountries.size} countries,{' '}
-                  {selectedLevels.size} levels, {selectedCategories.size} categories,{' '}
-                  {selectedLifecycles.size} lifecycles, {selectedYears.size} years
-                  {search && `, searching for "${search}"`}
+                  <strong>Filters:</strong> {selectedCountries.size > 0 && `${selectedCountries.size} countries`}
+                  {selectedCountries.size > 0 && selectedLevels.size > 0 && ', '}
+                  {selectedLevels.size > 0 && `${selectedLevels.size} levels`}
+                  {(selectedCountries.size > 0 || selectedLevels.size > 0) && selectedCategories.size > 0 && ', '}
+                  {selectedCategories.size > 0 && `${selectedCategories.size} categories`}
+                  {(selectedCountries.size > 0 || selectedLevels.size > 0 || selectedCategories.size > 0) && selectedStatuses.size > 0 && ', '}
+                  {selectedStatuses.size > 0 && `${selectedStatuses.size} statuses`}
                 </div>
               )}
             </>
@@ -340,14 +373,14 @@ export function ExportModal({ onClose }: ExportFiltersProps) {
         <div className="sticky bottom-0 flex gap-3 p-6 border-t border-rule bg-paper">
           <button
             onClick={onClose}
-            className="flex-1 px-4 py-3 rounded-lg border border-ink/20 text-ink hover:bg-sand/10 transition font-medium"
+            className="flex-1 px-4 py-3 rounded-lg border border-ink/20 text-ink hover:bg-sand/10 transition font-medium text-sm"
           >
             Cancel
           </button>
           <button
             onClick={handleExport}
             disabled={loading || optionsLoading}
-            className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-ocean text-white hover:bg-ocean-deep disabled:opacity-50 disabled:cursor-not-allowed transition font-medium"
+            className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-ocean text-white hover:bg-ocean-deep disabled:opacity-50 disabled:cursor-not-allowed transition font-medium text-sm"
           >
             {loading ? (
               <>
