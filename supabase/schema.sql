@@ -34,6 +34,7 @@ ON CONFLICT (name) DO NOTHING;
 
 CREATE TABLE IF NOT EXISTS policies (
   id TEXT PRIMARY KEY,
+  slug TEXT UNIQUE NOT NULL,
   title TEXT NOT NULL,
   summary TEXT,
   year INTEGER,
@@ -54,6 +55,7 @@ CREATE TABLE IF NOT EXISTS policies (
 );
 
 -- Create indexes for policies
+CREATE INDEX IF NOT EXISTS idx_policies_slug ON policies(slug);
 CREATE INDEX IF NOT EXISTS idx_policies_country ON policies(country);
 CREATE INDEX IF NOT EXISTS idx_policies_year ON policies(year DESC);
 CREATE INDEX IF NOT EXISTS idx_policies_category ON policies(category);

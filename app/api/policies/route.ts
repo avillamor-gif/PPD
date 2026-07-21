@@ -156,7 +156,7 @@ export async function POST(request: NextRequest) {
 
     // Generate ID from slug (based on title) with deduplication
     const baseSlug = generateSlugFromTitle(normalizedBody.title);
-    const uniqueSlug = await generateUniqueSlug(baseSlug);
+    let uniqueSlug = await generateUniqueSlug(baseSlug);
 
     // Convert form data to database format (camelCase → snake_case)
     const convertedData = convertFormDataToDbFormat(normalizedBody);
@@ -176,25 +176,53 @@ export async function POST(request: NextRequest) {
       allKeys: Object.keys(policyData)
     });
 
-    // Save to Supabase
-    const { data, error } = await supabaseAdmin
-      .from('policies')
-      .insert([policyData])
-      .select();
+    // Save to Supabase with retry logic for race conditions
+    let lastError: Error | null = null;
+    let retryCount = 0;
+    const maxRetries = 5;
 
-    if (error) {
-      console.error('Supabase error:', error);
-      throw new Error(error.message || 'Failed to save policy to database');
+    while (retryCount < maxRetries) {
+      const { data, error } = await supabaseAdmin
+        .from('policies')
+        .insert([{ ...policyData, slug: uniqueSlug, id: uniqueSlug }])
+        .select();
+
+      if (error) {
+        // Check if this is a unique constraint violation (race condition)
+        if (error.code === '23505' || error.message?.includes('unique')) {
+          console.warn(`⚠️ [POST] Slug collision detected for "${uniqueSlug}", retrying with counter...`);
+          retryCount++;
+          // Try with incremented counter
+          uniqueSlug = `${baseSlug}-${retryCount}`;
+          policyData.id = uniqueSlug;
+          policyData.slug = uniqueSlug;
+          lastError = new Error(`Slug already exists: ${error.message}`);
+          continue;
+        } else {
+          console.error('Supabase error:', error);
+          throw new Error(error.message || 'Failed to save policy to database');
+        }
+      }
+
+      if (!data || data.length === 0) {
+        console.error('No data returned from insert');
+        throw new Error('Failed to save policy - no data returned');
+      }
+
+      console.log('✅ [POST] Policy saved successfully with slug:', uniqueSlug);
+      return NextResponse.json(
+        {
+          success: true,
+          message: 'Policy submitted successfully',
+          data: data[0],
+        },
+        { status: 201 }
+      );
     }
 
-    return NextResponse.json(
-      {
-        success: true,
-        message: 'Policy submitted successfully',
-        data: data?.[0] || policyData,
-      },
-      { status: 201 }
-    );
+    // If we exhausted retries
+    console.error(`❌ [POST] Failed to save policy after ${maxRetries} retries`);
+    throw new Error(`Could not generate unique slug after ${maxRetries} attempts. ${lastError?.message || 'Slug collision detected'}`);
   } catch (error) {
     console.error('API error:', error);
     return NextResponse.json(

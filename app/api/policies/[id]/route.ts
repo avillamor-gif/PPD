@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { validatePolicy } from '@/lib/utils/validation';
+import { validatePolicy, generateSlugFromTitle } from '@/lib/utils/validation';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 
 /**
@@ -90,6 +90,51 @@ function normalizePolicyDateFields(data: Record<string, any>) {
   }
 
   return normalized;
+}
+
+/**
+ * Generates a unique slug by checking for duplicates and appending a counter if needed
+ */
+async function generateUniqueSlugForUpdate(baseSlug: string, excludeSlug: string): Promise<string> {
+  // Check if base slug exists (excluding the current slug)
+  let query = supabaseAdmin
+    .from('policies')
+    .select('id', { count: 'exact', head: true })
+    .eq('slug', baseSlug)
+    .neq('slug', excludeSlug);
+
+  const { count, error } = await query;
+
+  if (error) {
+    console.error('Error checking slug uniqueness:', error);
+    return baseSlug;
+  }
+
+  // If no duplicates, return base slug
+  if (!count || count === 0) {
+    return baseSlug;
+  }
+
+  // Append counter until unique
+  let counter = 1;
+  let uniqueSlug = `${baseSlug}-${counter}`;
+  
+  while (true) {
+    let checkQuery = supabaseAdmin
+      .from('policies')
+      .select('id', { count: 'exact', head: true })
+      .eq('slug', uniqueSlug)
+      .neq('slug', excludeSlug);
+
+    const { count: duplicateCount } = await checkQuery;
+    
+    if (!duplicateCount || duplicateCount === 0) {
+      return uniqueSlug;
+    }
+    
+    counter++;
+    uniqueSlug = `${baseSlug}-${counter}`;
+  }
 }
 
 /**
@@ -224,6 +269,36 @@ export async function PUT(
       }
     }
 
+    // Fetch current policy to check if title changed
+    let currentPolicyResult = await supabaseAdmin
+      .from('policies')
+      .select('id, title, slug')
+      .eq('slug', id)
+      .single();
+
+    // If not found by slug, try by id
+    if (currentPolicyResult.error || !currentPolicyResult.data) {
+      currentPolicyResult = await supabaseAdmin
+        .from('policies')
+        .select('id, title, slug')
+        .eq('id', id)
+        .single();
+    }
+
+    if (currentPolicyResult.error || !currentPolicyResult.data) {
+      return NextResponse.json(
+        { success: false, error: 'Policy not found' },
+        { status: 404 }
+      );
+    }
+
+    const currentPolicy = currentPolicyResult.data;
+    const titleChanged = normalizedBody.title && normalizedBody.title !== currentPolicy.title;
+    
+    if (titleChanged) {
+      console.log('✏️ [PUT] Title changed from "' + currentPolicy.title + '" to "' + normalizedBody.title + '", regenerating slug');
+    }
+
     // Convert form data to database format (camelCase → snake_case)
     const convertedData = convertFormDataToDbFormat(normalizedBody);
 
@@ -231,10 +306,20 @@ export async function PUT(
     const policyData = {
       ...convertedData,
       updated_at: new Date().toISOString(),
-    };
+    } as any;
+
+    // If title changed, generate new slug
+    if (titleChanged) {
+      const baseSlug = generateSlugFromTitle(normalizedBody.title);
+      const newSlug = await generateUniqueSlugForUpdate(baseSlug, currentPolicy.slug);
+      policyData.slug = newSlug;
+      console.log('✏️ [PUT] New slug generated:', newSlug);
+    }
 
     console.log('✏️ [PUT] After conversion:', { 
       id,
+      titleChanged,
+      newSlug: policyData.slug,
       other_links: (policyData as any).other_links,
       keywords: (policyData as any).keywords,
       lifecycle_stage: (policyData as any).lifecycle_stage,
@@ -247,16 +332,15 @@ export async function PUT(
     let result = await supabaseAdmin
       .from('policies')
       .update(policyData)
-      .eq('slug', id)
+      .eq('slug', currentPolicy.slug)
       .select();
 
     // If not found by slug, try by id instead
-    // This condition checks for NO results, not just specific error codes
     if (!result.data || result.data.length === 0) {
       result = await supabaseAdmin
         .from('policies')
         .update(policyData)
-        .eq('id', id)
+        .eq('id', currentPolicy.id)
         .select();
     }
 
