@@ -111,7 +111,9 @@ export function ExportModal({ onClose }: ExportFiltersProps) {
       const url = `/api/policies/export?${params.toString()}`;
 
       // Trigger download
-      const response = await fetch(url);
+      const response = await fetch(url, {
+        credentials: 'include', // Include cookies for authentication
+      });
 
       if (!response.ok) {
         const data = await response.json();
