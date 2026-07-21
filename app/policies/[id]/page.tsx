@@ -27,10 +27,14 @@ export const revalidate = 3600; // Revalidate every hour
 
 export async function generateStaticParams() {
   try {
+    // Fetch all policy slugs for static generation
+    // Since we have dynamicParams = true, this generates common pages upfront
+    // and remaining pages will be generated on-demand
     const { data: policies } = await supabaseAdmin
       .from('policies')
       .select('slug')
-      .limit(100); // Fetch up to 100 policies for pre-generation
+      .order('created_at', { ascending: false })
+      .limit(500); // Generate first 500 most recent policies upfront
 
     return (policies || []).map((policy: { slug: string }) => ({
       id: policy.slug,
