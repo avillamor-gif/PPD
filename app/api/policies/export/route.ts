@@ -52,7 +52,7 @@ export async function GET(req: NextRequest) {
     // Build query
     let query = supabaseAdmin
       .from('policies')
-      .select('id, slug, title, year, country, level, category, status, lifecycle_stage, authority, link, other_links, summary, keywords, language');
+      .select('id, slug, title, commencement_date, country, level, category, status, lifecycle_stage, authority, link, other_links, summary, keywords, language');
 
     // Apply filters - use 'in' for multiple values
     if (statuses.length > 0) {
@@ -63,12 +63,8 @@ export async function GET(req: NextRequest) {
       query = query.in('country', allCountryCodes);
     }
 
-    if (years.length > 0) {
-      query = query.in('year', years);
-    }
-
-    // Order by country, year desc
-    query = query.order('country', { ascending: true }).order('year', { ascending: false });
+    // Order by country ascending, then commencement_date descending
+    query = query.order('country', { ascending: true }).order('commencement_date', { ascending: false });
 
     // Execute query
     const { data: policies, error } = await query;
@@ -81,23 +77,33 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    if (!policies || policies.length === 0) {
+    // Filter by years if provided (extract year from commencement_date)
+    let filteredPolicies = policies || [];
+    if (years.length > 0) {
+      filteredPolicies = filteredPolicies.filter((p: any) => {
+        if (!p.commencement_date) return false;
+        const policyYear = new Date(p.commencement_date).getFullYear();
+        return years.includes(policyYear);
+      });
+    }
+
+    if (!filteredPolicies || filteredPolicies.length === 0) {
       return NextResponse.json(
         { error: 'No policies found matching the filters' },
         { status: 404 }
       );
     }
 
-    console.log(`📥 [EXPORT] Found ${policies.length} policies, generating Excel...`);
+    console.log(`📥 [EXPORT] Found ${filteredPolicies.length} policies, generating Excel...`);
 
     // Format policies for export - convert country codes to full names
-    const exportData: PolicyExportData[] = policies.map((p: any) => {
+    const exportData: PolicyExportData[] = filteredPolicies.map((p: any) => {
       const countryName = COUNTRIES.find(c => c.code === p.country)?.name || p.country;
       return {
         id: p.id,
         slug: p.slug,
         title: p.title,
-        year: p.year,
+        commencement_date: p.commencement_date,
         country: countryName,
         level: p.level,
         category: p.category,

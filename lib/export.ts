@@ -4,7 +4,7 @@ export interface PolicyExportData {
   id: string;
   slug: string;
   title: string;
-  year?: number;
+  commencement_date?: string;
   country: string;
   level?: string;
   category: string;
@@ -30,7 +30,7 @@ export async function formatPoliciesToExcel(policies: PolicyExportData[]): Promi
     { header: 'Policy Title', key: 'title', width: 35 },
     { header: 'Country', key: 'country', width: 15 },
     { header: 'Level', key: 'level', width: 12 },
-    { header: 'Year', key: 'year', width: 8 },
+    { header: 'Date of Enactment/Commencement', key: 'commencement_date', width: 18 },
     { header: 'Instrument Type', key: 'category', width: 18 },
     { header: 'Status', key: 'status', width: 12 },
     { header: 'Lifecycle Stage', key: 'lifecycle_stage', width: 15 },
