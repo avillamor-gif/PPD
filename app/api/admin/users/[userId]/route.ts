@@ -139,54 +139,65 @@ export async function DELETE(
 
     console.log('🗑️ [DELETE] Starting user deletion for userId:', userId);
 
+    // Verify admin client is available
+    if (!supabaseAdmin.auth?.admin) {
+      console.error('🗑️ [DELETE] Supabase admin auth client not available');
+      return NextResponse.json(
+        { error: 'Admin client not configured' },
+        { status: 500 }
+      );
+    }
+
     // First, verify user exists
     console.log('🗑️ [DELETE] Verifying user exists...');
-    const { data: userExists } = await supabaseAdmin.auth.admin.getUserById(userId);
+    let userExists;
+    try {
+      userExists = await supabaseAdmin.auth.admin.getUserById(userId);
+      console.log('🗑️ [DELETE] User lookup result:', userExists?.data ? 'found' : 'not found');
+    } catch (lookupErr) {
+      console.error('🗑️ [DELETE] User lookup error:', lookupErr);
+      return NextResponse.json(
+        { error: 'Failed to lookup user' },
+        { status: 400 }
+      );
+    }
     
-    if (!userExists) {
+    if (!userExists?.data) {
       return NextResponse.json(
         { error: 'User not found' },
         { status: 404 }
       );
     }
+    }
 
     console.log('🗑️ [DELETE] User found, attempting deletion...');
-    console.log('🗑️ [DELETE] Using userId:', userId);
-    console.log('🗑️ [DELETE] Supabase admin auth client:', supabaseAdmin.auth.admin ? 'available' : 'missing');
 
     // Delete from auth using admin API
-    try {
-      const deleteResponse = await supabaseAdmin.auth.admin.deleteUser(userId);
-      console.log('🗑️ [DELETE] Delete response received:', deleteResponse);
-      console.log('🗑️ [DELETE] Response keys:', Object.keys(deleteResponse || {}));
-      
-      const { error: deleteError, data: deleteData } = deleteResponse;
-      
-      console.log('🗑️ [DELETE] deleteError:', deleteError);
-      console.log('🗑️ [DELETE] deleteError is null/undefined:', deleteError === null || deleteError === undefined);
-      console.log('🗑️ [DELETE] deleteError toString:', deleteError?.toString());
-      console.log('🗑️ [DELETE] deleteData:', deleteData);
+    const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(userId);
 
-      if (deleteError) {
-        console.error('🗑️ [DELETE] Auth deletion failed');
-        console.error('🗑️ [DELETE] Full error object:', deleteError);
-        console.error('🗑️ [DELETE] Error constructor:', deleteError?.constructor?.name);
-        console.error('🗑️ [DELETE] Error entries:', Object.entries(deleteError));
-        
-        return NextResponse.json(
-          { error: `User deletion failed. Please check server logs.` },
-          { status: 400 }
-        );
+    if (deleteError) {
+      // Try to extract any useful error info
+      let errorDetails = 'Unknown error';
+      try {
+        // Try various ways to get error message
+        if (typeof deleteError === 'string') {
+          errorDetails = deleteError;
+        } else if (deleteError && typeof deleteError === 'object') {
+          const err = deleteError as any;
+          errorDetails = err.message || err.error_description || err.msg || err.error || JSON.stringify(err);
+        }
+      } catch (e) {
+        errorDetails = 'Error object parsing failed';
       }
-
-      console.log('🗑️ [DELETE] User deleted from auth successfully');
-    } catch (authError) {
-      console.error('🗑️ [DELETE] Exception during auth deletion:', authError);
+      
+      console.error('🗑️ [DELETE] Auth deletion error:', errorDetails);
       return NextResponse.json(
-        { error: `Auth error: ${authError instanceof Error ? authError.message : String(authError)}` },
+        { error: `Failed to delete user from auth: ${errorDetails}` },
         { status: 400 }
       );
     }
+
+    console.log('🗑️ [DELETE] User deleted from auth successfully');
 
     // Log audit event
     console.log('🗑️ [DELETE] Logging audit event...');
