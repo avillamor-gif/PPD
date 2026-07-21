@@ -12,9 +12,12 @@ interface SnapshotData {
 
 interface SnapshotCardProps {
   staticData: SnapshotData; // Fallback server-rendered data
+  earliestYear: number;
+  earliestCountry?: string;
+  earliestTitle?: string;
 }
 
-export function SnapshotCard({ staticData }: SnapshotCardProps) {
+export function SnapshotCard({ staticData, earliestYear, earliestCountry, earliestTitle }: SnapshotCardProps) {
   const [data, setData] = useState<SnapshotData>(staticData);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -55,6 +58,15 @@ export function SnapshotCard({ staticData }: SnapshotCardProps) {
         <Stat n={data.countriesCovered.toString()} label="Countries covered" />
         <Stat n={data.inForce.toString()} label="In force" accent />
         <Stat n={data.proposedDraft.toString()} label="Proposed / in draft" />
+      </div>
+      <div className="mt-8 border-t border-rule pt-6">
+        <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
+          Earliest record
+        </div>
+        <div className="mt-1 font-display text-2xl font-semibold">{earliestYear}</div>
+        <div className="text-sm text-muted-foreground">
+          {earliestCountry} · {earliestTitle}
+        </div>
       </div>
     </div>
   );

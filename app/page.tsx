@@ -135,18 +135,10 @@ export default async function Home() {
                 proposedDraft: proposed,
                 countriesCovered
               }}
+              earliestYear={earliest}
+              earliestCountry={COUNTRIES.find((c) => c.code === earliestPolicy?.country)?.name}
+              earliestTitle={earliestPolicy?.title}
             />
-            <div className="rounded-2xl border border-ink/10 bg-card p-8 shadow-[0_30px_80px_-40px_rgba(20,40,60,0.35)] mt-8">
-              <div className="mt-8 border-t border-rule pt-6">
-                <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
-                  Earliest record
-                </div>
-                <div className="mt-1 font-display text-2xl font-semibold">{earliest}</div>
-                <div className="text-sm text-muted-foreground">
-                  {COUNTRIES.find((c) => c.code === earliestPolicy?.country)?.name} · {earliestPolicy?.title}
-                </div>
-              </div>
-            </div>
             <div className="pointer-events-none absolute -right-6 -top-6 hidden h-24 w-24 rounded-full bg-coral/20 blur-3xl md:block" />
           </div>
         </div>
