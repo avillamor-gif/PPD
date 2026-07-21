@@ -139,7 +139,7 @@ CREATE TABLE IF NOT EXISTS discussion_threads (
   policy_id TEXT NOT NULL, -- references app/data/policies.ts
   title TEXT NOT NULL,
   description TEXT,
-  author_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE SET NULL,
+  author_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
   status VARCHAR(20) DEFAULT 'open', -- open, closed, pinned, archived
   is_pinned BOOLEAN DEFAULT FALSE,
   comment_count INT DEFAULT 0,
