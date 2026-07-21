@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -9,8 +9,9 @@ import { MessageSquare, ArrowLeft, AlertCircle } from 'lucide-react';
 export default function CreateThreadPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
+  const resolvedParams = use(params);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false);
@@ -26,7 +27,7 @@ export default function CreateThreadPage({
 
   const fetchPolicyId = async () => {
     try {
-      const response = await fetch(`/api/policies/${params.id}`);
+      const response = await fetch(`/api/policies/${resolvedParams.id}`);
       if (response.ok) {
         const policy = await response.json();
         setPolicyId(policy.id);
@@ -87,7 +88,7 @@ export default function CreateThreadPage({
       }
 
       const result = await response.json();
-      router.push(`/policies/${params.id}/discuss/${result.threadId}`);
+      router.push(`/policies/${resolvedParams.id}/discuss/${result.threadId}`);
     } catch (err) {
       setError(
         err instanceof Error ? err.message : 'Failed to create thread'
@@ -101,7 +102,7 @@ export default function CreateThreadPage({
     <div className="max-w-2xl mx-auto space-y-8">
       {/* Back link */}
       <Link
-        href={`/policies/${params.id}/discuss`}
+        href={`/policies/${resolvedParams.id}/discuss`}
         className="inline-flex items-center gap-2 text-ocean hover:text-ocean-deep transition"
       >
         <ArrowLeft className="w-4 h-4" />
@@ -172,7 +173,7 @@ export default function CreateThreadPage({
             )}
           </button>
           <Link
-            href={`/policies/${params.id}/discuss`}
+            href={`/policies/${resolvedParams.id}/discuss`}
             className="px-6 py-3 rounded-lg border border-ink/20 text-ink hover:bg-sand/30 transition font-medium"
           >
             Cancel

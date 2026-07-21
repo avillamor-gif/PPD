@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
 import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -22,8 +22,9 @@ interface Thread {
 export default function PolicyDiscussionsPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
+  const resolvedParams = use(params);
   const [threads, setThreads] = useState<Thread[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>('');
@@ -47,7 +48,7 @@ export default function PolicyDiscussionsPage({
   useEffect(() => {
     checkAuth();
     loadPolicy();
-  }, [params.id]);
+  }, [resolvedParams.id]);
 
   const checkAuth = async () => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -57,7 +58,7 @@ export default function PolicyDiscussionsPage({
 
   const loadPolicy = async () => {
     try {
-      const res = await fetch(`/api/policies/${params.id}`);
+      const res = await fetch(`/api/policies/${resolvedParams.id}`);
       if (res.ok) {
         const data = await res.json();
         setPolicy(data);
@@ -75,7 +76,7 @@ export default function PolicyDiscussionsPage({
   const loadThreads = async (policyId?: string) => {
     try {
       // Use the actual policy ID, not the slug
-      const actualPolicyId = policyId || policy?.id || params.id;
+      const actualPolicyId = policyId || policy?.id || resolvedParams.id;
       
       const response = await fetch(`/api/discussions?policyId=${encodeURIComponent(actualPolicyId)}`, {
         cache: 'no-store',
@@ -103,7 +104,7 @@ export default function PolicyDiscussionsPage({
       {/* Back button */}
       {policy && (
         <Link
-          href={`/policies/${params.id}`}
+          href={`/policies/${resolvedParams.id}`}
           className="inline-flex items-center gap-2 text-ocean hover:text-ocean-deep transition"
         >
           <ArrowLeft className="w-4 h-4" />
@@ -135,7 +136,7 @@ export default function PolicyDiscussionsPage({
         </div>
         {user && (
           <button
-            onClick={() => router.push(`/policies/${params.id}/discuss/create`)}
+            onClick={() => router.push(`/policies/${resolvedParams.id}/discuss/create`)}
             className="inline-flex items-center gap-2 rounded-lg bg-ink px-6 py-3 font-medium text-paper hover:bg-ink/90 transition"
           >
             <Plus className="w-5 h-5" />
@@ -158,7 +159,7 @@ export default function PolicyDiscussionsPage({
           <p className="text-ink/60">No discussions yet. Start one!</p>
           {user && (
             <button
-              onClick={() => router.push(`/policies/${params.id}/discuss/create`)}
+              onClick={() => router.push(`/policies/${resolvedParams.id}/discuss/create`)}
               className="inline-flex items-center gap-2 rounded-lg bg-ink px-6 py-3 font-medium text-paper hover:bg-ink/90 transition mt-4"
             >
               <Plus className="w-5 h-5" />
@@ -167,7 +168,7 @@ export default function PolicyDiscussionsPage({
           )}
           {!user && (
             <Link
-              href={`/auth/login?redirect=${encodeURIComponent(`/policies/${params.id}/discuss#community-discussion`)}`}
+              href={`/auth/login?redirect=${encodeURIComponent(`/policies/${resolvedParams.id}/discuss#community-discussion`)}`}
               className="inline-block mt-4 text-ocean hover:text-ocean-deep font-medium"
             >
               Log in to join the discussion
@@ -179,7 +180,7 @@ export default function PolicyDiscussionsPage({
           {threads.map((thread) => (
             <Link
               key={thread.id}
-              href={`/policies/${params.id}/discuss/${thread.id}`}
+              href={`/policies/${resolvedParams.id}/discuss/${thread.id}`}
               className="block p-6 rounded-lg border border-ink/10 hover:border-ocean hover:bg-sand/30 transition"
             >
               <div className="flex items-start justify-between gap-4">
