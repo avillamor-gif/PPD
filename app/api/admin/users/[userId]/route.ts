@@ -168,8 +168,7 @@ export async function DELETE(
         { status: 404 }
       );
     }
-    }
-
+    
     console.log('🗑️ [DELETE] User found, attempting deletion...');
 
     // Delete from auth using admin API
