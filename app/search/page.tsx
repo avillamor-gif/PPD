@@ -2,9 +2,10 @@
 
 import Link from 'next/link';
 import { useState, useMemo, useEffect } from 'react';
-import { Search, ChevronDown, Loader } from 'lucide-react';
+import { Search, ChevronDown, Loader, Download } from 'lucide-react';
 import { COUNTRIES } from '@/lib/constants';
 import { useReferenceData } from '@/lib/hooks/useReferenceData';
+import { ExportModal } from '@/app/components/ExportModal';
 
 // Transform policies to include country names for display
 const transformPolicies = (policies: any[]) => {
@@ -80,6 +81,7 @@ export default function SearchPage() {
   const [theme, setTheme] = useState("All Instrument Types");
   const [status, setStatus] = useState("Any status");
   const [sortBy, setSortBy] = useState("Year: Newest");
+  const [showExportModal, setShowExportModal] = useState(false);
 
   // Statuses from reference data with "Any status" option
   const STATUSES = referenceData?.statuses 
@@ -300,8 +302,19 @@ export default function SearchPage() {
             onChange={setStatus} 
             options={STATUSES.map((s) => [s, s] as [string, string])} 
           />
-          <div className="ml-auto font-mono text-[11px] uppercase tracking-[0.18em] text-ink/60">
-            {rows.length} result{rows.length === 1 ? "" : "s"}
+          <div className="ml-auto flex items-center gap-4">
+            <div className="font-mono text-[11px] uppercase tracking-[0.18em] text-ink/60">
+              {rows.length} result{rows.length === 1 ? "" : "s"}
+            </div>
+            {rows.length > 0 && (
+              <button
+                onClick={() => setShowExportModal(true)}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-ocean/10 text-ocean hover:bg-ocean/20 transition font-medium text-sm"
+              >
+                <Download className="w-4 h-4" />
+                Export
+              </button>
+            )}
           </div>
         </div>
       </section>
@@ -365,6 +378,9 @@ export default function SearchPage() {
           )}
         </div>
       </section>
+
+      {/* Export Modal */}
+      {showExportModal && <ExportModal onClose={() => setShowExportModal(false)} />}
     </div>
   );
 }
