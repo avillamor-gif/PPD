@@ -36,7 +36,7 @@ export async function formatPoliciesToExcel(policies: PolicyExportData[]): Promi
     { header: 'Instrument Type', key: 'category', width: 18 },
     { header: 'Status', key: 'status', width: 12 },
     { header: 'Lifecycle Stage', key: 'lifecycle_stage', width: 15 },
-    { header: 'Authority', key: 'authority', width: 20 },
+    { header: 'Competent Authority', key: 'authority', width: 20 },
     { header: 'Summary', key: 'summary', width: 40 },
     { header: 'Keywords', key: 'keywords', width: 20 },
     { header: 'Language', key: 'language', width: 10 },
