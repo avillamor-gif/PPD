@@ -200,6 +200,29 @@ export async function GET(
       error = result.error;
     }
 
+    // If still not found, check if it's an old slug (previous_slugs)
+    if (error || !data) {
+      const { data: policyWithOldSlug } = await supabaseAdmin
+        .from('policies')
+        .select('slug, previous_slugs')
+        .contains('previous_slugs', [id])
+        .limit(1)
+        .single();
+
+      if (policyWithOldSlug) {
+        // Return redirect info
+        return NextResponse.json(
+          { 
+            success: true, 
+            redirect: true, 
+            newSlug: policyWithOldSlug.slug,
+            message: 'Policy slug has been updated'
+          },
+          { status: 200 }
+        );
+      }
+    }
+
     if (error || !data) {
       return NextResponse.json(
         { success: false, error: 'Policy not found' },
@@ -327,6 +350,28 @@ export async function PUT(
     });
     
     console.log('✏️ [PUT] Full policyData object:', JSON.stringify(policyData, null, 2));
+
+    // If slug is changing, save old slug to previous_slugs array
+    if (policyData.slug && policyData.slug !== currentPolicy.slug) {
+      console.log('✏️ [PUT] Slug changed from "' + currentPolicy.slug + '" to "' + policyData.slug + '", adding to previous_slugs');
+      
+      // Get current previous_slugs array
+      const { data: currentWithPrevious } = await supabaseAdmin
+        .from('policies')
+        .select('previous_slugs')
+        .eq('id', currentPolicy.id)
+        .single();
+
+      const previousSlugs = currentWithPrevious?.previous_slugs || [];
+      const oldSlug = currentPolicy.slug;
+      
+      // Add old slug if not already in the array
+      if (!previousSlugs.includes(oldSlug)) {
+        previousSlugs.push(oldSlug);
+        policyData.previous_slugs = previousSlugs;
+        console.log('✏️ [PUT] Added to previous_slugs:', previousSlugs);
+      }
+    }
 
     // Update in Supabase - try by slug first, then by id
     let result = await supabaseAdmin

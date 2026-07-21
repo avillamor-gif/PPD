@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { COUNTRIES } from '@/lib/constants';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import { ArrowLeft, MapPin, Calendar, Building2, Globe, MessageCircle, ThumbsUp, Eye } from 'lucide-react';
 import { PolicyForumSection } from '@/app/components/PolicyForumSection';
 import { AdminEditButton } from '@/app/components/AdminEditButton';
@@ -69,6 +69,21 @@ export default async function PolicyPage({ params }: { params: Promise<{ id: str
     }
 
     if (error || !policy) {
+      console.log(`[POLICY PAGE] Policy not found! Checking if it's an old slug...`);
+      
+      // Check if id matches any previous_slugs
+      const { data: policyWithOldSlug } = await supabaseAdmin
+        .from('policies')
+        .select('slug')
+        .contains('previous_slugs', [id])
+        .limit(1)
+        .single();
+
+      if (policyWithOldSlug) {
+        console.log(`[POLICY PAGE] Found policy with old slug. Redirecting to new slug: ${policyWithOldSlug.slug}`);
+        redirect(`/policies/${policyWithOldSlug.slug}`);
+      }
+
       console.log(`[POLICY PAGE] Policy not found! Returning 404`);
       return notFound();
     }
