@@ -311,8 +311,14 @@ CREATE POLICY "Users can update their own profile" ON user_profiles FOR UPDATE U
 CREATE POLICY "Users can insert their own profile" ON user_profiles FOR INSERT WITH CHECK (auth.uid() = id);
 -- Allow service_role and postgres to insert (for triggers)
 CREATE POLICY "Service role can insert profiles" ON user_profiles FOR INSERT WITH CHECK (auth.role() IN ('service_role', 'postgres'));
--- Allow service_role to delete profiles (admin user deletion)
+-- Allow service_role to delete profiles (admin user deletion via API)
 CREATE POLICY "Service role can delete profiles" ON user_profiles FOR DELETE USING (auth.role() = 'service_role');
+-- Allow admins to delete profiles (manual Supabase deletion)
+CREATE POLICY "Admins can delete profiles" ON user_profiles FOR DELETE USING (
+  EXISTS (
+    SELECT 1 FROM user_profiles WHERE id = auth.uid() AND role_id = (SELECT id FROM roles WHERE name = 'admin')
+  )
+);
 -- Allow service_role and postgres to delete (for admin operations)
 CREATE POLICY "Service role can delete profiles" ON user_profiles FOR DELETE WITH CHECK (auth.role() IN ('service_role', 'postgres'));
 
