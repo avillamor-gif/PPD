@@ -100,7 +100,7 @@ export default function PolicyDiscussionsPage({
   };
 
   return (
-    <div className="space-y-8">
+    <div className="mx-auto max-w-4xl px-6 lg:px-0 space-y-8">
       {/* Back button */}
       {policy && (
         <Link
