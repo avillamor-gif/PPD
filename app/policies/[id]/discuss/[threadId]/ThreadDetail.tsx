@@ -176,9 +176,10 @@ export default function ThreadDetail({
 
   return (
     <div className="w-full">
-      {/* Header Navigation */}
-      <div className="border-b border-rule bg-paper">
-        <div className="mx-auto max-w-350 px-6 py-4 lg:px-10">
+      {/* Main container with max-width */}
+      <div className="mx-auto max-w-3xl">
+        {/* Header Navigation */}
+        <div className="border-b border-rule bg-paper px-6 py-4 lg:px-0">
           <Link 
             href={`/policies/${policyId}/discuss`}
             className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em] text-ink/60 hover:text-coral transition"
@@ -187,11 +188,9 @@ export default function ThreadDetail({
             Back to discussions
           </Link>
         </div>
-      </div>
 
-      {/* Thread Hero Section */}
-      <section className="border-b border-rule bg-paper">
-        <div className="mx-auto max-w-350 px-6 py-12 lg:px-10">
+        {/* Thread Hero Section */}
+        <section className="border-b border-rule bg-paper px-6 py-12 lg:px-0">
           <div className="space-y-8">
             {/* Status & Title */}
             <div className="space-y-6">
@@ -243,12 +242,10 @@ export default function ThreadDetail({
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Comments Section */}
-      <section className="border-b border-rule">
-        <div className="mx-auto max-w-350 px-6 py-12 lg:px-10">
+        {/* Comments Section */}
+        <section className="border-b border-rule px-6 py-12 lg:px-0">
           <div className="space-y-8">
             {/* Comments Count */}
             <div>
@@ -285,8 +282,8 @@ export default function ThreadDetail({
               </div>
             )}
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
     </div>
   );
 }

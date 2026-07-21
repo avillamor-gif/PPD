@@ -26,8 +26,10 @@ export default function PolicyDiscussionsPage({
 }) {
   const [threads, setThreads] = useState<Thread[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string>('');
   const [user, setUser] = useState<any>(null);
   const [policy, setPolicy] = useState<any>(null);
+  const [policyLoading, setPolicyLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
@@ -64,6 +66,9 @@ export default function PolicyDiscussionsPage({
       }
     } catch (error) {
       console.error('Error loading policy:', error);
+      setError('Failed to load policy');
+    } finally {
+      setPolicyLoading(false);
     }
   };
 
@@ -72,18 +77,22 @@ export default function PolicyDiscussionsPage({
       // Use the actual policy ID, not the slug
       const actualPolicyId = policyId || policy?.id || params.id;
       
-      const response = await fetch(`/api/discussions?policyId=${actualPolicyId}`, {
+      const response = await fetch(`/api/discussions?policyId=${encodeURIComponent(actualPolicyId)}`, {
         cache: 'no-store',
       });
 
       if (!response.ok) {
-        throw new Error('Failed to fetch discussions');
+        const errorData = await response.text();
+        throw new Error(`API Error: ${response.status} - ${errorData}`);
       }
 
       const threadsWithAuthor = await response.json();
       setThreads(threadsWithAuthor);
+      setError('');
     } catch (error) {
-      console.error('Load threads error:', error);
+      const errorMsg = error instanceof Error ? error.message : 'Failed to load discussions';
+      console.error('Load threads error:', errorMsg);
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -136,6 +145,11 @@ export default function PolicyDiscussionsPage({
       </div>
 
       {/* Threads */}
+      {error && (
+        <div className="p-4 rounded-lg bg-coral/10 border border-coral/20 text-coral text-sm">
+          <p className="font-mono">Error: {error}</p>
+        </div>
+      )}
       {loading ? (
         <div className="text-center py-12 text-ink/60">Loading discussions...</div>
       ) : threads.length === 0 ? (
