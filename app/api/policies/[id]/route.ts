@@ -204,22 +204,15 @@ export async function GET(
     if (error || !data) {
       const { data: policyWithOldSlug } = await supabaseAdmin
         .from('policies')
-        .select('slug, previous_slugs')
+        .select()
         .contains('previous_slugs', [id])
         .limit(1)
         .single();
 
       if (policyWithOldSlug) {
-        // Return redirect info
-        return NextResponse.json(
-          { 
-            success: true, 
-            redirect: true, 
-            newSlug: policyWithOldSlug.slug,
-            message: 'Policy slug has been updated'
-          },
-          { status: 200 }
-        );
+        // Return the full policy data (not redirect info) so edit forms can load it
+        // The policy page component will handle the redirect to new slug
+        data = policyWithOldSlug;
       }
     }
 
