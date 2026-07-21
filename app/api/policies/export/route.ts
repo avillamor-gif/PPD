@@ -11,8 +11,19 @@ export async function GET(req: NextRequest) {
     // Debug: Log authentication attempt
     console.log('📥 [EXPORT] Export request received');
     
-    // Check authentication using Supabase SSR client
+    // Debug: Check all cookies from headers
+    const authHeader = req.headers.get('cookie');
+    console.log('📥 [EXPORT] Raw cookie header:', authHeader);
+    
+    // Check for specific Supabase cookie patterns
     const cookies = req.cookies;
+    const authToken = 
+      cookies.get('sb-auth-token')?.value || 
+      cookies.get('auth-token')?.value ||
+      cookies.get('supabase-auth-token')?.value;
+    console.log('📥 [EXPORT] Supabase auth token found:', !!authToken);
+    
+    // Check authentication using Supabase SSR client
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL || '',
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
@@ -20,7 +31,9 @@ export async function GET(req: NextRequest) {
         cookies: {
           get(name: string) {
             const value = cookies.get(name)?.value;
-            console.log(`📥 [EXPORT] Cookie get('${name}'): ${value ? 'found' : 'not found'}`);
+            if (value) {
+              console.log(`📥 [EXPORT] Cookie '${name}': found (${value.substring(0, 20)}...)`);
+            }
             return value;
           },
           set(name: string, value: string, options: any) {
@@ -39,7 +52,9 @@ export async function GET(req: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (authError || !user?.id) {
-      console.error('❌ [EXPORT] Auth error:', authError, 'User:', user);
+      console.error('❌ [EXPORT] Auth failed');
+      console.error('❌ [EXPORT] Auth error:', authError?.message);
+      console.error('❌ [EXPORT] User:', user);
       return NextResponse.json(
         { error: 'Authentication required. Please log in to download policies.' },
         { status: 401 }
