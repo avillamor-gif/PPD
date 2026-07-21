@@ -188,65 +188,56 @@ export async function DELETE(
       );
     }
 
-    if (deleteError || !deleteSuccess) {
-      console.error('🗑️ [DELETE] Delete failed. Error:', deleteError);
-      console.error('🗑️ [DELETE] Attempting soft-delete as fallback...');
-      
-      // Fallback: soft delete in database by marking as deleted
-      try {
-        const { error: softDeleteError } = await supabaseAdmin
-          .from('user_profiles')
-          .update({ 
-            display_name: '[Deleted User]',
-            bio: null,
-            avatar_url: null 
-          })
-          .eq('id', userId);
+    // Also delete user profile from database (hard delete)
+    console.log('🗑️ [DELETE] Deleting user profile from database...');
+    try {
+      const { error: profileDeleteError } = await supabaseAdmin
+        .from('user_profiles')
+        .delete()
+        .eq('id', userId);
 
-        if (softDeleteError) {
-          console.error('🗑️ [DELETE] Soft delete also failed:', softDeleteError);
-          return NextResponse.json(
-            { error: 'Could not delete user via auth or database' },
-            { status: 400 }
-          );
-        }
-
-        console.log('🗑️ [DELETE] Successfully soft-deleted user profile');
-        
-        // Log audit event
-        await supabaseAdmin
-          .from('audit_logs')
-          .insert({
-            resource_type: 'user',
-            resource_id: userId,
-            action: 'user_soft_deleted',
-          });
-
-        return NextResponse.json({ 
-          success: true, 
-          message: 'User profile deleted successfully (soft delete)',
-          note: 'Auth account still exists but profile data cleared'
-        });
-      } catch (softErr) {
-        console.error('🗑️ [DELETE] Soft delete exception:', softErr);
+      if (profileDeleteError) {
+        console.error('🗑️ [DELETE] Profile delete error:', profileDeleteError);
         return NextResponse.json(
-          { error: 'Failed to delete user' },
+          { error: 'Failed to delete user profile' },
           { status: 400 }
         );
       }
-    }
 
-    console.log('🗑️ [DELETE] User deleted from auth successfully');
+      console.log('🗑️ [DELETE] Successfully deleted user profile from database');
+    } catch (profileErr) {
+      console.error('🗑️ [DELETE] Profile delete exception:', profileErr);
+      return NextResponse.json(
+        { error: 'Failed to delete user profile' },
+        { status: 400 }
+      );
+    }
 
     // Log audit event
     console.log('🗑️ [DELETE] Logging audit event...');
-    const { error: auditError } = await supabaseAdmin
-      .from('audit_logs')
-      .insert({
-        resource_type: 'user',
-        resource_id: userId,
-        action: 'user_deleted',
-      });
+    let auditError = null;
+    
+    if (deleteError || !deleteSuccess) {
+      console.warn('🗑️ [DELETE] Auth deletion failed, but profile deleted. Recording partial delete.');
+      const result = await supabaseAdmin
+        .from('audit_logs')
+        .insert({
+          resource_type: 'user',
+          resource_id: userId,
+          action: 'user_deleted_partial',
+        });
+      auditError = result.error;
+    } else {
+      console.log('🗑️ [DELETE] Auth deletion succeeded, recording complete delete.');
+      const result = await supabaseAdmin
+        .from('audit_logs')
+        .insert({
+          resource_type: 'user',
+          resource_id: userId,
+          action: 'user_deleted',
+        });
+      auditError = result.error;
+    }
 
     if (auditError) {
       console.warn('🗑️ [DELETE] Audit log error (non-critical):', auditError);
