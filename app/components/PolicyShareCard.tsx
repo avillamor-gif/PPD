@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Share2 } from 'lucide-react';
+import { Share2, Mail } from 'lucide-react';
 
 interface PolicyShareCardProps {
   title: string;
@@ -11,10 +11,16 @@ interface PolicyShareCardProps {
 export function PolicyShareCard({ title, url }: PolicyShareCardProps) {
   const [copied, setCopied] = useState(false);
 
-  const handleTwitterShare = () => {
-    const text = `Check out this policy: ${title}`;
-    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
-    window.open(twitterUrl, '_blank', 'width=550,height=420');
+  const handleLinkedInShare = () => {
+    const linkedInUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
+    window.open(linkedInUrl, '_blank', 'width=550,height=420');
+  };
+
+  const handleEmailShare = () => {
+    const subject = `Check out this policy: ${title}`;
+    const body = `I found this interesting policy on the Plastic Policy Database:\n\n${title}\n\n${url}`;
+    const mailtoLink = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.location.href = mailtoLink;
   };
 
   const handleInstagramShare = () => {
@@ -40,10 +46,17 @@ export function PolicyShareCard({ title, url }: PolicyShareCardProps) {
       <h3 className="font-bold text-ink text-sm uppercase tracking-wider">Share</h3>
       <div className="grid gap-2">
         <button
-          onClick={handleTwitterShare}
-          className="w-full py-2 px-3 rounded-lg bg-ocean text-white text-sm font-semibold hover:bg-ocean/90 transition"
+          onClick={handleLinkedInShare}
+          className="w-full py-2 px-3 rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700 transition"
         >
-          Twitter
+          LinkedIn
+        </button>
+        <button
+          onClick={handleEmailShare}
+          className="w-full py-2 px-3 rounded-lg bg-slate-600 text-white text-sm font-semibold hover:bg-slate-700 transition flex items-center justify-center gap-2"
+        >
+          <Mail className="w-4 h-4" />
+          Email
         </button>
         <button
           onClick={handleInstagramShare}
