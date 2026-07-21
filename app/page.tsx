@@ -5,6 +5,7 @@ import type { Policy } from '@/lib/types/policy';
 import { CountriesSection } from '@/app/components/CountriesSection';
 import { ThemesSection } from '@/app/components/ThemesSection';
 import { RecentlyIndexedSection } from '@/app/components/RecentlyIndexedSection';
+import { SnapshotCard } from '@/app/components/SnapshotCard';
 
 export const metadata = {
   title: "Plastic Policy Database — Asia Pacific",
@@ -127,16 +128,15 @@ export default async function Home() {
 
           {/* Stat block */}
           <div className="relative">
-            <div className="rounded-2xl border border-ink/10 bg-card p-8 shadow-[0_30px_80px_-40px_rgba(20,40,60,0.35)]">
-              <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
-                Snapshot
-              </div>
-              <div className="mt-6 grid grid-cols-2 gap-y-8 gap-x-4">
-                <Stat n={total.toString()} label="Policies indexed" />
-                <Stat n={countriesCovered.toString()} label="Countries covered" />
-                <Stat n={inForce.toString()} label="In force" accent />
-                <Stat n={proposed.toString()} label="Proposed / in draft" />
-              </div>
+            <SnapshotCard 
+              staticData={{
+                total,
+                inForce,
+                proposedDraft: proposed,
+                countriesCovered
+              }}
+            />
+            <div className="rounded-2xl border border-ink/10 bg-card p-8 shadow-[0_30px_80px_-40px_rgba(20,40,60,0.35)] mt-8">
               <div className="mt-8 border-t border-rule pt-6">
                 <div className="font-mono text-[10px] uppercase tracking-[0.22em] text-muted-foreground">
                   Earliest record
@@ -227,17 +227,6 @@ export default async function Home() {
           </div>
         </div>
       </section>
-    </div>
-  );
-}
-
-function Stat({ n, label, accent }: { n: string; label: string; accent?: boolean }) {
-  return (
-    <div>
-      <div className={`font-display text-5xl font-semibold leading-none tracking-tight ${accent ? "text-coral" : "text-ink"}`}>
-        {n}
-      </div>
-      <div className="mt-2 font-mono text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{label}</div>
     </div>
   );
 }
