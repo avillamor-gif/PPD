@@ -181,7 +181,7 @@ export default function PolicyDiscussionsPage({
           )}
         </div>
       ) : (
-        <div className="space-y-8">
+        <div className="space-y-8 pb-12">
           {threads.map((thread) => (
             <Link
               key={thread.id}
