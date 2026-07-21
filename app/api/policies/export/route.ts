@@ -8,6 +8,9 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
   try {
+    // Debug: Log authentication attempt
+    console.log('📥 [EXPORT] Export request received');
+    
     // Check authentication using Supabase SSR client
     const cookies = req.cookies;
     const supabase = createServerClient(
@@ -16,7 +19,9 @@ export async function GET(req: NextRequest) {
       {
         cookies: {
           get(name: string) {
-            return cookies.get(name)?.value;
+            const value = cookies.get(name)?.value;
+            console.log(`📥 [EXPORT] Cookie get('${name}'): ${value ? 'found' : 'not found'}`);
+            return value;
           },
           set(name: string, value: string, options: any) {
             // Not needed for GET requests
@@ -34,14 +39,14 @@ export async function GET(req: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (authError || !user?.id) {
-      console.error('Auth error:', authError);
+      console.error('❌ [EXPORT] Auth error:', authError, 'User:', user);
       return NextResponse.json(
         { error: 'Authentication required. Please log in to download policies.' },
         { status: 401 }
       );
     }
 
-    console.log('✅ User authenticated:', user.id);
+    console.log('✅ [EXPORT] User authenticated:', user.id);
 
     const searchParams = req.nextUrl.searchParams;
     
