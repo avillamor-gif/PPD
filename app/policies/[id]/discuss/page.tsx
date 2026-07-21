@@ -100,17 +100,22 @@ export default function PolicyDiscussionsPage({
   };
 
   return (
-    <div className="mx-auto max-w-4xl px-6 lg:px-0 space-y-8">
-      {/* Back button */}
-      {policy && (
-        <Link
-          href={`/policies/${resolvedParams.id}`}
-          className="inline-flex items-center gap-2 text-ocean hover:text-ocean-deep transition"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Back to policy
-        </Link>
-      )}
+    <div className="mx-auto max-w-4xl px-6 lg:px-0">
+      {/* Back button section with border */}
+      <div className="py-4 border-b border-rule">
+        {policy && (
+          <Link
+            href={`/policies/${resolvedParams.id}`}
+            className="inline-flex items-center gap-2 text-ocean hover:text-ocean-deep transition"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to policy
+          </Link>
+        )}
+      </div>
+
+      <div className="space-y-8 pt-8">
+      {/* Back button was here */}
 
       {/* Policy Context Card */}
       {policy && (
@@ -223,6 +228,7 @@ export default function PolicyDiscussionsPage({
           ))}
         </div>
       )}
+      </div>
     </div>
   );
 }
