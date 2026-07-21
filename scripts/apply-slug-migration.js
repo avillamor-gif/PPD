@@ -24,7 +24,7 @@ function generateSlugFromTitle(title) {
     .replace(/[^a-z0-9\s-]/g, '')
     .replace(/\s+/g, '-')
     .replace(/-+/g, '-')
-    .slice(0, 100);
+    .slice(0, 150); // Increased from 100 to allow longer policy titles
 }
 
 async function applyMigration() {
