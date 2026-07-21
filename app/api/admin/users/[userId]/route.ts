@@ -151,29 +151,42 @@ export async function DELETE(
     }
 
     console.log('🗑️ [DELETE] User found, attempting deletion...');
+    console.log('🗑️ [DELETE] Using userId:', userId);
+    console.log('🗑️ [DELETE] Supabase admin auth client:', supabaseAdmin.auth.admin ? 'available' : 'missing');
 
     // Delete from auth using admin API
-    const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(userId);
+    try {
+      const deleteResponse = await supabaseAdmin.auth.admin.deleteUser(userId);
+      console.log('🗑️ [DELETE] Delete response received:', deleteResponse);
+      console.log('🗑️ [DELETE] Response keys:', Object.keys(deleteResponse || {}));
+      
+      const { error: deleteError, data: deleteData } = deleteResponse;
+      
+      console.log('🗑️ [DELETE] deleteError:', deleteError);
+      console.log('🗑️ [DELETE] deleteError is null/undefined:', deleteError === null || deleteError === undefined);
+      console.log('🗑️ [DELETE] deleteError toString:', deleteError?.toString());
+      console.log('🗑️ [DELETE] deleteData:', deleteData);
 
-    if (deleteError) {
-      console.error('🗑️ [DELETE] Auth deletion error (full object):', JSON.stringify(deleteError, null, 2));
-      console.error('🗑️ [DELETE] Error type:', typeof deleteError);
-      console.error('🗑️ [DELETE] Error keys:', Object.keys(deleteError));
-      const errorMsg = 
-        (deleteError as any).message || 
-        (deleteError as any).error_description || 
-        (deleteError as any).error ||
-        (deleteError as any).code ||
-        JSON.stringify(deleteError) || 
-        'Unknown auth error';
-      console.error('🗑️ [DELETE] Extracted error message:', errorMsg);
+      if (deleteError) {
+        console.error('🗑️ [DELETE] Auth deletion failed');
+        console.error('🗑️ [DELETE] Full error object:', deleteError);
+        console.error('🗑️ [DELETE] Error constructor:', deleteError?.constructor?.name);
+        console.error('🗑️ [DELETE] Error entries:', Object.entries(deleteError));
+        
+        return NextResponse.json(
+          { error: `User deletion failed. Please check server logs.` },
+          { status: 400 }
+        );
+      }
+
+      console.log('🗑️ [DELETE] User deleted from auth successfully');
+    } catch (authError) {
+      console.error('🗑️ [DELETE] Exception during auth deletion:', authError);
       return NextResponse.json(
-        { error: `Auth deletion failed: ${errorMsg}` },
+        { error: `Auth error: ${authError instanceof Error ? authError.message : String(authError)}` },
         { status: 400 }
       );
     }
-
-    console.log('🗑️ [DELETE] User deleted from auth successfully');
 
     // Log audit event
     console.log('🗑️ [DELETE] Logging audit event...');
