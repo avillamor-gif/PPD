@@ -12,6 +12,7 @@ export interface PolicyExportData {
   lifecycle_stage?: string;
   authority: string;
   link: string;
+  other_links?: string;
   summary?: string;
   keywords?: string;
   language?: string;
@@ -37,7 +38,8 @@ export async function formatPoliciesToExcel(policies: PolicyExportData[]): Promi
     { header: 'Summary', key: 'summary', width: 40 },
     { header: 'Keywords', key: 'keywords', width: 20 },
     { header: 'Language', key: 'language', width: 10 },
-    { header: 'Link', key: 'link', width: 30 },
+    { header: 'Official Link', key: 'link', width: 30 },
+    { header: 'Other Links', key: 'other_links', width: 30 },
   ];
 
   // Style header row
@@ -79,9 +81,15 @@ export async function formatPoliciesToExcel(policies: PolicyExportData[]): Promi
       wrapText: true,
     };
 
-    // Make links blue and underlined
+    // Make link columns blue and underlined
     const linkCell = row.getCell('link');
     linkCell.font = {
+      color: { argb: 'FF0563C1' },
+      underline: 'single',
+    };
+    
+    const otherLinksCell = row.getCell('other_links');
+    otherLinksCell.font = {
       color: { argb: 'FF0563C1' },
       underline: 'single',
     };

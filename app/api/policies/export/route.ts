@@ -52,7 +52,7 @@ export async function GET(req: NextRequest) {
     // Build query
     let query = supabaseAdmin
       .from('policies')
-      .select('id, slug, title, year, country, level, category, status, lifecycle_stage, authority, link, summary, keywords, language');
+      .select('id, slug, title, year, country, level, category, status, lifecycle_stage, authority, link, other_links, summary, keywords, language');
 
     // Apply filters - use 'in' for multiple values
     if (statuses.length > 0) {
@@ -90,23 +90,27 @@ export async function GET(req: NextRequest) {
 
     console.log(`📥 [EXPORT] Found ${policies.length} policies, generating Excel...`);
 
-    // Format policies for export
-    const exportData: PolicyExportData[] = policies.map((p: any) => ({
-      id: p.id,
-      slug: p.slug,
-      title: p.title,
-      year: p.year,
-      country: p.country,
-      level: p.level,
-      category: p.category,
-      status: p.status,
-      lifecycle_stage: p.lifecycle_stage,
-      authority: p.authority,
-      link: p.link,
-      summary: p.summary,
-      keywords: p.keywords,
-      language: p.language,
-    }));
+    // Format policies for export - convert country codes to full names
+    const exportData: PolicyExportData[] = policies.map((p: any) => {
+      const countryName = COUNTRIES.find(c => c.code === p.country)?.name || p.country;
+      return {
+        id: p.id,
+        slug: p.slug,
+        title: p.title,
+        year: p.year,
+        country: countryName,
+        level: p.level,
+        category: p.category,
+        status: p.status,
+        lifecycle_stage: p.lifecycle_stage,
+        authority: p.authority,
+        link: p.link,
+        other_links: p.other_links,
+        summary: p.summary,
+        keywords: p.keywords,
+        language: p.language,
+      };
+    });
 
     // Generate Excel file
     const buffer = await formatPoliciesToExcel(exportData);
