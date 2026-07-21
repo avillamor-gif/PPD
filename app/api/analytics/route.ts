@@ -65,7 +65,11 @@ export async function GET(req: NextRequest) {
 
 function getPolicyByStatus(policies: any[]) {
   const grouped = policies.reduce((acc, p) => {
-    const status = p.status || 'Unknown';
+    let status = p.status || 'Unknown';
+    // Combine Draft and Proposed into one category
+    if (status === 'Draft' || status === 'Proposed') {
+      status = 'Proposed/Draft';
+    }
     acc[status] = (acc[status] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);

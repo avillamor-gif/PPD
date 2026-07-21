@@ -192,9 +192,9 @@ export default function AdminDashboard() {
         </div>
 
         <div className="rounded-2xl border border-ink/10 bg-card p-6">
-          <div className="text-sm font-mono uppercase tracking-[0.22em] text-ink/60">Proposed</div>
+          <div className="text-sm font-mono uppercase tracking-[0.22em] text-ink/60">Proposed/Draft</div>
           <div className="mt-3 font-display text-5xl font-bold text-coral">
-            {analytics?.policyByStatus.find(s => s.status === 'Proposed')?.count || 0}
+            {analytics?.policyByStatus.find(s => s.status === 'Proposed/Draft')?.count || 0}
           </div>
           <div className="mt-2 text-xs text-ink/50">In development</div>
         </div>
