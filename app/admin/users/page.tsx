@@ -222,11 +222,12 @@ export default function UserManagementPage() {
       } catch {
         data = {};
       }
-      console.log('🗑️ Delete response:', { status: response.status, data });
+      console.log('🗑️ Delete response status:', response.status);
+      console.log('🗑️ Delete response data:', JSON.stringify(data, null, 2));
 
       if (!response.ok) {
         const errorMsg = data?.error || data?.message || `Server error (${response.status})`;
-        console.error('🗑️ Delete failed:', errorMsg);
+        console.error('🗑️ Delete failed with error:', errorMsg);
         setErrorMessage(`✗ ${errorMsg}`);
         return;
       }

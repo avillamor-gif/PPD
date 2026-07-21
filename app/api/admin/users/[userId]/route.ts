@@ -156,8 +156,17 @@ export async function DELETE(
     const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(userId);
 
     if (deleteError) {
-      console.error('🗑️ [DELETE] Auth deletion error:', deleteError);
-      const errorMsg = (deleteError as any).message || (deleteError as any).error_description || JSON.stringify(deleteError) || 'Unknown error';
+      console.error('🗑️ [DELETE] Auth deletion error (full object):', JSON.stringify(deleteError, null, 2));
+      console.error('🗑️ [DELETE] Error type:', typeof deleteError);
+      console.error('🗑️ [DELETE] Error keys:', Object.keys(deleteError));
+      const errorMsg = 
+        (deleteError as any).message || 
+        (deleteError as any).error_description || 
+        (deleteError as any).error ||
+        (deleteError as any).code ||
+        JSON.stringify(deleteError) || 
+        'Unknown auth error';
+      console.error('🗑️ [DELETE] Extracted error message:', errorMsg);
       return NextResponse.json(
         { error: `Auth deletion failed: ${errorMsg}` },
         { status: 400 }
