@@ -15,6 +15,7 @@ const statusColors: Record<string, { bg: string; badge: string }> = {
   "Proposed": { bg: "bg-coral/10", badge: "bg-coral text-white" },
   "Phased": { bg: "bg-sand/10", badge: "bg-sand text-ink" },
   "Repealed": { bg: "bg-ink/5", badge: "bg-ink/20 text-ink/60" },
+  "Draft": { bg: "bg-slate/10", badge: "bg-slate-400 text-ink" },
 };
 
 export const metadata = {
