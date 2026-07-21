@@ -181,23 +181,27 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
+    console.log(`[GET] Fetching policy with id: "${id}"`);
 
-    // Try to fetch by slug first, then by id
+    // Try to fetch by ID first (ID is more stable than slug)
     let { data, error } = await supabaseAdmin
       .from('policies')
       .select()
-      .eq('slug', id)
+      .eq('id', id)
       .single();
 
-    // If not found by slug, try by id
+    console.log(`[GET] ID query - Found: ${!!data}, Error: ${error?.message}`);
+
+    // If not found by ID, try by slug (for backward compatibility)
     if (error || !data) {
       const result = await supabaseAdmin
         .from('policies')
         .select()
-        .eq('id', id)
+        .eq('slug', id)
         .single();
       data = result.data;
       error = result.error;
+      console.log(`[GET] Slug query - Found: ${!!data}, Error: ${error?.message}`);
     }
 
     // If still not found, check if it's an old slug (previous_slugs)
@@ -286,18 +290,19 @@ export async function PUT(
     }
 
     // Fetch current policy to check if title changed
+    // Try by ID first (ID is stable), then by slug for backward compatibility
     let currentPolicyResult = await supabaseAdmin
       .from('policies')
       .select('id, title, slug')
-      .eq('slug', id)
+      .eq('id', id)
       .single();
 
-    // If not found by slug, try by id
+    // If not found by id, try by slug (for backward compatibility)
     if (currentPolicyResult.error || !currentPolicyResult.data) {
       currentPolicyResult = await supabaseAdmin
         .from('policies')
         .select('id, title, slug')
-        .eq('id', id)
+        .eq('slug', id)
         .single();
     }
 
@@ -366,19 +371,19 @@ export async function PUT(
       }
     }
 
-    // Update in Supabase - try by slug first, then by id
+    // Update in Supabase - use the stable ID for the update
     let result = await supabaseAdmin
       .from('policies')
       .update(policyData)
-      .eq('slug', currentPolicy.slug)
+      .eq('id', currentPolicy.id)
       .select();
 
-    // If not found by slug, try by id instead
+    // If that fails, try by slug as fallback (for backward compatibility)
     if (!result.data || result.data.length === 0) {
       result = await supabaseAdmin
         .from('policies')
         .update(policyData)
-        .eq('id', currentPolicy.id)
+        .eq('slug', currentPolicy.slug)
         .select();
     }
 
