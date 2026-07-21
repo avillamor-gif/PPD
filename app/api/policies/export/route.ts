@@ -1,5 +1,5 @@
 import { supabaseAdmin } from '@/lib/supabase-admin';
-import { formatPoliciesToExcel, generateFilename, PolicyExportData } from '@/lib/export';
+import { formatPoliciesToExcel, PolicyExportData } from '@/lib/export';
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 
@@ -33,22 +33,20 @@ export async function GET(req: NextRequest) {
 
     const searchParams = req.nextUrl.searchParams;
     
-    // Get filter parameters
-    const country = searchParams.get('country');
-    const region = searchParams.get('region');
-    const year = searchParams.get('year');
-    const category = searchParams.get('category');
-    const status = searchParams.get('status');
-    const lifecycle = searchParams.get('lifecycle');
+    // Get filter parameters - handle multiple values
+    const countries = searchParams.getAll('countries');
+    const levels = searchParams.getAll('levels');
+    const categories = searchParams.getAll('categories');
+    const lifecycles = searchParams.getAll('lifecycles');
+    const years = searchParams.getAll('years').map((y) => parseInt(y)).filter((y) => !isNaN(y));
     const search = searchParams.get('search');
 
     console.log('📥 [EXPORT] Policy export requested with filters:', {
-      country,
-      region,
-      year,
-      category,
-      status,
-      lifecycle,
+      countries,
+      levels,
+      categories,
+      lifecycles,
+      years,
       search,
     });
 
@@ -58,29 +56,25 @@ export async function GET(req: NextRequest) {
       .select('id, slug, title, year, country, level, category, status, lifecycle_stage, authority, link, summary, keywords, language')
       .eq('status', 'Enacted'); // Only export enacted policies
 
-    // Apply filters
-    if (country) {
-      query = query.eq('country', country);
+    // Apply filters - use 'in' for multiple values
+    if (countries.length > 0) {
+      query = query.in('country', countries);
     }
 
-    if (region) {
-      query = query.eq('level', region);
+    if (levels.length > 0) {
+      query = query.in('level', levels);
     }
 
-    if (year) {
-      query = query.eq('year', parseInt(year));
+    if (years.length > 0) {
+      query = query.in('year', years);
     }
 
-    if (category) {
-      query = query.eq('category', category);
+    if (categories.length > 0) {
+      query = query.in('category', categories);
     }
 
-    if (status && status !== 'all') {
-      query = query.eq('status', status);
-    }
-
-    if (lifecycle) {
-      query = query.eq('lifecycle_stage', lifecycle);
+    if (lifecycles.length > 0) {
+      query = query.in('lifecycle_stage', lifecycles);
     }
 
     if (search) {
@@ -132,11 +126,22 @@ export async function GET(req: NextRequest) {
 
     // Generate Excel file
     const buffer = await formatPoliciesToExcel(exportData);
-    const filename = generateFilename({
-      country: country || undefined,
-      year: year ? parseInt(year) : undefined,
-      category: category || undefined,
-    });
+    
+    // Build filename with filter info
+    const timestamp = new Date().toISOString().split('T')[0];
+    const filenameParts = ['policies', timestamp];
+    
+    if (countries.length > 0) {
+      filenameParts.push(`${countries.length}countries`);
+    }
+    if (categories.length > 0) {
+      filenameParts.push(`${categories.length}categories`);
+    }
+    if (years.length > 0) {
+      filenameParts.push(`${years.length}years`);
+    }
+    
+    const filename = `${filenameParts.join('_')}.xlsx`;
 
     console.log(`✅ [EXPORT] Excel file generated: ${filename} (${buffer.length} bytes)`);
 
