@@ -6,6 +6,7 @@ import { Search, ChevronDown, Loader, Download } from 'lucide-react';
 import { COUNTRIES } from '@/lib/constants';
 import { useReferenceData } from '@/lib/hooks/useReferenceData';
 import { ExportModal } from '@/app/components/ExportModal';
+import { supabase } from '@/lib/supabase';
 
 // Transform policies to include country names for display
 const transformPolicies = (policies: any[]) => {
@@ -82,6 +83,7 @@ export default function SearchPage() {
   const [status, setStatus] = useState("Any status");
   const [sortBy, setSortBy] = useState("Year: Newest");
   const [showExportModal, setShowExportModal] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   // Statuses from reference data with "Any status" option
   const STATUSES = referenceData?.statuses 
@@ -113,6 +115,17 @@ export default function SearchPage() {
       }
     };
     fetchPolicies();
+  }, []);
+
+  // Check if user is logged in
+  useEffect(() => {
+    const checkAuth = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      setIsLoggedIn(!!session?.user?.id);
+    };
+    checkAuth();
   }, []);
 
   const POLICIES = rawPolicies;
@@ -306,7 +319,7 @@ export default function SearchPage() {
             <div className="font-mono text-[11px] uppercase tracking-[0.18em] text-ink/60">
               {rows.length} result{rows.length === 1 ? "" : "s"}
             </div>
-            {rows.length > 0 && (
+            {rows.length > 0 && isLoggedIn && (
               <button
                 onClick={() => setShowExportModal(true)}
                 className="flex items-center gap-2 px-4 py-2 rounded-lg bg-ocean/10 text-ocean hover:bg-ocean/20 transition font-medium text-sm"

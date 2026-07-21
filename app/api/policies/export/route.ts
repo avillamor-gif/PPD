@@ -1,11 +1,36 @@
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { formatPoliciesToExcel, generateFilename, PolicyExportData } from '@/lib/export';
 import { NextRequest, NextResponse } from 'next/server';
+import { createServerClient } from '@supabase/ssr';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
   try {
+    // Check authentication
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
+      {
+        cookies: {
+          get(name: string) {
+            return req.cookies.get(name)?.value;
+          },
+        },
+      }
+    );
+
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { error: 'Authentication required. Please log in to download policies.' },
+        { status: 401 }
+      );
+    }
+
     const searchParams = req.nextUrl.searchParams;
     
     // Get filter parameters
