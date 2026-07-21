@@ -10,8 +10,6 @@ interface ExportFiltersProps {
 interface ExportOptions {
   countries: string[];
   regions: string[];
-  categories: string[];
-  lifecycles: string[];
   statuses: string[];
   years: number[];
 }
@@ -23,29 +21,23 @@ export function ExportModal({ onClose }: ExportFiltersProps) {
   const [options, setOptions] = useState<ExportOptions>({
     countries: [],
     regions: [],
-    categories: [],
-    lifecycles: [],
     statuses: [],
     years: [],
   });
 
   // Multi-select state
   const [selectedCountries, setSelectedCountries] = useState<Set<string>>(
-    new Set()
+    new Set(options.countries)
   );
   const [selectedRegions, setSelectedRegions] = useState<Set<string>>(
-    new Set()
-  );
-  const [selectedCategories, setSelectedCategories] = useState<Set<string>>(
-    new Set()
-  );
-  const [selectedLifecycles, setSelectedLifecycles] = useState<Set<string>>(
-    new Set()
+    new Set(options.regions)
   );
   const [selectedStatuses, setSelectedStatuses] = useState<Set<string>>(
-    new Set()
+    new Set(options.statuses)
   );
-  const [selectedYears, setSelectedYears] = useState<Set<number>>(new Set());
+  const [selectedYears, setSelectedYears] = useState<Set<number>>(
+    new Set(options.years)
+  );
   const [search, setSearch] = useState('');
 
   // Dropdown open state
@@ -53,8 +45,6 @@ export function ExportModal({ onClose }: ExportFiltersProps) {
   const [searchFilters, setSearchFilters] = useState({
     countries: '',
     regions: '',
-    categories: '',
-    lifecycles: '',
     statuses: '',
     years: '',
   });
@@ -106,16 +96,6 @@ export function ExportModal({ onClose }: ExportFiltersProps) {
         selectedRegions.forEach((l) => params.append('regions', l));
       }
 
-      // Add multiple categories
-      if (selectedCategories.size > 0) {
-        selectedCategories.forEach((c) => params.append('categories', c));
-      }
-
-      // Add multiple lifecycles
-      if (selectedLifecycles.size > 0) {
-        selectedLifecycles.forEach((l) => params.append('lifecycles', l));
-      }
-
       // Add multiple statuses
       if (selectedStatuses.size > 0) {
         selectedStatuses.forEach((s) => params.append('statuses', s));
@@ -126,11 +106,6 @@ export function ExportModal({ onClose }: ExportFiltersProps) {
         Array.from(selectedYears)
           .sort((a, b) => b - a)
           .forEach((y) => params.append('years', y.toString()));
-      }
-
-      // Add search
-      if (search) {
-        params.append('search', search);
       }
 
       const url = `/api/policies/export?${params.toString()}`;
@@ -168,18 +143,40 @@ export function ExportModal({ onClose }: ExportFiltersProps) {
     selected,
     onToggle,
     searchKey,
+    allItems,
   }: {
     label: string;
     items: (string | number)[];
     selected: Set<string | number>;
     onToggle: (value: string | number) => void;
     searchKey: keyof typeof searchFilters;
+    allItems: (string | number)[];
   }) => {
     const isOpen = openDropdown === searchKey;
     const searchValue = searchFilters[searchKey];
     const filtered = items.filter((item) =>
       item.toString().toLowerCase().includes(searchValue.toLowerCase())
     );
+    
+    const allSelected = allItems.length > 0 && selected.size === allItems.length;
+    
+    const handleSelectAll = () => {
+      if (allSelected) {
+        // Deselect all
+        allItems.forEach(item => {
+          if (selected.has(item)) {
+            onToggle(item);
+          }
+        });
+      } else {
+        // Select all
+        allItems.forEach(item => {
+          if (!selected.has(item)) {
+            onToggle(item);
+          }
+        });
+      }
+    };
 
     return (
       <div className="relative">
@@ -188,12 +185,12 @@ export function ExportModal({ onClose }: ExportFiltersProps) {
           className="w-full px-3 py-2 rounded-lg border border-ink/20 bg-white text-left text-sm flex items-center justify-between hover:border-ocean focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20 transition"
         >
           <span className="text-ink">
-            {selected.size > 0 ? (
-              <span className="font-medium">
-                {label} <span className="text-ocean">({selected.size})</span>
-              </span>
+            {allSelected ? (
+              <span className="font-medium">{label}</span>
             ) : (
-              <span className="text-ink/60">{label}</span>
+              <span className="font-medium">
+                {label} <span className="text-ocean">({selected.size}/{allItems.length})</span>
+              </span>
             )}
           </span>
           <ChevronDown
@@ -205,6 +202,14 @@ export function ExportModal({ onClose }: ExportFiltersProps) {
 
         {isOpen && (
           <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-ink/20 rounded-lg shadow-lg z-50">
+            <div className="p-2 border-b border-ink/10">
+              <button
+                onClick={handleSelectAll}
+                className="w-full px-2 py-1 text-left text-sm font-medium text-ocean hover:bg-ocean/10 rounded transition"
+              >
+                {allSelected ? '✓ All selected' : 'Select all'}
+              </button>
+            </div>
             <input
               type="text"
               placeholder="Search..."
@@ -272,97 +277,62 @@ export function ExportModal({ onClose }: ExportFiltersProps) {
             </div>
           ) : (
             <>
-              {/* Search */}
-              <div>
-                <label className="block text-sm font-medium text-ink mb-2">
-                  Keywords
-                </label>
-                <input
-                  type="text"
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Search by title, summary, or keywords…"
-                  className="w-full px-3 py-2 rounded-lg border border-ink/20 bg-white focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20 transition text-sm"
-                />
-              </div>
-
               {/* Filters - Multi-select dropdowns */}
               {options.countries.length > 0 && (
                 <MultiSelect
-                  label="Countries"
+                  label="All Countries"
                   items={options.countries}
                   selected={selectedCountries}
                   onToggle={(val) => setSelectedCountries(toggle(selectedCountries, val))}
                   searchKey="countries"
+                  allItems={options.countries}
                 />
               )}
 
               {options.regions.length > 0 && (
                 <MultiSelect
-                  label="Region"
+                  label="All Regions"
                   items={options.regions}
                   selected={selectedRegions}
                   onToggle={(val) => setSelectedRegions(toggle(selectedRegions, val))}
                   searchKey="regions"
-                />
-              )}
-
-              {options.categories.length > 0 && (
-                <MultiSelect
-                  label="Instrument Type"
-                  items={options.categories}
-                  selected={selectedCategories}
-                  onToggle={(val) => setSelectedCategories(toggle(selectedCategories, val))}
-                  searchKey="categories"
-                />
-              )}
-
-              {options.lifecycles.length > 0 && (
-                <MultiSelect
-                  label="Lifecycle Stage"
-                  items={options.lifecycles}
-                  selected={selectedLifecycles}
-                  onToggle={(val) => setSelectedLifecycles(toggle(selectedLifecycles, val))}
-                  searchKey="lifecycles"
+                  allItems={options.regions}
                 />
               )}
 
               {options.statuses.length > 0 && (
                 <MultiSelect
-                  label="Status"
+                  label="All Statuses"
                   items={options.statuses}
                   selected={selectedStatuses}
                   onToggle={(val) => setSelectedStatuses(toggle(selectedStatuses, val))}
                   searchKey="statuses"
+                  allItems={options.statuses}
                 />
               )}
 
               {options.years.length > 0 && (
                 <MultiSelect
-                  label="Year"
+                  label="All Years"
                   items={options.years}
                   selected={selectedYears}
                   onToggle={(val) => setSelectedYears(toggle(selectedYears, val as number))}
                   searchKey="years"
+                  allItems={options.years}
                 />
               )}
 
               {/* Summary */}
-              {(selectedCountries.size > 0 ||
-                selectedRegions.size > 0 ||
-                selectedCategories.size > 0 ||
-                selectedLifecycles.size > 0 ||
-                selectedStatuses.size > 0 ||
-                selectedYears.size > 0 ||
-                search) && (
+              {(selectedCountries.size < options.countries.length ||
+                selectedRegions.size < options.regions.length ||
+                selectedStatuses.size < options.statuses.length ||
+                selectedYears.size < options.years.length) && (
                 <div className="p-3 rounded-lg bg-ocean/10 border border-ocean/20 text-sm text-ink">
-                  <strong>Filters:</strong> {selectedCountries.size > 0 && `${selectedCountries.size} countries`}
-                  {selectedCountries.size > 0 && selectedRegions.size > 0 && ', '}
-                  {selectedRegions.size > 0 && `${selectedRegions.size} regions`}
-                  {(selectedCountries.size > 0 || selectedRegions.size > 0) && selectedCategories.size > 0 && ', '}
-                  {selectedCategories.size > 0 && `${selectedCategories.size} categories`}
-                  {(selectedCountries.size > 0 || selectedRegions.size > 0 || selectedCategories.size > 0) && selectedStatuses.size > 0 && ', '}
-                  {selectedStatuses.size > 0 && `${selectedStatuses.size} statuses`}
+                  <strong>Filters:</strong> {selectedCountries.size < options.countries.length && `${selectedCountries.size}/${options.countries.length} countries`}
+                  {selectedCountries.size < options.countries.length && selectedRegions.size < options.regions.length && ', '}
+                  {selectedRegions.size < options.regions.length && `${selectedRegions.size}/${options.regions.length} regions`}
+                  {(selectedCountries.size < options.countries.length || selectedRegions.size < options.regions.length) && selectedStatuses.size < options.statuses.length && ', '}
+                  {selectedStatuses.size < options.statuses.length && `${selectedStatuses.size}/${options.statuses.length} statuses`}
                 </div>
               )}
             </>

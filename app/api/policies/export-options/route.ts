@@ -12,29 +12,15 @@ export async function GET() {
       .select('country')
       .order('country');
 
-    // Get distinct categories
-    const { data: categoriesData, error: categoriesError } = await supabaseAdmin
-      .from('policies')
-      .select('category')
-      .order('category');
-
-    // Get distinct lifecycle stages
-    const { data: lifecyclesData, error: lifecyclesError } = await supabaseAdmin
-      .from('policies')
-      .select('lifecycle_stage')
-      .order('lifecycle_stage');
-
     // Get distinct statuses
     const { data: statusesData, error: statusesError } = await supabaseAdmin
       .from('policies')
       .select('status')
       .order('status');
 
-    if (countriesError || categoriesError || lifecyclesError || statusesError) {
+    if (countriesError || statusesError) {
       console.error('Database errors:', {
         countriesError,
-        categoriesError,
-        lifecyclesError,
         statusesError,
       });
       return NextResponse.json(
@@ -67,16 +53,6 @@ export async function GET() {
       )
     ).sort();
 
-    const categories = Array.from(
-      new Set(categoriesData?.map((p: any) => p.category).filter(Boolean) || [])
-    ).sort();
-
-    const lifecycles = Array.from(
-      new Set(
-        lifecyclesData?.map((p: any) => p.lifecycle_stage).filter(Boolean) || []
-      )
-    ).sort();
-
     const statuses = Array.from(
       new Set(statusesData?.map((p: any) => p.status).filter(Boolean) || [])
     ).sort();
@@ -98,8 +74,6 @@ export async function GET() {
     return NextResponse.json({
       countries: countryNames,
       regions,
-      categories,
-      lifecycles,
       statuses,
       years,
     });

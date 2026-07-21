@@ -37,11 +37,8 @@ export async function GET(req: NextRequest) {
     // Get filter parameters - handle multiple values
     const countryNames = searchParams.getAll('countries');
     const regionNames = searchParams.getAll('regions');
-    const categories = searchParams.getAll('categories');
-    const lifecycles = searchParams.getAll('lifecycles');
     const statuses = searchParams.getAll('statuses');
     const years = searchParams.getAll('years').map((y) => parseInt(y)).filter((y) => !isNaN(y));
-    const search = searchParams.get('search');
 
     // Convert country names to codes
     const countryCodes = countryNames
@@ -71,11 +68,8 @@ export async function GET(req: NextRequest) {
       countryNames,
       regionNames,
       allCountryCodes,
-      categories,
-      lifecycles,
       statuses,
       years,
-      search,
     });
 
     // Build query
@@ -94,20 +88,6 @@ export async function GET(req: NextRequest) {
 
     if (years.length > 0) {
       query = query.in('year', years);
-    }
-
-    if (categories.length > 0) {
-      query = query.in('category', categories);
-    }
-
-    if (lifecycles.length > 0) {
-      query = query.in('lifecycle_stage', lifecycles);
-    }
-
-    if (search) {
-      query = query.or(
-        `title.ilike.%${search}%,summary.ilike.%${search}%,keywords.ilike.%${search}%`
-      );
     }
 
     // Order by country, year desc
@@ -163,9 +143,6 @@ export async function GET(req: NextRequest) {
     }
     if (regionNames.length > 0) {
       filenameParts.push(`${regionNames.length}regions`);
-    }
-    if (categories.length > 0) {
-      filenameParts.push(`${categories.length}categories`);
     }
     if (years.length > 0) {
       filenameParts.push(`${years.length}years`);
