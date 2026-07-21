@@ -16,20 +16,6 @@ export default function AdminSubmitPage() {
 
       {/* Form */}
       <PolicyForm />
-
-      {/* Info Box */}
-      <div className="rounded-2xl border border-ocean/20 bg-ocean/5 p-8">
-        <h3 className="font-display text-lg font-bold text-ink mb-3">Integration Ready</h3>
-        <p className="text-sm text-ink/70 mb-3">
-          This form is designed to work seamlessly with Supabase. Once connected:
-        </p>
-        <ul className="text-sm text-ink/70 space-y-2">
-          <li>✓ Data will be stored in the <code className="bg-paper px-2 py-1 rounded">policies</code> table</li>
-          <li>✓ Real-time updates across all pages</li>
-          <li>✓ Full-text search integration</li>
-          <li>✓ Automatic schema validation</li>
-        </ul>
-      </div>
     </div>
   );
 }
