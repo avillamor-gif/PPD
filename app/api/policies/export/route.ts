@@ -99,11 +99,23 @@ export async function GET(req: NextRequest) {
     // Format policies for export - convert country codes to full names
     const exportData: PolicyExportData[] = filteredPolicies.map((p: any) => {
       const countryName = COUNTRIES.find(c => c.code === p.country)?.name || p.country;
+      
+      // Format date as "June 6, 2023"
+      let formattedDate = '';
+      if (p.commencement_date) {
+        const date = new Date(p.commencement_date);
+        formattedDate = date.toLocaleDateString('en-US', { 
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric' 
+        });
+      }
+      
       return {
         id: p.id,
         slug: p.slug,
         title: p.title,
-        commencement_date: p.commencement_date,
+        commencement_date: formattedDate,
         country: countryName,
         level: p.level,
         category: p.category,
