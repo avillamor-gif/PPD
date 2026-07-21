@@ -246,31 +246,24 @@ export default async function PolicyPage({ params }: { params: Promise<{ id: str
             {/* Engagement Card */}
             <PolicyEngagementCard policyId={policy.id} />
 
-            {/* Metadata Card */}
+            {/* Key Words Card */}
             <div className="rounded-xl border border-ink/10 bg-white p-6 space-y-3">
-              <h3 className="font-bold text-ink text-sm uppercase tracking-wider">Metadata</h3>
+              <h3 className="font-bold text-ink text-sm uppercase tracking-wider">Key Words</h3>
               <div className="space-y-2 text-sm">
-                <div>
-                  <p className="text-ink/60">ID</p>
-                  <p className="text-ink font-mono text-xs">{policy.id}</p>
-                </div>
-                <div>
-                  <p className="text-ink/60">Key Words</p>
-                  {policy.keywords ? (
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      {policy.keywords.split(',').map((keyword: string, index: number) => (
-                        <span 
-                          key={index} 
-                          className="inline-block px-2 py-1 rounded bg-ocean/10 text-ocean text-xs font-semibold"
-                        >
-                          {keyword.trim()}
-                        </span>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-ink/40 italic">No keywords added</p>
-                  )}
-                </div>
+                {policy.keywords ? (
+                  <div className="flex flex-wrap gap-2">
+                    {policy.keywords.split(',').map((keyword: string, index: number) => (
+                      <span 
+                        key={index} 
+                        className="inline-block px-2 py-1 rounded bg-ocean/10 text-ocean text-xs font-semibold"
+                      >
+                        {keyword.trim()}
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-ink/40 italic">No keywords added</p>
+                )}
               </div>
             </div>
 
