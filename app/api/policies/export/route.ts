@@ -115,8 +115,11 @@ export async function GET(req: NextRequest) {
 
     console.log(`✅ [EXPORT] Excel file generated: ${filename} (${buffer.length} bytes)`);
 
+    // Convert Buffer to Uint8Array for NextResponse
+    const uint8Array = new Uint8Array(buffer);
+
     // Return file as download
-    return new NextResponse(buffer, {
+    return new NextResponse(uint8Array, {
       status: 200,
       headers: {
         'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
