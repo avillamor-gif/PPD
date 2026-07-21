@@ -28,7 +28,7 @@ export async function formatPoliciesToExcel(policies: PolicyExportData[]): Promi
   // Define columns
   worksheet.columns = [
     { header: 'ID', key: 'id', width: 12, hidden: true },
-    { header: 'Policy Title', key: 'title', width: 35 },
+    { header: 'Legislation/Regulation', key: 'title', width: 35 },
     { header: 'Country', key: 'country', width: 15 },
     { header: 'Region', key: 'region', width: 15 },
     { header: 'Level', key: 'level', width: 12 },
