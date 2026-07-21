@@ -157,8 +157,9 @@ export async function DELETE(
 
     if (deleteError) {
       console.error('🗑️ [DELETE] Auth deletion error:', deleteError);
+      const errorMsg = (deleteError as any).message || (deleteError as any).error_description || JSON.stringify(deleteError) || 'Unknown error';
       return NextResponse.json(
-        { error: `Auth deletion failed: ${deleteError.message || JSON.stringify(deleteError)}` },
+        { error: `Auth deletion failed: ${errorMsg}` },
         { status: 400 }
       );
     }
