@@ -153,10 +153,10 @@ function SetPasswordContent() {
           <h2 className="text-2xl font-bold text-ink">Verification Link Invalid</h2>
           <p className="text-ink/60">{error}</p>
           <button
-            onClick={() => router.push('/auth/signup')}
+            onClick={() => router.push('/auth/login')}
             className="w-full py-3 px-4 rounded-lg bg-ocean text-paper font-medium hover:bg-ocean-deep transition"
           >
-            Try Again
+            Go to Sign In
           </button>
         </div>
       </div>

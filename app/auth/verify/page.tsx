@@ -88,14 +88,8 @@ function VerifyContent() {
             </div>
             <div className="pt-4 space-y-2">
               <Link
-                href="/auth/signup"
-                className="block px-4 py-2 rounded-lg bg-ocean text-white font-medium hover:bg-ocean/90 transition"
-              >
-                Try Signing Up Again
-              </Link>
-              <Link
                 href="/auth/login"
-                className="block px-4 py-2 rounded-lg border border-ink/20 text-ink hover:bg-ink/5 transition"
+                className="block px-4 py-2 rounded-lg bg-ocean text-white font-medium hover:bg-ocean/90 transition text-center"
               >
                 Go to Login
               </Link>

@@ -244,14 +244,6 @@ function LoginContent() {
                 <span className="px-3 bg-card text-ink/50">Don't have an account?</span>
               </div>
             </div>
-
-            {/* Sign Up Link */}
-            <Link
-              href="/auth/signup"
-              className="w-full flex items-center justify-center rounded-lg border-2 border-ocean px-4 py-3 font-medium text-ocean transition hover:bg-ocean/5"
-            >
-              Create Account
-            </Link>
           </div>
 
           {/* Footer Link */}
