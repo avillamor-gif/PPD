@@ -8,29 +8,40 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
   try {
-    // Check authentication
+    // Check authentication using Supabase SSR client
+    const cookies = req.cookies;
     const supabase = createServerClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL || '',
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
       {
         cookies: {
           get(name: string) {
-            return req.cookies.get(name)?.value;
+            return cookies.get(name)?.value;
+          },
+          set(name: string, value: string, options: any) {
+            // Not needed for GET requests
+          },
+          remove(name: string, options: any) {
+            // Not needed for GET requests
           },
         },
       }
     );
 
     const {
-      data: { session },
-    } = await supabase.auth.getSession();
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
 
-    if (!session?.user?.id) {
+    if (authError || !user?.id) {
+      console.error('Auth error:', authError);
       return NextResponse.json(
         { error: 'Authentication required. Please log in to download policies.' },
         { status: 401 }
       );
     }
+
+    console.log('✅ User authenticated:', user.id);
 
     const searchParams = req.nextUrl.searchParams;
     
