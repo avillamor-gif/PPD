@@ -183,25 +183,25 @@ export async function GET(
     const { id } = await params;
     console.log(`[GET] Fetching policy with id: "${id}"`);
 
-    // Try to fetch by ID first (ID is more stable than slug)
+    // Try to fetch by slug first (URLs always use slugs)
     let { data, error } = await supabaseAdmin
       .from('policies')
       .select()
-      .eq('id', id)
+      .eq('slug', id)
       .single();
 
-    console.log(`[GET] ID query - Found: ${!!data}, Error: ${error?.message}`);
+    console.log(`[GET] Slug query - Found: ${!!data}, Error: ${error?.message}`);
 
-    // If not found by ID, try by slug (for backward compatibility)
+    // If not found by slug, try by ID (for backward compatibility)
     if (error || !data) {
       const result = await supabaseAdmin
         .from('policies')
         .select()
-        .eq('slug', id)
+        .eq('id', id)
         .single();
       data = result.data;
       error = result.error;
-      console.log(`[GET] Slug query - Found: ${!!data}, Error: ${error?.message}`);
+      console.log(`[GET] ID query - Found: ${!!data}, Error: ${error?.message}`);
     }
 
     // If still not found, check if it's an old slug (previous_slugs)
@@ -290,19 +290,19 @@ export async function PUT(
     }
 
     // Fetch current policy to check if title changed
-    // Try by ID first (ID is stable), then by slug for backward compatibility
+    // Try by slug first (URLs use slugs), then by ID for backward compatibility
     let currentPolicyResult = await supabaseAdmin
       .from('policies')
       .select('id, title, slug')
-      .eq('id', id)
+      .eq('slug', id)
       .single();
 
-    // If not found by id, try by slug (for backward compatibility)
+    // If not found by slug, try by id (for backward compatibility)
     if (currentPolicyResult.error || !currentPolicyResult.data) {
       currentPolicyResult = await supabaseAdmin
         .from('policies')
         .select('id, title, slug')
-        .eq('slug', id)
+        .eq('id', id)
         .single();
     }
 
@@ -372,13 +372,14 @@ export async function PUT(
     }
 
     // Update in Supabase - use the stable ID for the update
+    // (currentPolicy.id is the actual database ID, guaranteed to be unique)
     let result = await supabaseAdmin
       .from('policies')
       .update(policyData)
       .eq('id', currentPolicy.id)
       .select();
 
-    // If that fails, try by slug as fallback (for backward compatibility)
+    // If that fails, try by slug as fallback
     if (!result.data || result.data.length === 0) {
       result = await supabaseAdmin
         .from('policies')
