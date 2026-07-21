@@ -127,9 +127,9 @@ export function ExportModal({ onClose }: ExportFiltersProps) {
       const url = `/api/policies/export?${params.toString()}`;
 
       console.log('📤 [EXPORT] Sending request with URL:', url);
-      console.log('📤 [EXPORT] Credentials:', 'include');
+      console.log('📤 [EXPORT] Credentials: include');
 
-      // Trigger download
+      // Trigger download with auth credentials
       const response = await fetch(url, {
         credentials: 'include', // Include cookies for authentication
       });

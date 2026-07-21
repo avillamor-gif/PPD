@@ -2,66 +2,12 @@ import { supabaseAdmin } from '@/lib/supabase-admin';
 import { COUNTRIES } from '@/lib/constants/policies';
 import { formatPoliciesToExcel, PolicyExportData } from '@/lib/export';
 import { NextRequest, NextResponse } from 'next/server';
-import { createServerClient } from '@supabase/ssr';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
   try {
-    // Debug: Log authentication attempt
     console.log('📥 [EXPORT] Export request received');
-    
-    // Debug: Check all cookies from headers
-    const authHeader = req.headers.get('cookie');
-    console.log('📥 [EXPORT] Raw cookie header:', authHeader);
-    
-    // Check for specific Supabase cookie patterns
-    const cookies = req.cookies;
-    const authToken = 
-      cookies.get('sb-auth-token')?.value || 
-      cookies.get('auth-token')?.value ||
-      cookies.get('supabase-auth-token')?.value;
-    console.log('📥 [EXPORT] Supabase auth token found:', !!authToken);
-    
-    // Check authentication using Supabase SSR client
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
-      {
-        cookies: {
-          get(name: string) {
-            const value = cookies.get(name)?.value;
-            if (value) {
-              console.log(`📥 [EXPORT] Cookie '${name}': found (${value.substring(0, 20)}...)`);
-            }
-            return value;
-          },
-          set(name: string, value: string, options: any) {
-            // Not needed for GET requests
-          },
-          remove(name: string, options: any) {
-            // Not needed for GET requests
-          },
-        },
-      }
-    );
-
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
-
-    if (authError || !user?.id) {
-      console.error('❌ [EXPORT] Auth failed');
-      console.error('❌ [EXPORT] Auth error:', authError?.message);
-      console.error('❌ [EXPORT] User:', user);
-      return NextResponse.json(
-        { error: 'Authentication required. Please log in to download policies.' },
-        { status: 401 }
-      );
-    }
-
-    console.log('✅ [EXPORT] User authenticated:', user.id);
 
     const searchParams = req.nextUrl.searchParams;
     
