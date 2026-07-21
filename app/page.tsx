@@ -41,7 +41,7 @@ export default async function Home() {
 
   const total = POLICIES.length;
   const inForce = POLICIES.filter((p: Policy) => p.status === "In Force").length;
-  const proposed = POLICIES.filter((p: Policy) => p.status === "Proposed").length;
+  const proposed = POLICIES.filter((p: Policy) => p.status === "Proposed" || p.status === "Draft").length;
   const earliest = POLICIES.length > 0 ? Math.min(...POLICIES.map((p: Policy) => p.year || new Date().getFullYear())) : new Date().getFullYear();
   const earliestPolicy = POLICIES.length > 0 ? [...POLICIES].filter((p: Policy) => p.year === earliest).sort((a, b) => a.year - b.year)[0] : null;
   const countriesCovered = new Set(POLICIES.map((p: Policy) => p.country)).size;

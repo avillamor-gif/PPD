@@ -1,4 +1,4 @@
-export type PolicyStatus = "Unknown" | "In Force" | "Proposed" | "Phased" | "Repealed";
+export type PolicyStatus = "Unknown" | "In Force" | "Proposed" | "Phased" | "Repealed" | "Draft";
 export type PolicyCategory = "Umbrella law" | "Environment Impact Assessment (EIA)" | "Waste Management Regulation" | "Recycling Regulation" | "Penalities" | "Taxes" | "Incentives" | "Polluter Pays" | "Bans" | "Waste Reduction" | "Single-Use Plastics" | "Hazardous Waste" | "Waste Burning" | "Reuse" | "Redesign" | "Waste Trade" | "Plastic Alternatives" | "Upstream" | "Midstream" | "Downstream";
 export type PolicyLevel = "National" | "Sub-national" | "Regional" | "International";
 
