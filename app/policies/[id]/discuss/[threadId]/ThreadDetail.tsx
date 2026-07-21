@@ -176,10 +176,10 @@ export default function ThreadDetail({
 
   return (
     <div className="w-full">
-      {/* Main container - full width with padding */}
-      <div className="w-full px-6 lg:px-16">
+      {/* Main container with max-width */}
+      <div className="mx-auto max-w-3xl">
         {/* Header Navigation */}
-        <div className="border-b border-rule bg-paper py-4">
+        <div className="border-b border-rule bg-paper px-6 py-4 lg:px-0">
           <Link 
             href={`/policies/${policyId}/discuss`}
             className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em] text-ink/60 hover:text-coral transition"
@@ -190,7 +190,7 @@ export default function ThreadDetail({
         </div>
 
         {/* Thread Hero Section */}
-        <section className="border-b border-rule bg-paper py-12">
+        <section className="border-b border-rule bg-paper px-6 py-12 lg:px-0">
           <div className="space-y-8">
             {/* Status & Title */}
             <div className="space-y-6">
@@ -218,7 +218,7 @@ export default function ThreadDetail({
               </div>
 
               {thread.description && (
-                <p className="text-lg text-ink/70">
+                <p className="text-lg text-ink/70 max-w-2xl">
                   {thread.description}
                 </p>
               )}
@@ -245,7 +245,7 @@ export default function ThreadDetail({
         </section>
 
         {/* Comments Section */}
-        <section className="border-b border-rule py-12">
+        <section className="border-b border-rule px-6 py-12 lg:px-0">
           <div className="space-y-8">
             {/* Comments Count */}
             <div>
