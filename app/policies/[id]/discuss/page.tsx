@@ -100,13 +100,13 @@ export default function PolicyDiscussionsPage({
   };
 
   return (
-    <div className="mx-auto max-w-4xl px-6 lg:px-0">
-      {/* Back button section with border */}
-      <div className="py-4 border-b border-rule">
+    <div className="mx-auto max-w-4xl">
+      {/* Back button section with border - matches thread detail styling */}
+      <div className="border-b border-rule bg-paper px-6 py-4 lg:px-0">
         {policy && (
           <Link
             href={`/policies/${resolvedParams.id}`}
-            className="inline-flex items-center gap-2 text-ocean hover:text-ocean-deep transition"
+            className="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em] text-ink/60 hover:text-coral transition"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to policy
@@ -114,7 +114,7 @@ export default function PolicyDiscussionsPage({
         )}
       </div>
 
-      <div className="space-y-8 pt-8">
+      <div className="space-y-8 pt-8 px-6 lg:px-0">
       {/* Back button was here */}
 
       {/* Policy Context Card */}
@@ -181,7 +181,7 @@ export default function PolicyDiscussionsPage({
           )}
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-8">
           {threads.map((thread) => (
             <Link
               key={thread.id}
