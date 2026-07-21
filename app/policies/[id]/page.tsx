@@ -22,28 +22,8 @@ export const metadata = {
   description: "View detailed information about plastic policy regulations.",
 };
 
-export const dynamicParams = true; // Enable on-demand ISR for new policies
-export const revalidate = 3600; // Revalidate every hour
-
-export async function generateStaticParams() {
-  try {
-    // Fetch all policy slugs for static generation
-    // Since we have dynamicParams = true, this generates common pages upfront
-    // and remaining pages will be generated on-demand
-    const { data: policies } = await supabaseAdmin
-      .from('policies')
-      .select('slug')
-      .order('created_at', { ascending: false })
-      .limit(500); // Generate first 500 most recent policies upfront
-
-    return (policies || []).map((policy: { slug: string }) => ({
-      id: policy.slug,
-    }));
-  } catch (error) {
-    console.error('Error generating static params:', error);
-    return [];
-  }
-}
+export const dynamic = 'force-dynamic'; // Don't cache - always query fresh for policy details
+export const revalidate = 0; // Don't reuse cache
 
 export default async function PolicyPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
