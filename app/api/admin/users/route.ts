@@ -15,6 +15,7 @@ export async function GET(req: NextRequest) {
     let query = supabaseAdmin
       .from('user_stats')
       .select('*', { count: 'exact' })
+      .neq('display_name', '[Deleted User]') // Filter out soft-deleted users
       .order('created_at', { ascending: false });
 
     if (search) {
