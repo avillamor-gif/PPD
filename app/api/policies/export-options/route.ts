@@ -1,4 +1,5 @@
 import { supabaseAdmin } from '@/lib/supabase-admin';
+import { COUNTRIES } from '@/lib/constants/policies';
 import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
@@ -10,12 +11,6 @@ export async function GET() {
       .from('policies')
       .select('country')
       .order('country');
-
-    // Get distinct regions/levels
-    const { data: levelsData, error: levelsError } = await supabaseAdmin
-      .from('policies')
-      .select('level')
-      .order('level');
 
     // Get distinct categories
     const { data: categoriesData, error: categoriesError } = await supabaseAdmin
@@ -35,10 +30,9 @@ export async function GET() {
       .select('status')
       .order('status');
 
-    if (countriesError || levelsError || categoriesError || lifecyclesError || statusesError) {
+    if (countriesError || categoriesError || lifecyclesError || statusesError) {
       console.error('Database errors:', {
         countriesError,
-        levelsError,
         categoriesError,
         lifecyclesError,
         statusesError,
@@ -49,13 +43,28 @@ export async function GET() {
       );
     }
 
-    // Extract unique values
-    const countries = Array.from(
+    // Extract unique country codes and map to names
+    const countryCodes = Array.from(
       new Set(countriesData?.map((p: any) => p.country).filter(Boolean) || [])
-    ).sort();
+    );
+    
+    const countryNames = countryCodes
+      .map(code => {
+        const country = COUNTRIES.find(c => c.code === code);
+        return country?.name || code;
+      })
+      .sort();
 
-    const levels = Array.from(
-      new Set(levelsData?.map((p: any) => p.level).filter(Boolean) || [])
+    // Extract unique regions from country data
+    const regions = Array.from(
+      new Set(
+        countryCodes
+          .map(code => {
+            const country = COUNTRIES.find(c => c.code === code);
+            return country?.region;
+          })
+          .filter(Boolean)
+      )
     ).sort();
 
     const categories = Array.from(
@@ -87,8 +96,8 @@ export async function GET() {
     );
 
     return NextResponse.json({
-      countries,
-      levels,
+      countries: countryNames,
+      regions,
       categories,
       lifecycles,
       statuses,

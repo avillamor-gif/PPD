@@ -9,7 +9,7 @@ interface ExportFiltersProps {
 
 interface ExportOptions {
   countries: string[];
-  levels: string[];
+  regions: string[];
   categories: string[];
   lifecycles: string[];
   statuses: string[];
@@ -22,7 +22,7 @@ export function ExportModal({ onClose }: ExportFiltersProps) {
   const [error, setError] = useState<string | null>(null);
   const [options, setOptions] = useState<ExportOptions>({
     countries: [],
-    levels: [],
+    regions: [],
     categories: [],
     lifecycles: [],
     statuses: [],
@@ -33,7 +33,7 @@ export function ExportModal({ onClose }: ExportFiltersProps) {
   const [selectedCountries, setSelectedCountries] = useState<Set<string>>(
     new Set()
   );
-  const [selectedLevels, setSelectedLevels] = useState<Set<string>>(
+  const [selectedRegions, setSelectedRegions] = useState<Set<string>>(
     new Set()
   );
   const [selectedCategories, setSelectedCategories] = useState<Set<string>>(
@@ -52,7 +52,7 @@ export function ExportModal({ onClose }: ExportFiltersProps) {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [searchFilters, setSearchFilters] = useState({
     countries: '',
-    levels: '',
+    regions: '',
     categories: '',
     lifecycles: '',
     statuses: '',
@@ -101,9 +101,9 @@ export function ExportModal({ onClose }: ExportFiltersProps) {
         selectedCountries.forEach((c) => params.append('countries', c));
       }
 
-      // Add multiple levels
-      if (selectedLevels.size > 0) {
-        selectedLevels.forEach((l) => params.append('levels', l));
+      // Add multiple levels/regions
+      if (selectedRegions.size > 0) {
+        selectedRegions.forEach((l) => params.append('regions', l));
       }
 
       // Add multiple categories
@@ -297,13 +297,13 @@ export function ExportModal({ onClose }: ExportFiltersProps) {
                 />
               )}
 
-              {options.levels.length > 0 && (
+              {options.regions.length > 0 && (
                 <MultiSelect
-                  label="Region/Level"
-                  items={options.levels}
-                  selected={selectedLevels}
-                  onToggle={(val) => setSelectedLevels(toggle(selectedLevels, val))}
-                  searchKey="levels"
+                  label="Region"
+                  items={options.regions}
+                  selected={selectedRegions}
+                  onToggle={(val) => setSelectedRegions(toggle(selectedRegions, val))}
+                  searchKey="regions"
                 />
               )}
 
@@ -349,7 +349,7 @@ export function ExportModal({ onClose }: ExportFiltersProps) {
 
               {/* Summary */}
               {(selectedCountries.size > 0 ||
-                selectedLevels.size > 0 ||
+                selectedRegions.size > 0 ||
                 selectedCategories.size > 0 ||
                 selectedLifecycles.size > 0 ||
                 selectedStatuses.size > 0 ||
@@ -357,11 +357,11 @@ export function ExportModal({ onClose }: ExportFiltersProps) {
                 search) && (
                 <div className="p-3 rounded-lg bg-ocean/10 border border-ocean/20 text-sm text-ink">
                   <strong>Filters:</strong> {selectedCountries.size > 0 && `${selectedCountries.size} countries`}
-                  {selectedCountries.size > 0 && selectedLevels.size > 0 && ', '}
-                  {selectedLevels.size > 0 && `${selectedLevels.size} levels`}
-                  {(selectedCountries.size > 0 || selectedLevels.size > 0) && selectedCategories.size > 0 && ', '}
+                  {selectedCountries.size > 0 && selectedRegions.size > 0 && ', '}
+                  {selectedRegions.size > 0 && `${selectedRegions.size} regions`}
+                  {(selectedCountries.size > 0 || selectedRegions.size > 0) && selectedCategories.size > 0 && ', '}
                   {selectedCategories.size > 0 && `${selectedCategories.size} categories`}
-                  {(selectedCountries.size > 0 || selectedLevels.size > 0 || selectedCategories.size > 0) && selectedStatuses.size > 0 && ', '}
+                  {(selectedCountries.size > 0 || selectedRegions.size > 0 || selectedCategories.size > 0) && selectedStatuses.size > 0 && ', '}
                   {selectedStatuses.size > 0 && `${selectedStatuses.size} statuses`}
                 </div>
               )}

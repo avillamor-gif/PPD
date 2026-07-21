@@ -1,4 +1,5 @@
 import { supabaseAdmin } from '@/lib/supabase-admin';
+import { COUNTRIES } from '@/lib/constants/policies';
 import { formatPoliciesToExcel, PolicyExportData } from '@/lib/export';
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
@@ -34,17 +35,42 @@ export async function GET(req: NextRequest) {
     const searchParams = req.nextUrl.searchParams;
     
     // Get filter parameters - handle multiple values
-    const countries = searchParams.getAll('countries');
-    const levels = searchParams.getAll('levels');
+    const countryNames = searchParams.getAll('countries');
+    const regionNames = searchParams.getAll('regions');
     const categories = searchParams.getAll('categories');
     const lifecycles = searchParams.getAll('lifecycles');
     const statuses = searchParams.getAll('statuses');
     const years = searchParams.getAll('years').map((y) => parseInt(y)).filter((y) => !isNaN(y));
     const search = searchParams.get('search');
 
+    // Convert country names to codes
+    const countryCodes = countryNames
+      .map(name => {
+        const country = COUNTRIES.find(c => c.name === name);
+        return country?.code;
+      })
+      .filter(Boolean) as string[];
+
+    // Convert region names to country codes
+    const regionCountryCodes = regionNames.length > 0
+      ? COUNTRIES
+          .filter(c => regionNames.includes(c.region))
+          .map(c => c.code)
+      : [];
+
+    // Combine country codes and region country codes
+    const allCountryCodes = countryNames.length > 0 && regionNames.length > 0
+      ? [...countryCodes, ...regionCountryCodes]
+      : countryNames.length > 0
+      ? countryCodes
+      : regionNames.length > 0
+      ? regionCountryCodes
+      : [];
+
     console.log('📥 [EXPORT] Policy export requested with filters:', {
-      countries,
-      levels,
+      countryNames,
+      regionNames,
+      allCountryCodes,
       categories,
       lifecycles,
       statuses,
@@ -62,12 +88,8 @@ export async function GET(req: NextRequest) {
       query = query.in('status', statuses);
     }
 
-    if (countries.length > 0) {
-      query = query.in('country', countries);
-    }
-
-    if (levels.length > 0) {
-      query = query.in('level', levels);
+    if (allCountryCodes.length > 0) {
+      query = query.in('country', allCountryCodes);
     }
 
     if (years.length > 0) {
@@ -136,8 +158,11 @@ export async function GET(req: NextRequest) {
     const timestamp = new Date().toISOString().split('T')[0];
     const filenameParts = ['policies', timestamp];
     
-    if (countries.length > 0) {
-      filenameParts.push(`${countries.length}countries`);
+    if (countryNames.length > 0) {
+      filenameParts.push(`${countryNames.length}countries`);
+    }
+    if (regionNames.length > 0) {
+      filenameParts.push(`${regionNames.length}regions`);
     }
     if (categories.length > 0) {
       filenameParts.push(`${categories.length}categories`);
