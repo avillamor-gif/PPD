@@ -311,6 +311,10 @@ CREATE POLICY "Users can update their own profile" ON user_profiles FOR UPDATE U
 CREATE POLICY "Users can insert their own profile" ON user_profiles FOR INSERT WITH CHECK (auth.uid() = id);
 -- Allow service_role and postgres to insert (for triggers)
 CREATE POLICY "Service role can insert profiles" ON user_profiles FOR INSERT WITH CHECK (auth.role() IN ('service_role', 'postgres'));
+-- Allow service_role to delete profiles (admin user deletion)
+CREATE POLICY "Service role can delete profiles" ON user_profiles FOR DELETE USING (auth.role() = 'service_role');
+-- Allow service_role and postgres to delete (for admin operations)
+CREATE POLICY "Service role can delete profiles" ON user_profiles FOR DELETE WITH CHECK (auth.role() IN ('service_role', 'postgres'));
 
 -- USER PREFERENCES RLS
 CREATE POLICY "Users can view their own preferences" ON user_preferences FOR SELECT USING (auth.uid() = user_id);
