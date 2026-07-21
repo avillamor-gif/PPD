@@ -172,26 +172,37 @@ export async function DELETE(
     console.log('🗑️ [DELETE] User found, attempting deletion...');
 
     // Delete from auth using admin API
-    const { error: deleteError } = await supabaseAdmin.auth.admin.deleteUser(userId);
+    let deleteError;
+    let deleteSuccess = false;
+    
+    try {
+      const result = await supabaseAdmin.auth.admin.deleteUser(userId);
+      deleteError = result.error;
+      deleteSuccess = !deleteError;
+      console.log('🗑️ [DELETE] deleteUser returned:', { error: deleteError, success: deleteSuccess });
+    } catch (e) {
+      console.error('🗑️ [DELETE] deleteUser threw exception:', e);
+      return NextResponse.json(
+        { error: `Exception: ${e instanceof Error ? e.message : String(e)}` },
+        { status: 400 }
+      );
+    }
 
-    if (deleteError) {
-      // Try to extract any useful error info
-      let errorDetails = 'Unknown error';
-      try {
-        // Try various ways to get error message
-        if (typeof deleteError === 'string') {
-          errorDetails = deleteError;
-        } else if (deleteError && typeof deleteError === 'object') {
-          const err = deleteError as any;
-          errorDetails = err.message || err.error_description || err.msg || err.error || JSON.stringify(err);
-        }
-      } catch (e) {
-        errorDetails = 'Error object parsing failed';
+    if (deleteError || !deleteSuccess) {
+      console.error('🗑️ [DELETE] Delete failed. Error:', deleteError);
+      console.error('🗑️ [DELETE] Error is object:', deleteError && typeof deleteError === 'object');
+      
+      // If error is empty object, try to get more info
+      if (deleteError && Object.keys(deleteError).length === 0) {
+        console.error('🗑️ [DELETE] Error is empty object - likely a Supabase permission or auth issue');
+        return NextResponse.json(
+          { error: 'Failed to delete user - check Supabase permissions or user status' },
+          { status: 400 }
+        );
       }
       
-      console.error('🗑️ [DELETE] Auth deletion error:', errorDetails);
       return NextResponse.json(
-        { error: `Failed to delete user from auth: ${errorDetails}` },
+        { error: `Auth deletion failed: ${JSON.stringify(deleteError) || 'unknown error'}` },
         { status: 400 }
       );
     }
