@@ -68,6 +68,22 @@ export function ExportModal({ onClose }: ExportFiltersProps) {
     fetchOptions();
   }, []);
 
+  // Update selected filters when options load
+  useEffect(() => {
+    if (options.countries.length > 0) {
+      setSelectedCountries(new Set(options.countries));
+    }
+    if (options.regions.length > 0) {
+      setSelectedRegions(new Set(options.regions));
+    }
+    if (options.statuses.length > 0) {
+      setSelectedStatuses(new Set(options.statuses));
+    }
+    if (options.years.length > 0) {
+      setSelectedYears(new Set(options.years));
+    }
+  }, [options]);
+
   const toggle = (set: Set<any>, value: any) => {
     const newSet = new Set(set);
     if (newSet.has(value)) {
