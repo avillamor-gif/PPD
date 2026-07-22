@@ -2,9 +2,19 @@ import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Lazy initialization of OpenAI client
+let openai: OpenAI | null = null;
+
+function getOpenAIClient(): OpenAI {
+  if (!openai) {
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) {
+      throw new Error('OPENAI_API_KEY environment variable is not set');
+    }
+    openai = new OpenAI({ apiKey });
+  }
+  return openai;
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -46,7 +56,8 @@ Summary: ${p.summary}
       .join('\n---\n');
 
     // Build the comparison prompt and call OpenAI
-    const message = await openai.chat.completions.create({
+    const client = getOpenAIClient();
+    const message = await client.chat.completions.create({
       model: 'gpt-4o-mini',
       max_tokens: 2000,
       messages: [
