@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useState, useMemo, useEffect } from 'react';
-import { Search, ChevronDown, Loader, Download } from 'lucide-react';
+import { Search, ChevronDown, Loader, Download, CheckCircle2, Circle } from 'lucide-react';
 import { COUNTRIES } from '@/lib/constants';
 import { useReferenceData } from '@/lib/hooks/useReferenceData';
 import { ExportModal } from '@/app/components/ExportModal';
@@ -73,6 +74,7 @@ function Select({
 }
 
 export default function SearchPage() {
+  const router = useRouter();
   const { data: referenceData, loading: refLoading } = useReferenceData();
   const [rawPolicies, setRawPolicies] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -81,9 +83,11 @@ export default function SearchPage() {
   const [country, setCountry] = useState("all");
   const [theme, setTheme] = useState("All Instrument Types");
   const [status, setStatus] = useState("Any status");
+  const [year, setYear] = useState("All years");
   const [sortBy, setSortBy] = useState("Year: Newest");
   const [showExportModal, setShowExportModal] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [selectedPolicies, setSelectedPolicies] = useState<Set<string>>(new Set());
 
   // Statuses from reference data with "Any status" option
   const STATUSES = referenceData?.statuses 
@@ -134,10 +138,11 @@ export default function SearchPage() {
   const EXCLUDED_CATEGORIES = ["Plastic Ban", "Circular Economy", "EPR"];
 
   // Combine all filter computations into a single pass for better performance
-  const { availableThemes, availableRegions, countriesWithEntries } = useMemo(() => {
+  const { availableThemes, availableRegions, countriesWithEntries, availableYears } = useMemo(() => {
     const themeCounts = new Map<string, number>();
     const regionCounts = new Map<string, number>();
     const countryCounts = new Map<string, number>();
+    const yearCounts = new Map<number, number>();
 
     POLICIES.forEach(p => {
       // Count themes
@@ -159,6 +164,11 @@ export default function SearchPage() {
 
       // Count countries
       countryCounts.set(p.countryCode, (countryCounts.get(p.countryCode) || 0) + 1);
+
+      // Count years
+      if (p.year) {
+        yearCounts.set(p.year, (yearCounts.get(p.year) || 0) + 1);
+      }
     });
 
     // Format themes
@@ -177,10 +187,16 @@ export default function SearchPage() {
       displayName: `${c.name} (${countryCounts.get(c.code) || 0})`
     }));
 
+    // Format years (sorted newest first)
+    const years = Array.from(yearCounts.entries())
+      .sort((a, b) => b[0] - a[0])
+      .map(([yr, count]) => `${yr} (${count})`);
+
     return {
       availableThemes: ["All Instrument Types", ...themes],
       availableRegions: ["All regions", ...regions],
-      countriesWithEntries: countries
+      countriesWithEntries: countries,
+      availableYears: ["All years", ...years]
     };
   }, [POLICIES]);
 
@@ -205,6 +221,23 @@ export default function SearchPage() {
     setCountry("all");
   };
 
+  const togglePolicy = (policyId: string) => {
+    const newSelected = new Set(selectedPolicies);
+    if (newSelected.has(policyId)) {
+      newSelected.delete(policyId);
+    } else {
+      newSelected.add(policyId);
+    }
+    setSelectedPolicies(newSelected);
+  };
+
+  const handleCompare = () => {
+    if (selectedPolicies.size >= 2) {
+      const ids = Array.from(selectedPolicies).join(',');
+      router.push(`/policies/compare?ids=${ids}`);
+    }
+  };
+
   const rows = useMemo(() => {
     const s = q.trim().toLowerCase();
     return POLICIES
@@ -227,6 +260,12 @@ export default function SearchPage() {
         return categories.includes(themeName);
       })
       .filter((p) => (status === "Any status" ? true : p.status === status))
+      .filter((p) => {
+        if (year === "All years") return true;
+        // Extract year from year (remove the count: "2025 (5)" -> "2025")
+        const yearNum = parseInt(year.replace(/ \(\d+\)$/, ''));
+        return p.year === yearNum;
+      })
       .filter((p) =>
         s
           ? (p.title?.toLowerCase().includes(s) ?? false) ||
@@ -247,7 +286,7 @@ export default function SearchPage() {
             return b.year - a.year;
         }
       });
-  }, [POLICIES, q, region, country, theme, status, sortBy]);
+  }, [POLICIES, q, region, country, theme, status, year, sortBy]);
 
   return (
     <div className="w-full">
@@ -288,6 +327,9 @@ export default function SearchPage() {
               options={SORT_OPTIONS} 
             />
           </div>
+          <div className="font-mono text-[11px] uppercase tracking-[0.18em] text-ink/60">
+            {rows.length} result{rows.length === 1 ? "" : "s"}
+          </div>
         </div>
         {/* Filters - row 2 */}
         <div className="flex w-full items-center gap-3 px-6 py-2 lg:px-10">
@@ -315,20 +357,21 @@ export default function SearchPage() {
             onChange={setStatus} 
             options={STATUSES.map((s) => [s, s] as [string, string])} 
           />
-          <div className="ml-auto flex items-center gap-4">
-            <div className="font-mono text-[11px] uppercase tracking-[0.18em] text-ink/60">
-              {rows.length} result{rows.length === 1 ? "" : "s"}
-            </div>
-            {rows.length > 0 && isLoggedIn && (
-              <button
-                onClick={() => setShowExportModal(true)}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-ocean/10 text-ocean hover:bg-ocean/20 transition font-medium text-sm"
-              >
-                <Download className="w-4 h-4" />
-                Export
-              </button>
-            )}
-          </div>
+          <Select 
+            label="Year" 
+            value={year} 
+            onChange={setYear} 
+            options={availableYears.map((y) => [y, y] as [string, string])} 
+          />
+          {rows.length > 0 && isLoggedIn && (
+            <button
+              onClick={() => setShowExportModal(true)}
+              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-ocean/10 text-ocean hover:bg-ocean/20 transition font-medium text-sm ml-auto"
+            >
+              <Download className="w-4 h-4" />
+              Export
+            </button>
+          )}
         </div>
       </section>
 
@@ -349,8 +392,18 @@ export default function SearchPage() {
               {rows.map((p) => (
                 <li 
                   key={p.id} 
-                  className="group grid gap-3 py-6 md:grid-cols-[80px_120px_1fr_180px_140px_140px_80px] md:items-start md:gap-6"
+                  className="group grid gap-3 py-6 md:grid-cols-[40px_80px_120px_1fr_180px_140px_140px_80px] md:items-start md:gap-6"
                 >
+                  <button
+                    onClick={() => togglePolicy(p.id)}
+                    className="flex items-center justify-center w-5 h-5 hover:text-ocean transition"
+                  >
+                    {selectedPolicies.has(p.id) ? (
+                      <CheckCircle2 className="w-5 h-5 text-ocean" />
+                    ) : (
+                      <Circle className="w-5 h-5 text-ink/30" />
+                    )}
+                  </button>
                   <div className="font-mono text-sm tabular-nums text-ink/60">{p.year}</div>
                   <div>
                     <div className="font-mono text-[11px] uppercase tracking-[0.18em] text-coral">{p.country}</div>
@@ -394,6 +447,21 @@ export default function SearchPage() {
 
       {/* Export Modal */}
       {showExportModal && <ExportModal onClose={() => setShowExportModal(false)} />}
+
+      {/* Floating Comparison Button */}
+      {selectedPolicies.size >= 2 && (
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-40">
+          <button
+            onClick={handleCompare}
+            className="flex items-center gap-3 px-6 py-3 rounded-full bg-ocean text-white shadow-lg hover:bg-ocean-deep transition font-semibold"
+          >
+            <span>Compare {selectedPolicies.size} Policies</span>
+            <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-sm">
+              {selectedPolicies.size}
+            </div>
+          </button>
+        </div>
+      )}
     </div>
   );
 }
