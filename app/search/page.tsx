@@ -293,16 +293,29 @@ export default function SearchPage() {
       {/* Header */}
       <section className="border-b border-rule">
         <div className="mx-auto max-w-350 px-6 pb-10 pt-14 lg:px-10">
-          <div className="font-mono text-[11px] uppercase tracking-[0.22em] text-coral">
-            The database · {POLICIES.length} entries
+          <div className="flex items-start justify-between gap-6">
+            <div className="flex-1">
+              <div className="font-mono text-[11px] uppercase tracking-[0.22em] text-coral">
+                The database · {POLICIES.length} entries
+              </div>
+              <h1 className="mt-4 font-fraunces text-5xl font-semibold leading-[1.02] tracking-[-0.02em] md:text-6xl">
+                Search every indexed regulation.
+              </h1>
+              <p className="mt-4 max-w-2xl text-pretty text-ink/60">
+                Filter by country, theme, status, or full-text search. All entries link to their originating
+                instrument and summarize what the regulation does, not what we think about it.
+              </p>
+            </div>
+            {rows.length > 0 && isLoggedIn && (
+              <button
+                onClick={() => setShowExportModal(true)}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-ocean/10 text-ocean hover:bg-ocean/20 transition font-medium text-sm flex-shrink-0 mt-1"
+              >
+                <Download className="w-4 h-4" />
+                Export
+              </button>
+            )}
           </div>
-          <h1 className="mt-4 font-fraunces text-5xl font-semibold leading-[1.02] tracking-[-0.02em] md:text-6xl">
-            Search every indexed regulation.
-          </h1>
-          <p className="mt-4 max-w-2xl text-pretty text-ink/60">
-            Filter by country, theme, status, or full-text search. All entries link to their originating
-            instrument and summarize what the regulation does, not what we think about it.
-          </p>
         </div>
       </section>
 
@@ -363,15 +376,6 @@ export default function SearchPage() {
             onChange={setYear} 
             options={availableYears.map((y) => [y, y] as [string, string])} 
           />
-          {rows.length > 0 && isLoggedIn && (
-            <button
-              onClick={() => setShowExportModal(true)}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-ocean/10 text-ocean hover:bg-ocean/20 transition font-medium text-sm ml-auto"
-            >
-              <Download className="w-4 h-4" />
-              Export
-            </button>
-          )}
         </div>
       </section>
 
