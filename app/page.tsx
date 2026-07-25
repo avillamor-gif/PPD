@@ -163,8 +163,8 @@ export default async function Home() {
             eyebrow="12 countries · phase 1"
             title="From Jakarta to Wellington."
           >
-            Coverage spans Southeast Asia, South Asia, East Asia, and Oceania. Each country page
-            lists the full text of indexed regulations, their status, and instrument type.
+            Coverage spans countries in Southeast Asia, South Asia, East Asia, and Oceania. Each country page
+            lists the full text of indexed policies, their current status, and instrument type as of July 2026.
           </SectionHeading>
 
           <CountriesSection initialCounts={initialCountryCounts} />
