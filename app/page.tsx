@@ -149,8 +149,7 @@ export default async function Home() {
             eyebrow="What's regulated"
             title={<>How governments are <em className="text-ocean">acting</em>.</>}
           >
-            Distribution of indexed instruments by policy type. Bans and EPR dominate the
-            first wave; circular economy remains growing.
+            Distribution of policy instruments by instrument type. Disposal focused policies are still prioritised; with circular economy plans, SUP bans and EPR policies growing across the region.
           </SectionHeading>
 
           <ThemesSection themeCounts={themeCounts} maxCat={maxCat} />
