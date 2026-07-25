@@ -147,7 +147,7 @@ export default async function Home() {
         <div className="mx-auto max-w-350 px-6 py-20 lg:px-10">
           <SectionHeading
             eyebrow="What's regulated"
-            title={<>Where governments are <em className="text-ocean">acting</em>.</>}
+            title={<>How governments are <em className="text-ocean">acting</em>.</>}
           >
             Distribution of indexed instruments by policy type. Bans and EPR dominate the
             first wave; circular economy remains growing.
