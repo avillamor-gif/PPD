@@ -202,10 +202,7 @@ export default async function Home() {
             </div>
             <div>
               <p className="font-fraunces text-pretty text-3xl font-medium leading-tight text-ink md:text-4xl">
-                Plastic pollution isn't an opinion problem — it's a coordination problem.
-                We built this database so the next press release, parliamentary brief, or
-                campaign strategy can start from <em className="text-coral">what already exists</em>,
-                not from a blank page.
+                Plastic pollution isn't a waste management problem - it's a failure of a system built on a take-make-dispose model. The response must take a comprehensive life cycle approach that addresses the plastic crisis from extraction of feedstock to its use as productions and eventual disposal as waste. We built this database so the next press release, parliamentary brief, or campaign strategy can start by filling the gaps in <em className="text-coral">what already exists</em>, not from a blank page.
               </p>
               <div className="mt-10 grid gap-6 sm:grid-cols-3">
                 <Tenet n="01" title="Repository, not analysis">Primary-source instruments, summarized faithfully and tagged.</Tenet>
