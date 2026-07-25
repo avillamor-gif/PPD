@@ -201,7 +201,7 @@ export default async function Home() {
               </span>
             </div>
             <div>
-              <p className="font-fraunces text-pretty text-3xl font-medium leading-tight text-ink md:text-4xl">
+              <p className="font-fraunces text-pretty text-2xl font-medium leading-tight text-ink md:text-3xl">
                 Plastic pollution isn't a waste management problem - it's a failure of a system built on a take-make-dispose model. The response must take a comprehensive life cycle approach that addresses the plastic crisis from extraction of feedstock to its use as productions and eventual disposal as waste. We built this database so the next press release, parliamentary brief, or campaign strategy can start by filling the gaps in <em className="text-coral">what already exists</em>, not from a blank page.
               </p>
               <div className="mt-10 grid gap-6 sm:grid-cols-3">
