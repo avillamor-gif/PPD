@@ -99,10 +99,10 @@ export default async function Home() {
         <div className="mx-auto grid max-w-350 gap-12 px-6 pb-20 pt-14 lg:grid-cols-[1.45fr_1.0fr] lg:gap-16 lg:px-10 lg:pt-20">
           <div>
             <h1 className="font-display text-[clamp(2.5rem,6vw,5.5rem)] font-semibold leading-[0.95] tracking-[-0.03em] text-ink">
-              Every plastic
+              <span className="text-coral">Plastic Policies</span>
               <br />
-              <em className="not-italic text-coral">policy</em>, one place,<br />
-              one ocean.
+              in a single living<br />
+              database
             </h1>
             <p className="mt-8 max-w-xl text-pretty text-lg text-ink/75">
               A living repository of national and regional regulations responding to plastic
