@@ -105,9 +105,7 @@ export default async function Home() {
               database
             </h1>
             <p className="mt-8 max-w-xl text-pretty text-lg text-ink/75">
-              A living repository of national and regional regulations responding to plastic
-              pollution across the Asia Pacific — built for advocates, researchers, journalists,
-              and policymakers who need to know what's actually on the books.
+              A living repository of national and regional policies on plastic pollution in Asia Pacific. Brought to you by GAIA Asia Pacific and its membership, this public tool is built for advocates, researchers, journalists, students, and policymakers to learn current policy trends, actions and initiatives to address the plastic crisis in the region.
             </p>
             <div className="mt-10 flex flex-wrap gap-3">
               <Link
