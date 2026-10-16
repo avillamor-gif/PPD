@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS user_profiles (
   bio TEXT,
   country_code VARCHAR(2),
   organization TEXT,
-  role_id BIGINT REFERENCES roles(id) DEFAULT 4, -- 4 = 'user' role (hardcoded per insertion order)
+  role_id BIGINT REFERENCES roles(id) DEFAULT 3, -- 3 = 'expert' role (default for contributors)
   email_verified BOOLEAN DEFAULT FALSE,
   expertise_areas TEXT[],
   social_links JSONB DEFAULT '{}', -- {twitter: url, linkedin: url, facebook: url, website: url}

@@ -43,7 +43,7 @@ function LoginContent() {
             .eq('id', session.user.id)
             .single();
 
-          const roleId = profile?.role_id || 4; // Default to USER (4)
+          const roleId = profile?.role_id || 3; // Default to EXPERT (3)
 
           // Check if there's a redirect parameter
           const redirectUrl = searchParams.get('redirect');
@@ -56,7 +56,8 @@ function LoginContent() {
           } else if (roleId === 3) {
             router.push('/admin/submit');
           } else {
-            router.push(`/profile/${session.user.id}`);
+            // For any other role, redirect to submit
+            router.push('/admin/submit');
           }
           return;
         }
@@ -126,7 +127,7 @@ function LoginContent() {
         .eq('id', user.id)
         .single();
 
-      const roleId = profile?.role_id || 4; // Default to USER (4)
+      const roleId = profile?.role_id || 3; // Default to EXPERT (3)
 
       setRedirected(true);
       
@@ -141,7 +142,8 @@ function LoginContent() {
       } else if (roleId === 3) {
         router.push('/admin/submit');
       } else {
-        router.push(`/profile/${user.id}`);
+        // For any other role, redirect to submit
+        router.push('/admin/submit');
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred during login');

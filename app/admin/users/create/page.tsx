@@ -12,7 +12,7 @@ export default function CreateUserPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
-  const [role, setRole] = useState('user');
+  const [role, setRole] = useState('expert');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
@@ -154,7 +154,6 @@ export default function CreateUserPage() {
                   onChange={(e) => setRole(e.target.value)}
                   className="w-full pl-12 pr-4 py-3 rounded-lg border border-ink/20 bg-white focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20 transition appearance-none cursor-pointer"
                 >
-                  <option value="user">User (Regular)</option>
                   <option value="expert">Expert (Contributor)</option>
                   <option value="moderator">Moderator</option>
                   <option value="admin">Admin</option>
@@ -197,13 +196,7 @@ export default function CreateUserPage() {
               {/* Expert */}
               <div className="pb-3 border-b border-ink/10">
                 <div className="font-semibold text-ink">Expert (Level 3)</div>
-                <p className="text-ink/60 text-xs mt-1">Policy contributor. Create and edit policies, participate in forums.</p>
-              </div>
-
-              {/* User */}
-              <div className="pb-3 border-b border-ink/10">
-                <div className="font-semibold text-ink">User (Level 2)</div>
-                <p className="text-ink/60 text-xs mt-1">Regular user. View database, create threads/comments, edit own content.</p>
+                <p className="text-ink/60 text-xs mt-1">Policy contributor (default). Create and edit policies, participate in forums. <span className="font-semibold text-ocean">Default role for new users.</span></p>
               </div>
 
               {/* Guest */}

@@ -54,7 +54,7 @@ export async function extractUser(
     .single();
 
   const roles = Array.isArray(profile?.roles) ? profile.roles : [profile?.roles];
-  const userRole = (roles?.[0]?.name as UserRole) || UserRole.USER;
+  const userRole = (roles?.[0]?.name as UserRole) || UserRole.EXPERT;
 
   return {
     userId: session.user.id,
@@ -91,7 +91,6 @@ export async function protectRouteByRole(
     [UserRole.ADMIN]: 5,
     [UserRole.MODERATOR]: 4,
     [UserRole.EXPERT]: 3,
-    [UserRole.USER]: 2,
     [UserRole.GUEST]: 1,
   };
 

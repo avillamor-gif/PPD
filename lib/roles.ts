@@ -4,16 +4,14 @@
  * Roles hierarchy:
  * 1. ADMIN - Full system access, user management, moderation
  * 2. MODERATOR - Forum moderation, content review
- * 3. EXPERT - Contributor, can submit policies
- * 4. USER - Regular user, basic access
- * 5. GUEST - No authentication required
+ * 3. EXPERT - Default role, policy contributor
+ * 4. GUEST - No authentication required
  */
 
 export enum UserRole {
   ADMIN = 'admin',
   MODERATOR = 'moderator',
   EXPERT = 'expert',
-  USER = 'user',
   GUEST = 'guest',
 }
 
@@ -116,27 +114,6 @@ export const rolePermissions: Record<UserRole, string[]> = {
     'export_results',
   ],
 
-  [UserRole.USER]: [
-    // Basic Forum Access
-    'view_forum',
-    'create_thread',
-    'create_comment',
-    'edit_own_comment',
-    'delete_own_comment',
-    'edit_own_thread',
-    'delete_own_thread',
-    
-    // Database Access
-    'view_database',
-    'search_policies',
-    'view_policy',
-    
-    // Profile
-    'view_profile',
-    'edit_own_profile',
-    'view_statistics',
-  ],
-
   [UserRole.GUEST]: [
     // Read-only access
     'view_database',
@@ -153,7 +130,6 @@ export const roleHierarchy: Record<UserRole, number> = {
   [UserRole.ADMIN]: 5,
   [UserRole.MODERATOR]: 4,
   [UserRole.EXPERT]: 3,
-  [UserRole.USER]: 2,
   [UserRole.GUEST]: 1,
 };
 
@@ -202,7 +178,6 @@ export function getRoleDisplayName(role: UserRole): string {
     [UserRole.ADMIN]: 'Administrator',
     [UserRole.MODERATOR]: 'Moderator',
     [UserRole.EXPERT]: 'Expert / Contributor',
-    [UserRole.USER]: 'Regular User',
     [UserRole.GUEST]: 'Guest',
   };
   return displayNames[role];
@@ -218,8 +193,7 @@ export function getRoleDescription(role: UserRole): string {
     [UserRole.MODERATOR]:
       'Forum moderation, content review, and discussion management',
     [UserRole.EXPERT]:
-      'Policy expert, can submit and manage policy entries',
-    [UserRole.USER]: 'Regular user with discussion and database access',
+      'Default role for policy contributors, can submit and manage policy entries',
     [UserRole.GUEST]: 'Limited read-only access to public content',
   };
   return descriptions[role];

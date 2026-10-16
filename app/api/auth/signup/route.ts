@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Create user profile with display name
+    // Create user profile with display name and Expert role (role_id = 3)
     const { error: profileError } = await supabaseAdmin
       .from('user_profiles')
       .insert({
@@ -55,6 +55,7 @@ export async function POST(req: NextRequest) {
         email,
         display_name: displayName,
         email_verified: false,
+        role_id: 3, // Expert role
       });
 
     if (profileError) {

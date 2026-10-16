@@ -48,7 +48,7 @@ export async function getCurrentUser(): Promise<AuthUser | null> {
       : profile.roles
         ? [profile.roles]
         : [];
-    const roleName = (roles?.[0]?.name as UserRole) || UserRole.USER;
+    const roleName = (roles?.[0]?.name as UserRole) || UserRole.EXPERT;
 
     return {
       id: session.user.id,
@@ -81,7 +81,6 @@ export async function hasRole(requiredRole: UserRole): Promise<boolean> {
     [UserRole.ADMIN]: 5,
     [UserRole.MODERATOR]: 4,
     [UserRole.EXPERT]: 3,
-    [UserRole.USER]: 2,
     [UserRole.GUEST]: 1,
   };
 
@@ -118,7 +117,6 @@ export async function requireRole(requiredRole: UserRole): Promise<AuthUser> {
     [UserRole.ADMIN]: 5,
     [UserRole.MODERATOR]: 4,
     [UserRole.EXPERT]: 3,
-    [UserRole.USER]: 2,
     [UserRole.GUEST]: 1,
   };
 
