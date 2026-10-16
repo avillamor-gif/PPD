@@ -182,7 +182,7 @@ export default function SignupPage() {
                 disabled={loading}
                 autoComplete="new-password"
                 withIcon={false}
-                className="px-4 py-2 border-sand bg-paper focus:ring-0"
+                className="py-2 border-sand bg-paper focus:border-ocean focus:ring-0"
               />
             </div>
 
@@ -198,7 +198,7 @@ export default function SignupPage() {
                 disabled={loading}
                 autoComplete="new-password"
                 withIcon={false}
-                className="px-4 py-2 border-sand bg-paper focus:ring-0"
+                className="py-2 border-sand bg-paper focus:border-ocean focus:ring-0"
               />
             </div>
 
