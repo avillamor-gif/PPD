@@ -392,7 +392,14 @@ export default function SearchPage() {
               <p className="mt-2 text-sm text-ink/60">Try widening your filters or clearing the search.</p>
             </div>
           ) : (
-            <ul className="divide-y divide-rule border-y border-rule">
+            <>
+              <div className="mb-4 flex items-center gap-2 text-xs text-ink/60">
+                <div className="w-5 h-5 rounded border border-dashed border-ink/30 flex items-center justify-center">
+                  <span className="text-[10px]">✓</span>
+                </div>
+                <span className="font-mono uppercase tracking-[0.12em]">Select to compare 2+ policies</span>
+              </div>
+              <ul className="divide-y divide-rule border-y border-rule">
               {rows.map((p) => (
                 <li 
                   key={p.id} 
@@ -400,12 +407,13 @@ export default function SearchPage() {
                 >
                   <button
                     onClick={() => togglePolicy(p.id)}
-                    className="flex items-center justify-center w-5 h-5 hover:text-ocean transition"
+                    className="flex items-center justify-center w-5 h-5 hover:text-ocean transition group/checkbox"
+                    title="Select to compare policies"
                   >
                     {selectedPolicies.has(p.id) ? (
                       <CheckCircle2 className="w-5 h-5 text-ocean" />
                     ) : (
-                      <Circle className="w-5 h-5 text-ink/30" />
+                      <Circle className="w-5 h-5 text-ink/30 group-hover/checkbox:text-ink/60" />
                     )}
                   </button>
                   <div className="font-mono text-base font-semibold tabular-nums text-ink">{p.year}</div>
@@ -444,12 +452,13 @@ export default function SearchPage() {
                       View
                     </a>
                   </div>
-                  <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink/60">
+                  <div className="font-mono text-sm font-semibold uppercase tracking-[0.14em] text-ink/60">
                     {p.language}
                   </div>
                 </li>
               ))}
-            </ul>
+              </ul>
+            </>
           )}
         </div>
       </section>
