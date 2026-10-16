@@ -248,7 +248,7 @@ function LoginContent() {
             {/* Create Account Button */}
             <Link 
               href="/auth/signup" 
-              className="block w-full py-3 px-4 rounded-lg bg-ocean text-paper font-medium hover:bg-ocean-deep transition text-center"
+              className="block w-full py-3 px-4 rounded-lg bg-ocean text-paper font-mono text-sm uppercase tracking-[0.18em] hover:bg-ocean-deep transition text-center"
             >
               Create Account
             </Link>
