@@ -14,6 +14,14 @@ interface NavItem {
   submenu?: NavItem[];
 }
 
+// Map role_id to UserRole
+const roleIdMap: Record<number, UserRole> = {
+  1: UserRole.ADMIN,
+  2: UserRole.MODERATOR,
+  3: UserRole.EXPERT,
+  5: UserRole.GUEST,
+};
+
 export default function AdminLayout({
   children,
 }: {
@@ -23,7 +31,6 @@ export default function AdminLayout({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [submitEntryDropdownOpen, setSubmitEntryDropdownOpen] = useState(false);
   const [userRole, setUserRole] = useState<UserRole | null>(null);
-  const [loading, setLoading] = useState(true);
   
   // Define all navigation items with role-based access
   const allNavItems: NavItem[] = [
@@ -42,32 +49,32 @@ export default function AdminLayout({
     { href: '/admin/manage', label: 'Manage Entries', requiredRole: [UserRole.ADMIN, UserRole.MODERATOR] },
   ];
 
-  // Fetch current user role
+  // Fetch current user role (optimized - only fetch once on mount)
   useEffect(() => {
     const fetchUserRole = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         
         if (!session?.user?.id) {
-          setLoading(false);
           return;
         }
 
+        // Quick fetch - only get role_id, not nested relations
         const { data: profile } = await supabase
           .from('user_profiles')
-          .select('roles (name)')
+          .select('role_id')
           .eq('id', session.user.id)
           .single();
 
-        if (profile?.roles) {
-          const roles = Array.isArray(profile.roles) ? profile.roles : [profile.roles];
-          const roleName = (roles[0]?.name as UserRole) || UserRole.EXPERT;
-          setUserRole(roleName);
+        if (profile?.role_id) {
+          const role = roleIdMap[profile.role_id] || UserRole.EXPERT;
+          setUserRole(role);
+        } else {
+          setUserRole(UserRole.EXPERT);
         }
       } catch (error) {
         console.error('Error fetching user role:', error);
-      } finally {
-        setLoading(false);
+        setUserRole(UserRole.EXPERT);
       }
     };
 
@@ -76,12 +83,13 @@ export default function AdminLayout({
 
   // Filter navigation items based on user role
   const filterNavItems = (items: NavItem[]): NavItem[] => {
-    if (!userRole) return [];
+    // Show all items if role not yet loaded, then they'll filter once loaded
+    const role = userRole || UserRole.EXPERT;
     
     return items
       .filter((item) => {
         if (!item.requiredRole) return true;
-        return item.requiredRole.includes(userRole);
+        return item.requiredRole.includes(role);
       })
       .map((item) => {
         if (item.submenu) {
