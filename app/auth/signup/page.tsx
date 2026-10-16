@@ -181,7 +181,8 @@ export default function SignupPage() {
                 placeholder="At least 8 characters"
                 disabled={loading}
                 autoComplete="new-password"
-                withIcon={true}
+                withIcon={false}
+                className="px-4 py-2 border-sand bg-paper focus:ring-0"
               />
             </div>
 
@@ -196,7 +197,8 @@ export default function SignupPage() {
                 placeholder="Re-enter password"
                 disabled={loading}
                 autoComplete="new-password"
-                withIcon={true}
+                withIcon={false}
+                className="px-4 py-2 border-sand bg-paper focus:ring-0"
               />
             </div>
 
