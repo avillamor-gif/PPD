@@ -394,7 +394,7 @@ export default function SearchPage() {
           ) : (
             <>
               <div className="mb-4 flex items-center gap-2 text-xs text-ink/60">
-                <div className="w-5 h-5 rounded border border-dashed border-ink/30 flex items-center justify-center">
+                <div className="w-5 h-5 rounded-full border border-ink/30 flex items-center justify-center">
                   <span className="text-[10px]">✓</span>
                 </div>
                 <span className="font-mono uppercase tracking-[0.12em]">Select to compare 2+ policies</span>
@@ -452,7 +452,7 @@ export default function SearchPage() {
                       View
                     </a>
                   </div>
-                  <div className="font-mono text-sm font-semibold uppercase tracking-[0.14em] text-ink/60">
+                  <div className="font-mono text-[10px] uppercase tracking-[0.14em] text-ink/60">
                     {p.language}
                   </div>
                 </li>
