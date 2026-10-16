@@ -408,9 +408,9 @@ export default function SearchPage() {
                       <Circle className="w-5 h-5 text-ink/30" />
                     )}
                   </button>
-                  <div className="font-mono text-sm tabular-nums text-ink/60">{p.year}</div>
+                  <div className="font-mono text-base font-semibold tabular-nums text-ink">{p.year}</div>
                   <div>
-                    <div className="font-mono text-[11px] uppercase tracking-[0.18em] text-coral">{p.country}</div>
+                    <div className="font-mono text-sm font-semibold uppercase tracking-[0.18em] text-coral">{p.country}</div>
                     <div className="text-xs text-ink/60 mt-1">{p.countryCode}</div>
                   </div>
                   <div>
@@ -431,11 +431,16 @@ export default function SearchPage() {
                     {p.level}
                   </div>
                   <div><StatusPill status={p.status} /></div>
-                  <div className="text-xs text-ink/60 leading-snug wrap-break-word">
+                  <div className="text-sm font-medium text-ink/80 leading-snug wrap-break-word">
                     {p.authority}
                   </div>
-                  <div className="text-xs text-ocean hover:text-ocean-deep transition">
-                    <a href={p.link} target="_blank" rel="noopener noreferrer" className="underline">
+                  <div>
+                    <a 
+                      href={p.link} 
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                      className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-ocean text-white hover:bg-ocean-deep transition font-mono text-xs uppercase tracking-[0.14em] font-semibold"
+                    >
                       View
                     </a>
                   </div>
