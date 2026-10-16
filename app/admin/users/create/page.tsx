@@ -92,86 +92,135 @@ export default function CreateUserPage() {
         <p className="mt-2 text-ink/60">Add a new user to the system</p>
       </div>
 
-      {/* Form */}
-      <div className="max-w-md">
-        <form onSubmit={handleCreateUser} className="space-y-6 p-8 rounded-lg border border-ink/10 bg-card">
-          {error && (
-            <div className="p-4 rounded-lg bg-coral/10 border border-coral/20 text-coral text-sm flex gap-3">
-              <AlertCircle className="w-5 h-5 shrink-0" />
-              <span>{error}</span>
-            </div>
-          )}
-
-          <div>
-            <label className="block text-sm font-medium text-ink mb-2">Email Address</label>
-            <div className="relative">
-              <Mail className="absolute left-4 top-3 w-5 h-5 text-ink/40" />
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="user@example.com"
-                className="w-full pl-12 pr-4 py-3 rounded-lg border border-ink/20 bg-white focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20 transition"
-                required
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-ink mb-2">Display Name</label>
-            <div className="relative">
-              <User className="absolute left-4 top-3 w-5 h-5 text-ink/40" />
-              <input
-                type="text"
-                value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
-                placeholder="John Doe"
-                className="w-full pl-12 pr-4 py-3 rounded-lg border border-ink/20 bg-white focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20 transition"
-                required
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-ink mb-2">Password</label>
-            <PasswordInput
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              required
-            />
-            <p className="text-xs text-ink/50 mt-1">Minimum {config.auth.passwordMinLength} characters</p>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-ink mb-2">Role</label>
-            <div className="relative">
-              <Shield className="absolute left-4 top-3 w-5 h-5 text-ink/40" />
-              <select
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 rounded-lg border border-ink/20 bg-white focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20 transition appearance-none cursor-pointer"
-              >
-                <option value="user">User (Regular)</option>
-                <option value="expert">Expert (Contributor)</option>
-                <option value="moderator">Moderator</option>
-                <option value="admin">Admin</option>
-              </select>
-            </div>
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3 rounded-lg bg-ink text-paper font-medium hover:bg-ink/90 disabled:opacity-50 transition flex items-center justify-center gap-2"
-          >
-            {loading ? 'Creating...' : (
-              <>
-                Create User <ArrowRight className="w-4 h-4" />
-              </>
+      {/* Two Column Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Form - Left Side (2 columns) */}
+        <div className="lg:col-span-2">
+          <form onSubmit={handleCreateUser} className="space-y-6 p-8 rounded-lg border border-ink/10 bg-card">
+            {error && (
+              <div className="p-4 rounded-lg bg-coral/10 border border-coral/20 text-coral text-sm flex gap-3">
+                <AlertCircle className="w-5 h-5 shrink-0" />
+                <span>{error}</span>
+              </div>
             )}
-          </button>
-        </form>
+
+            <div>
+              <label className="block text-sm font-medium text-ink mb-2">Email Address</label>
+              <div className="relative">
+                <Mail className="absolute left-4 top-3 w-5 h-5 text-ink/40" />
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="user@example.com"
+                  className="w-full pl-12 pr-4 py-3 rounded-lg border border-ink/20 bg-white focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20 transition"
+                  required
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-ink mb-2">Display Name</label>
+              <div className="relative">
+                <User className="absolute left-4 top-3 w-5 h-5 text-ink/40" />
+                <input
+                  type="text"
+                  value={displayName}
+                  onChange={(e) => setDisplayName(e.target.value)}
+                  placeholder="John Doe"
+                  className="w-full pl-12 pr-4 py-3 rounded-lg border border-ink/20 bg-white focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20 transition"
+                  required
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-ink mb-2">Password</label>
+              <PasswordInput
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                required
+              />
+              <p className="text-xs text-ink/50 mt-1">Minimum {config.auth.passwordMinLength} characters</p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-ink mb-2">Role</label>
+              <div className="relative">
+                <Shield className="absolute left-4 top-3 w-5 h-5 text-ink/40" />
+                <select
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                  className="w-full pl-12 pr-4 py-3 rounded-lg border border-ink/20 bg-white focus:border-ocean focus:outline-none focus:ring-2 focus:ring-ocean/20 transition appearance-none cursor-pointer"
+                >
+                  <option value="user">User (Regular)</option>
+                  <option value="expert">Expert (Contributor)</option>
+                  <option value="moderator">Moderator</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full py-3 rounded-lg bg-ink text-paper font-medium hover:bg-ink/90 disabled:opacity-50 transition flex items-center justify-center gap-2"
+            >
+              {loading ? 'Creating...' : (
+                <>
+                  Create User <ArrowRight className="w-4 h-4" />
+                </>
+              )}
+            </button>
+          </form>
+        </div>
+
+        {/* Roles Reference - Right Side (1 column) */}
+        <div className="lg:col-span-1">
+          <div className="sticky top-8 p-6 rounded-lg border border-ink/10 bg-card space-y-4">
+            <h3 className="text-lg font-bold text-ink">Role Reference</h3>
+            
+            <div className="space-y-3 text-sm">
+              {/* Admin */}
+              <div className="pb-3 border-b border-ink/10">
+                <div className="font-semibold text-ink">Admin (Level 5)</div>
+                <p className="text-ink/60 text-xs mt-1">Full system access. Manage users, policies, content, and view analytics.</p>
+              </div>
+
+              {/* Moderator */}
+              <div className="pb-3 border-b border-ink/10">
+                <div className="font-semibold text-ink">Moderator (Level 4)</div>
+                <p className="text-ink/60 text-xs mt-1">Forum and content moderation. Manage threads, comments, and reports.</p>
+              </div>
+
+              {/* Expert */}
+              <div className="pb-3 border-b border-ink/10">
+                <div className="font-semibold text-ink">Expert (Level 3)</div>
+                <p className="text-ink/60 text-xs mt-1">Policy contributor. Create and edit policies, participate in forums.</p>
+              </div>
+
+              {/* User */}
+              <div className="pb-3 border-b border-ink/10">
+                <div className="font-semibold text-ink">User (Level 2)</div>
+                <p className="text-ink/60 text-xs mt-1">Regular user. View database, create threads/comments, edit own content.</p>
+              </div>
+
+              {/* Guest */}
+              <div>
+                <div className="font-semibold text-ink">Guest (Level 1)</div>
+                <p className="text-ink/60 text-xs mt-1">Read-only access. View database and policies without authentication.</p>
+              </div>
+            </div>
+
+            {/* Hierarchy Note */}
+            <div className="mt-4 pt-4 border-t border-ink/10">
+              <p className="text-xs text-ink/50">
+                <span className="font-semibold">💡 Tip:</span> Higher level roles inherit permissions from lower levels.
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
