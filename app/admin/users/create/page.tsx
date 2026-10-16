@@ -178,39 +178,71 @@ export default function CreateUserPage() {
         {/* Roles Reference - Right Side (1 column) */}
         <div className="lg:col-span-1">
           <div className="sticky top-8 p-6 rounded-lg border border-ink/10 bg-card space-y-4">
-            <h3 className="text-lg font-bold text-ink">Role Reference</h3>
+            <h3 className="text-lg font-bold text-ink">Role Permissions</h3>
             
-            <div className="space-y-3 text-sm">
-              {/* Admin */}
-              <div className="pb-3 border-b border-ink/10">
-                <div className="font-semibold text-ink">Admin (Level 5)</div>
-                <p className="text-ink/60 text-xs mt-1">Full system access. Manage users, policies, content, and view analytics.</p>
+            {/* Admin */}
+            <div className="space-y-2 pb-3 border-b border-ink/10">
+              <div className="font-semibold text-ink text-sm flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-coral"></span>
+                Admin (Level 5)
               </div>
-
-              {/* Moderator */}
-              <div className="pb-3 border-b border-ink/10">
-                <div className="font-semibold text-ink">Moderator (Level 4)</div>
-                <p className="text-ink/60 text-xs mt-1">Forum moderation, policy management, content review, and discussion leadership. Manage threads, comments, policies, and reports.</p>
-              </div>
-
-              {/* Expert */}
-              <div className="pb-3 border-b border-ink/10">
-                <div className="font-semibold text-ink">Expert (Level 3)</div>
-                <p className="text-ink/60 text-xs mt-1">Policy contributor (default). Create and edit policies, participate in forums. <span className="font-semibold text-ocean">Default role for new users.</span></p>
-              </div>
-
-              {/* Guest */}
-              <div>
-                <div className="font-semibold text-ink">Guest (Level 1)</div>
-                <p className="text-ink/60 text-xs mt-1">Read-only access. View database and policies without authentication.</p>
-              </div>
+              <ul className="text-xs text-ink/60 space-y-1 ml-4">
+                <li>✓ Manage users & roles</li>
+                <li>✓ Create/edit/delete policies</li>
+                <li>✓ Moderate all content</li>
+                <li>✓ View analytics & logs</li>
+              </ul>
             </div>
 
-            {/* Hierarchy Note */}
-            <div className="mt-4 pt-4 border-t border-ink/10">
-              <p className="text-xs text-ink/50">
-                <span className="font-semibold">💡 Tip:</span> Higher level roles inherit permissions from lower levels.
-              </p>
+            {/* Moderator */}
+            <div className="space-y-2 pb-3 border-b border-ink/10">
+              <div className="font-semibold text-ink text-sm flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-ocean"></span>
+                Moderator (Level 4)
+              </div>
+              <ul className="text-xs text-ink/60 space-y-1 ml-4">
+                <li>✓ Manage policies & publish</li>
+                <li>✓ Moderate forum threads</li>
+                <li>✓ Manage comments & threads</li>
+                <li>✓ View & handle reports</li>
+              </ul>
+            </div>
+
+            {/* Expert */}
+            <div className="space-y-2 pb-3 border-b border-ink/10">
+              <div className="font-semibold text-ink text-sm flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-sand"></span>
+                Expert (Level 3) • Default
+              </div>
+              <ul className="text-xs text-ink/60 space-y-1 ml-4">
+                <li>✓ Create & submit policies</li>
+                <li>✓ Edit own policies</li>
+                <li>✓ Participate in forums</li>
+                <li>✓ View database</li>
+              </ul>
+            </div>
+
+            {/* Guest */}
+            <div className="space-y-2">
+              <div className="font-semibold text-ink text-sm flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-ink/30"></span>
+                Guest (Level 1)
+              </div>
+              <ul className="text-xs text-ink/60 space-y-1 ml-4">
+                <li>✓ View database</li>
+                <li>✓ View policies</li>
+                <li>✓ Search policies</li>
+                <li>✗ No account required</li>
+              </ul>
+            </div>
+
+            {/* Legend */}
+            <div className="mt-4 pt-4 border-t border-ink/10 space-y-2">
+              <p className="text-xs text-ink/50 font-semibold">Quick Info:</p>
+              <div className="text-xs text-ink/60 space-y-1">
+                <p>• Default: Users sign up as <span className="font-semibold text-ocean">Expert</span></p>
+                <p>• Hierarchy: Level 5 includes all permissions from levels below</p>
+              </div>
             </div>
           </div>
         </div>
