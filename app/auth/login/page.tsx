@@ -244,13 +244,11 @@ function LoginContent() {
                 <span className="px-3 bg-card text-ink/50">Don't have an account?</span>
               </div>
             </div>
-          </div>
 
-          {/* Create Account Button */}
-          <div className="text-center">
+            {/* Create Account Button */}
             <Link 
               href="/auth/signup" 
-              className="inline-block w-full py-3 px-4 rounded-lg bg-ocean text-paper font-medium hover:bg-ocean-deep transition"
+              className="block w-full py-3 px-4 rounded-lg bg-ocean text-paper font-medium hover:bg-ocean-deep transition text-center"
             >
               Create Account
             </Link>
