@@ -29,7 +29,7 @@ function StatusPill({ status }: { status: string }) {
     "Repealed": "bg-ink/10 text-ink/60",
   };
   return (
-    <span className={`inline-block px-3 py-2 rounded-full font-mono text-sm uppercase tracking-[0.14em] font-semibold ${colors[status] || colors["In Force"]}`}>
+    <span className={`inline-block px-3 py-2 rounded-full font-mono text-xs uppercase tracking-[0.14em] font-semibold ${colors[status] || colors["In Force"]}`}>
       {status}
     </span>
   );
