@@ -246,6 +246,16 @@ function LoginContent() {
             </div>
           </div>
 
+          {/* Create Account Button */}
+          <div className="text-center">
+            <Link 
+              href="/auth/signup" 
+              className="inline-block w-full py-3 px-4 rounded-lg bg-ocean text-paper font-medium hover:bg-ocean-deep transition"
+            >
+              Create Account
+            </Link>
+          </div>
+
           {/* Footer Link */}
           <div className="text-center">
             <Link href="/" className="text-sm text-ink/50 hover:text-ink transition">
