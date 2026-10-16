@@ -3,7 +3,16 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Menu, X, ChevronDown } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { supabase } from '@/lib/supabase';
+import { UserRole } from '@/lib/roles';
+
+interface NavItem {
+  href: string;
+  label: string;
+  requiredRole?: UserRole[];
+  submenu?: NavItem[];
+}
 
 export default function AdminLayout({
   children,
@@ -13,21 +22,80 @@ export default function AdminLayout({
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [submitEntryDropdownOpen, setSubmitEntryDropdownOpen] = useState(false);
+  const [userRole, setUserRole] = useState<UserRole | null>(null);
+  const [loading, setLoading] = useState(true);
   
-  const navItems = [
-    { href: '/admin', label: 'Dashboard' },
-    { href: '/admin/users', label: 'Users' },
-    { href: '/admin/moderation', label: 'Moderation' },
+  // Define all navigation items with role-based access
+  const allNavItems: NavItem[] = [
+    { href: '/admin', label: 'Dashboard', requiredRole: [UserRole.ADMIN, UserRole.MODERATOR, UserRole.EXPERT] },
+    { href: '/admin/users', label: 'Users', requiredRole: [UserRole.ADMIN] },
+    { href: '/admin/moderation', label: 'Moderation', requiredRole: [UserRole.ADMIN, UserRole.MODERATOR] },
     { 
       href: '/admin/submit', 
       label: 'Submit Entry',
+      requiredRole: [UserRole.ADMIN, UserRole.MODERATOR, UserRole.EXPERT],
       submenu: [
-        { href: '/admin/instrument-types', label: 'Instrument Types' },
-        { href: '/admin/statuses', label: 'Statuses' }
+        { href: '/admin/instrument-types', label: 'Instrument Types', requiredRole: [UserRole.ADMIN] },
+        { href: '/admin/statuses', label: 'Statuses', requiredRole: [UserRole.ADMIN] }
       ]
     },
-    { href: '/admin/manage', label: 'Manage Entries' },
+    { href: '/admin/manage', label: 'Manage Entries', requiredRole: [UserRole.ADMIN, UserRole.MODERATOR] },
   ];
+
+  // Fetch current user role
+  useEffect(() => {
+    const fetchUserRole = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (!session?.user?.id) {
+          setLoading(false);
+          return;
+        }
+
+        const { data: profile } = await supabase
+          .from('user_profiles')
+          .select('roles (name)')
+          .eq('id', session.user.id)
+          .single();
+
+        if (profile?.roles) {
+          const roles = Array.isArray(profile.roles) ? profile.roles : [profile.roles];
+          const roleName = (roles[0]?.name as UserRole) || UserRole.EXPERT;
+          setUserRole(roleName);
+        }
+      } catch (error) {
+        console.error('Error fetching user role:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserRole();
+  }, []);
+
+  // Filter navigation items based on user role
+  const filterNavItems = (items: NavItem[]): NavItem[] => {
+    if (!userRole) return [];
+    
+    return items
+      .filter((item) => {
+        if (!item.requiredRole) return true;
+        return item.requiredRole.includes(userRole);
+      })
+      .map((item) => {
+        if (item.submenu) {
+          return {
+            ...item,
+            submenu: filterNavItems(item.submenu),
+          };
+        }
+        return item;
+      })
+      .filter((item) => !item.submenu || item.submenu.length > 0);
+  };
+
+  const navItems = filterNavItems(allNavItems);
 
   const isActive = (href: string) => {
     if (href === '/admin') {
@@ -144,7 +212,7 @@ export default function AdminLayout({
                     )}
                   </Link>
                   
-                  {hasSubmenu && (
+                  {hasSubmenu && item.submenu && (
                     <>
                       {/* Invisible hover bridge to keep dropdown visible when moving mouse */}
                       <div className="absolute left-0 top-full h-2 w-32 group-hover:visible invisible" />
