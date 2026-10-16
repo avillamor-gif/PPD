@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { AlertCircle, Loader2, Check } from 'lucide-react';
+import PasswordInput from '@/app/components/PasswordInput';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -173,14 +174,14 @@ export default function SignupPage() {
               <label className="block text-sm font-medium text-ink mb-2">
                 Password
               </label>
-              <input
-                type="password"
+              <PasswordInput
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="At least 8 characters"
                 disabled={loading}
-                className="w-full px-4 py-2 rounded-lg border border-sand text-ink placeholder:text-ink/40 bg-paper focus:outline-none focus:border-ocean disabled:opacity-50"
+                autoComplete="new-password"
+                withIcon={true}
               />
             </div>
 
@@ -188,14 +189,14 @@ export default function SignupPage() {
               <label className="block text-sm font-medium text-ink mb-2">
                 Confirm Password
               </label>
-              <input
-                type="password"
+              <PasswordInput
                 name="confirmPassword"
                 value={formData.confirmPassword}
                 onChange={handleChange}
                 placeholder="Re-enter password"
                 disabled={loading}
-                className="w-full px-4 py-2 rounded-lg border border-sand text-ink placeholder:text-ink/40 bg-paper focus:outline-none focus:border-ocean disabled:opacity-50"
+                autoComplete="new-password"
+                withIcon={true}
               />
             </div>
 
