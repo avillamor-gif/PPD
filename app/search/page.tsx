@@ -29,7 +29,7 @@ function StatusPill({ status }: { status: string }) {
     "Repealed": "bg-ink/10 text-ink/60",
   };
   return (
-    <span className={`inline-block px-3 py-1 rounded-full font-mono text-[10px] uppercase tracking-[0.14em] font-semibold ${colors[status] || colors["In Force"]}`}>
+    <span className={`inline-block px-3 py-2 rounded-full font-mono text-sm uppercase tracking-[0.14em] font-semibold ${colors[status] || colors["In Force"]}`}>
       {status}
     </span>
   );
@@ -427,7 +427,7 @@ export default function SearchPage() {
                       </span>
                     </div>
                   </div>
-                  <div className="font-mono text-[11px] uppercase tracking-[0.16em] text-ink/60">
+                  <div className="font-mono text-sm font-semibold uppercase tracking-[0.16em] text-ink/60">
                     {p.level}
                   </div>
                   <div><StatusPill status={p.status} /></div>
