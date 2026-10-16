@@ -190,7 +190,7 @@ export default function CreateUserPage() {
               {/* Moderator */}
               <div className="pb-3 border-b border-ink/10">
                 <div className="font-semibold text-ink">Moderator (Level 4)</div>
-                <p className="text-ink/60 text-xs mt-1">Forum and content moderation. Manage threads, comments, and reports.</p>
+                <p className="text-ink/60 text-xs mt-1">Forum moderation, policy management, content review, and discussion leadership. Manage threads, comments, policies, and reports.</p>
               </div>
 
               {/* Expert */}

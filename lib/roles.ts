@@ -74,15 +74,19 @@ export const rolePermissions: Record<UserRole, string[]> = {
     'delete_own_comment',
     'moderate_comments',
     
+    // Policy Management
+    'create_policy',
+    'edit_policy',
+    'view_policy',
+    'publish_policy',
+    'archive_policy',
+    
     // Moderation
     'moderate_content',
     'flag_content',
     'remove_content',
     'view_reports',
     'lock_thread',
-    
-    // Policy Viewing
-    'view_policy',
     
     // Profile
     'view_profile',
@@ -191,7 +195,7 @@ export function getRoleDescription(role: UserRole): string {
     [UserRole.ADMIN]:
       'Full system access, user management, moderation, and analytics',
     [UserRole.MODERATOR]:
-      'Forum moderation, content review, and discussion management',
+      'Forum moderation, content review, policy management, and discussion leadership',
     [UserRole.EXPERT]:
       'Default role for policy contributors, can submit and manage policy entries',
     [UserRole.GUEST]: 'Limited read-only access to public content',
