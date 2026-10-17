@@ -230,8 +230,8 @@ export async function GET(
       );
     }
 
-    // Check approval status - only show pending/rejected policies to admins
-    if (!isAdmin && data.approval_status !== 'approved') {
+    // Check approval status - show draft/approved to everyone, pending/rejected only to admins
+    if (!isAdmin && !['approved', 'draft'].includes(data.approval_status)) {
       return NextResponse.json(
         { success: false, error: 'Policy not found' },
         { status: 404 }
