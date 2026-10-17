@@ -77,8 +77,23 @@ export default function SignupPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        const detailedError = data.details ? `${data.error}: ${data.details}` : data.error;
-        setError(detailedError || 'Signup failed');
+        // Log full error to console for debugging
+        console.error('Signup error response:', {
+          status: response.status,
+          error: data.error,
+          debug: data.debug,
+        });
+        
+        // Show detailed error message
+        let errorMsg = data.error || 'Signup failed';
+        if (data.debug?.message) {
+          errorMsg += ` (${data.debug.code}: ${data.debug.message})`;
+        }
+        if (data.debug?.hint) {
+          errorMsg += ` - ${data.debug.hint}`;
+        }
+        
+        setError(errorMsg);
         setLoading(false);
         return;
       }
