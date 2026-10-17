@@ -45,14 +45,15 @@ export async function POST(req: NextRequest) {
     }
 
     // Create user profile with display name and Expert role (role_id = 3)
+    // Use upsert in case the profile was created in a failed attempt
     const { data: profileData, error: profileError } = await supabaseAdmin
       .from('user_profiles')
-      .insert({
+      .upsert({
         id: authData.user.id,
         display_name: displayName,
         email_verified: false,
         role_id: 3, // Expert role
-      })
+      }, { onConflict: 'id' })
       .select();
 
     if (profileError) {
