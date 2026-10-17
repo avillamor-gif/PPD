@@ -24,6 +24,8 @@ async function sendViaMailgun(to: string, subject: string, html: string) {
 
   try {
     console.log('📧 [MAILGUN] Sending email to:', to);
+    console.log('📧 [MAILGUN] Domain:', domain);
+    console.log('📧 [MAILGUN] From:', config.email.from);
     
     const formData = new URLSearchParams();
     formData.append('from', config.email.from);
@@ -44,8 +46,14 @@ async function sendViaMailgun(to: string, subject: string, html: string) {
     const data = await response.json();
 
     if (!response.ok) {
-      console.error('❌ [MAILGUN] Error:', data);
-      throw new Error(data.message || 'Failed to send email via Mailgun');
+      console.error('❌ [MAILGUN] Error Response:', {
+        status: response.status,
+        statusText: response.statusText,
+        message: data.message,
+        error: data.error,
+        details: data,
+      });
+      throw new Error(data.message || `HTTP ${response.status}: ${response.statusText}`);
     }
 
     console.log('✅ [MAILGUN] Email sent successfully. ID:', data.id);
