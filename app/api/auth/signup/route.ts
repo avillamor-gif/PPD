@@ -181,7 +181,7 @@ export async function POST(req: NextRequest) {
     if (!emailResult.success) {
       console.error('Email send error:', emailResult);
       return NextResponse.json(
-        { error: 'Account created but verification email could not be sent. Please check your spam folder or try again.' },
+        { error: 'Account created but verification email could not be sent. Please check your email settings or contact support.' },
         { status: 500 }
       );
     }
