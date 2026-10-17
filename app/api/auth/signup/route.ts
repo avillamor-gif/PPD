@@ -119,12 +119,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         { 
           error: 'Failed to set up your profile. Please try again.',
-          debug: process.env.NODE_ENV === 'development' ? {
+          debug: {
             code: profileError.code,
             message: profileError.message,
             details: profileError.details,
             hint: profileError.hint,
-          } : undefined,
+          },
         },
         { status: 500 }
       );
