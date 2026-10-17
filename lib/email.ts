@@ -10,7 +10,8 @@ function getResendConfig() {
 
   if (!apiKey) {
     console.error('❌ [RESEND] Missing Resend API key');
-    throw new Error('Missing Resend configuration in .env');
+    console.error('❌ [RESEND] Available env vars:', Object.keys(process.env).filter(k => k.includes('RESEND') || k.includes('EMAIL')));
+    throw new Error('Missing Resend API key in environment variables. Add RESEND_API_KEY to Vercel Environment Variables.');
   }
 
   return new Resend(apiKey);

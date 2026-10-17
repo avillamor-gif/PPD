@@ -28,8 +28,8 @@ const getAppUrl = () => {
 const config = {
   // Email Configuration
   email: {
-    // Use onboarding@resend.dev for development/testing (no domain verification needed)
-    // Use verified domain for production
+    // For development/testing: Use onboarding@resend.dev (no verification needed)
+    // For production: Verify your domain at https://resend.com/dashboard and use your verified domain
     from: process.env.NEXT_PUBLIC_EMAIL_FROM || 'onboarding@resend.dev',
     appName: process.env.NEXT_PUBLIC_APP_NAME || 'Plastic Policy Database',
     adminNotificationEmail: process.env.ADMIN_NOTIFICATION_EMAIL || 'admin@plasticpolicydatabase.com',
