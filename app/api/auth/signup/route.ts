@@ -97,7 +97,7 @@ export async function POST(req: NextRequest) {
         id: authUserId,
         display_name: displayName,
         email_verified: false,
-        role_id: 3, // Expert role by default
+        // Let database default role_id to 3 (expert)
       });
 
     if (profileError) {
@@ -115,10 +115,17 @@ export async function POST(req: NextRequest) {
       } catch (deleteErr) {
         console.error('❌ Error cleaning up auth user:', deleteErr);
       }
-      }
       
       return NextResponse.json(
-        { error: 'Failed to set up your profile. Please try again.' },
+        { 
+          error: 'Failed to set up your profile. Please try again.',
+          debug: process.env.NODE_ENV === 'development' ? {
+            code: profileError.code,
+            message: profileError.message,
+            details: profileError.details,
+            hint: profileError.hint,
+          } : undefined,
+        },
         { status: 500 }
       );
     }
