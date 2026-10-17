@@ -52,7 +52,6 @@ export async function POST(req: NextRequest) {
       .from('user_profiles')
       .insert({
         id: authData.user.id,
-        email,
         display_name: displayName,
         email_verified: false,
         role_id: 3, // Expert role
