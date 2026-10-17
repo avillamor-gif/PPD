@@ -3,20 +3,69 @@ import { supabaseAdmin } from '@/lib/supabase-admin';
 import { sendVerificationEmail } from '@/lib/email';
 import { randomBytes } from 'crypto';
 
+// Helper function to convert Supabase errors to user-friendly messages
+function getHumanReadableError(error: any): string {
+  const message = error?.message || '';
+  
+  // Email-related errors
+  if (message.includes('already registered') || message.includes('User already exists')) {
+    return 'This email is already registered. Please use a different email or try logging in.';
+  }
+  if (message.includes('invalid email') || message.includes('Invalid email')) {
+    return 'Please enter a valid email address.';
+  }
+  
+  // Password-related errors
+  if (message.includes('password') && message.includes('weak')) {
+    return 'Password is too weak. Please use a stronger password with numbers and special characters.';
+  }
+  if (message.includes('password') && (message.includes('invalid') || message.includes('required'))) {
+    return 'Password must be at least 8 characters long.';
+  }
+  
+  // Display name errors
+  if (message.includes('display_name')) {
+    return 'Display name is required and must be valid.';
+  }
+  
+  // Network/connection errors
+  if (message.includes('network') || message.includes('timeout')) {
+    return 'Connection error. Please check your internet and try again.';
+  }
+  
+  // Default: return a generic message but log the original
+  console.error('Unmapped Supabase error:', message);
+  return 'Account creation failed. Please try again.';
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { email, password, displayName } = await req.json();
 
     if (!email || !password || !displayName) {
       return NextResponse.json(
-        { error: 'Email, password, and display name are required' },
+        { error: 'Email, password, and display name are all required' },
+        { status: 400 }
+      );
+    }
+
+    if (!email.includes('@') || !email.includes('.')) {
+      return NextResponse.json(
+        { error: 'Please enter a valid email address' },
         { status: 400 }
       );
     }
 
     if (password.length < 8) {
       return NextResponse.json(
-        { error: 'Password must be at least 8 characters' },
+        { error: 'Password must be at least 8 characters long' },
+        { status: 400 }
+      );
+    }
+
+    if (displayName.trim().length < 2) {
+      return NextResponse.json(
+        { error: 'Display name must be at least 2 characters' },
         { status: 400 }
       );
     }
@@ -31,10 +80,10 @@ export async function POST(req: NextRequest) {
 
     if (authError) {
       console.error('Auth creation error:', authError);
-      const message = authError?.message || 'Failed to create account';
+      const userMessage = getHumanReadableError(authError);
       
       // Check if user already exists - if so, try to proceed with profile update
-      if (message.includes('already') || message.includes('exist')) {
+      if (authError.message?.includes('already') || authError.message?.includes('exist')) {
         // Try to fetch the existing user by email
         try {
           const { data: { users }, error: listError } = await supabaseAdmin.auth.admin.listUsers();
@@ -45,28 +94,28 @@ export async function POST(req: NextRequest) {
             console.log('Found existing auth user, will update profile:', authUserId);
           } else {
             return NextResponse.json(
-              { error: 'Email already registered but user not found' },
+              { error: 'This email is already registered. Please use a different email or try logging in.' },
               { status: 400 }
             );
           }
         } catch (listErr) {
           console.error('Error listing users:', listErr);
           return NextResponse.json(
-            { error: 'Email already registered' },
+            { error: 'This email is already registered. Please use a different email or try logging in.' },
             { status: 400 }
           );
         }
       } else {
         return NextResponse.json(
-          { error: message },
-          { status: 500 }
+          { error: userMessage },
+          { status: 400 }
         );
       }
     } else if (authData?.user?.id) {
       authUserId = authData.user.id;
     } else {
       return NextResponse.json(
-        { error: 'Failed to create or find user account' },
+        { error: 'Account creation failed. Please try again.' },
         { status: 500 }
       );
     }
@@ -99,7 +148,7 @@ export async function POST(req: NextRequest) {
         }
       }
       return NextResponse.json(
-        { error: 'Failed to create user profile', details: profileError.message },
+        { error: 'Failed to set up your profile. Please try again.' },
         { status: 500 }
       );
     }
@@ -121,7 +170,7 @@ export async function POST(req: NextRequest) {
     if (tokenError) {
       console.error('Token creation error:', tokenError);
       return NextResponse.json(
-        { error: 'Failed to create verification token' },
+        { error: 'Failed to set up email verification. Please try signing up again.' },
         { status: 500 }
       );
     }
@@ -132,7 +181,7 @@ export async function POST(req: NextRequest) {
     if (!emailResult.success) {
       console.error('Email send error:', emailResult);
       return NextResponse.json(
-        { error: 'Account created but verification email failed. Please try again.' },
+        { error: 'Account created but verification email could not be sent. Please check your spam folder or try again.' },
         { status: 500 }
       );
     }
