@@ -2,64 +2,44 @@
 import { supabase } from './supabase';
 import { supabaseAdmin } from './supabase-admin';
 import config from './config';
+import { Resend } from 'resend';
 
-// Initialize Mailgun
-function getMailgunConfig() {
-  const apiKey = process.env.MAILGUN_API_KEY;
-  const domain = process.env.MAILGUN_DOMAIN;
+// Initialize Resend
+function getResendConfig() {
+  const apiKey = process.env.RESEND_API_KEY;
 
-  if (!apiKey || !domain) {
-    console.error('❌ [MAILGUN] Missing Mailgun credentials');
-    console.error('   MAILGUN_API_KEY:', apiKey ? '✓ Set' : '✗ Missing');
-    console.error('   MAILGUN_DOMAIN:', domain ? '✓ Set' : '✗ Missing');
-    throw new Error('Missing Mailgun configuration in .env.local');
+  if (!apiKey) {
+    console.error('❌ [RESEND] Missing Resend API key');
+    throw new Error('Missing Resend configuration in .env');
   }
 
-  return { apiKey, domain };
+  return new Resend(apiKey);
 }
 
-// Send email via Mailgun
-async function sendViaMailgun(to: string, subject: string, html: string) {
-  const { apiKey, domain } = getMailgunConfig();
+// Send email via Resend
+async function sendViaResend(to: string, subject: string, html: string) {
+  const resend = getResendConfig();
 
   try {
-    console.log('📧 [MAILGUN] Sending email to:', to);
-    console.log('📧 [MAILGUN] Domain:', domain);
-    console.log('📧 [MAILGUN] From:', config.email.from);
+    console.log('📧 [RESEND] Sending email to:', to);
+    console.log('📧 [RESEND] From:', config.email.from);
     
-    const formData = new URLSearchParams();
-    formData.append('from', config.email.from);
-    formData.append('to', to);
-    formData.append('subject', subject);
-    formData.append('html', html);
-
-    const auth = Buffer.from(`api:${apiKey}`).toString('base64');
-    
-    const response = await fetch(`https://api.mailgun.net/v3/${domain}/messages`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Basic ${auth}`,
-      },
-      body: formData,
+    const result = await resend.emails.send({
+      from: config.email.from,
+      to: to,
+      subject: subject,
+      html: html,
     });
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      console.error('❌ [MAILGUN] Error Response:', {
-        status: response.status,
-        statusText: response.statusText,
-        message: data.message,
-        error: data.error,
-        details: data,
-      });
-      throw new Error(data.message || `HTTP ${response.status}: ${response.statusText}`);
+    if (result.error) {
+      console.error('❌ [RESEND] Error:', result.error);
+      throw new Error(result.error.message || 'Failed to send email via Resend');
     }
 
-    console.log('✅ [MAILGUN] Email sent successfully. ID:', data.id);
-    return { success: true, messageId: data.id };
+    console.log('✅ [RESEND] Email sent successfully. ID:', result.data?.id);
+    return { success: true, messageId: result.data?.id };
   } catch (error) {
-    console.error('❌ [MAILGUN] Exception:', error);
+    console.error('❌ [RESEND] Exception:', error);
     throw error;
   }
 }
@@ -86,7 +66,7 @@ export async function sendVerificationEmail(email: string, token: string) {
       </div>
     `;
 
-    return await sendViaMailgun(
+    return await sendViaResend(
       email,
       `Verify your email - ${config.email.appName}`,
       html
@@ -119,7 +99,7 @@ export async function sendPasswordResetEmail(email: string, token: string) {
       </div>
     `;
 
-    return await sendViaMailgun(
+    return await sendViaResend(
       email,
       `Reset your password - ${config.email.appName}`,
       html
@@ -163,7 +143,7 @@ export async function sendCommentNotificationEmail(
       </div>
     `;
 
-    return await sendViaMailgun(
+    return await sendViaResend(
       recipientEmail,
       `${authorName} replied to your comment`,
       html
@@ -259,7 +239,7 @@ export async function sendNewUserWelcomeEmail(email: string, displayName: string
       </div>
     `;
 
-    return await sendViaMailgun(
+    return await sendViaResend(
       email,
       `Welcome to ${config.email.appName} - Your Account is Ready`,
       html
@@ -297,7 +277,7 @@ export async function sendNewUserAdminNotification(email: string, displayName: s
       </div>
     `;
 
-    return await sendViaMailgun(
+    return await sendViaResend(
       adminEmail,
       `New User Registration - ${displayName}`,
       html
@@ -343,7 +323,7 @@ export async function sendSetPasswordEmail(email: string, displayName: string, t
       </div>
     `;
 
-    const result = await sendViaMailgun(
+    const result = await sendViaResend(
       email,
       `Verify Your Email & Set Password - ${config.email.appName}`,
       html
