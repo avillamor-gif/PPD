@@ -22,24 +22,51 @@ export async function POST(req: NextRequest) {
     }
 
     // Create auth user
+    let authUserId: string;
     const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
       email,
       password,
       email_confirm: false,
     });
 
-    if (authError || !authData?.user) {
+    if (authError) {
       console.error('Auth creation error:', authError);
       const message = authError?.message || 'Failed to create account';
-      // Handle email already registered error
+      
+      // Check if user already exists - if so, try to proceed with profile update
       if (message.includes('already') || message.includes('exist')) {
+        // Try to fetch the existing user by email
+        try {
+          const { data: { users }, error: listError } = await supabaseAdmin.auth.admin.listUsers();
+          const existingUser = users?.find((u: any) => u.email === email);
+          
+          if (existingUser) {
+            authUserId = existingUser.id;
+            console.log('Found existing auth user, will update profile:', authUserId);
+          } else {
+            return NextResponse.json(
+              { error: 'Email already registered but user not found' },
+              { status: 400 }
+            );
+          }
+        } catch (listErr) {
+          console.error('Error listing users:', listErr);
+          return NextResponse.json(
+            { error: 'Email already registered' },
+            { status: 400 }
+          );
+        }
+      } else {
         return NextResponse.json(
-          { error: 'Email already registered' },
-          { status: 400 }
+          { error: message },
+          { status: 500 }
         );
       }
+    } else if (authData?.user?.id) {
+      authUserId = authData.user.id;
+    } else {
       return NextResponse.json(
-        { error: message },
+        { error: 'Failed to create or find user account' },
         { status: 500 }
       );
     }
@@ -49,7 +76,7 @@ export async function POST(req: NextRequest) {
     const { data: profileData, error: profileError } = await supabaseAdmin
       .from('user_profiles')
       .upsert({
-        id: authData.user.id,
+        id: authUserId,
         display_name: displayName,
         email_verified: false,
         role_id: 3, // Expert role
@@ -63,8 +90,14 @@ export async function POST(req: NextRequest) {
         details: profileError.details,
         hint: profileError.hint,
       });
-      // Try to clean up the auth user
-      await supabaseAdmin.auth.admin.deleteUser(authData.user.id);
+      // Try to clean up the auth user only if we just created it
+      if (!authError && authData?.user?.id) {
+        try {
+          await supabaseAdmin.auth.admin.deleteUser(authUserId);
+        } catch (deleteErr) {
+          console.error('Error deleting auth user:', deleteErr);
+        }
+      }
       return NextResponse.json(
         { error: 'Failed to create user profile', details: profileError.message },
         { status: 500 }
@@ -79,7 +112,7 @@ export async function POST(req: NextRequest) {
     const { error: tokenError } = await supabaseAdmin
       .from('email_verification_tokens')
       .insert({
-        user_id: authData.user.id,
+        user_id: authUserId,
         token,
         email,
         expires_at: expiresAt.toISOString(),
@@ -107,7 +140,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: true,
       message: 'Account created. Please verify your email.',
-      userId: authData.user.id,
+      userId: authUserId,
     });
   } catch (error) {
     console.error('Signup error:', error);
