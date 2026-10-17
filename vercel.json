@@ -1,4 +1,10 @@
 {
   "buildCommand": "next build",
-  "devCommand": "next dev"
+  "devCommand": "next dev",
+  "buildSettings": {
+    "nodeVersion": "20.x"
+  },
+  "env": {
+    "NEXT_SKIP_TURBOPACK": "true"
+  }
 }
