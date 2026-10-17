@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { COUNTRIES } from '@/lib/constants';
 import Link from 'next/link';
-import { Trash2, ExternalLink, Pencil, Loader } from 'lucide-react';
+import { Trash2, Pencil, Loader } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { UserRole } from '@/lib/roles';
 import type { Policy } from '@/lib/types/policy';
@@ -353,15 +353,6 @@ export default function AdminManagePage() {
                       <td className="px-6 py-4 text-sm text-ink/60 font-mono">{policy.year}</td>
                       <td className="px-6 py-4">
                         <div className="flex gap-2">
-                          <a
-                            href={policy.link}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="p-2 hover:bg-ocean/10 rounded transition text-ocean"
-                            title="View policy"
-                          >
-                            <ExternalLink className="w-4 h-4" />
-                          </a>
                           <Link
                             href={`/admin/manage/${policy.slug || policy.id}`}
                             className="p-2 hover:bg-ocean/10 rounded transition text-ocean"
