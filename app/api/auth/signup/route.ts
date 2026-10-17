@@ -70,7 +70,10 @@ export async function POST(req: NextRequest) {
     });
 
     if (authError) {
-      console.error('Auth creation error:', authError);
+      console.error('❌ Auth creation error:', {
+        message: authError.message,
+        code: authError.code,
+      });
       return NextResponse.json(
         { error: getHumanReadableError(authError) },
         { status: 400 }
@@ -85,6 +88,7 @@ export async function POST(req: NextRequest) {
     }
 
     const authUserId = authData.user.id;
+    console.log('✅ Auth user created:', authUserId);
 
     // 2. Create user profile with display name
     const { error: profileError } = await supabaseAdmin
@@ -97,12 +101,20 @@ export async function POST(req: NextRequest) {
       });
 
     if (profileError) {
-      console.error('Profile creation error:', profileError);
+      console.error('❌ Profile creation error:', {
+        message: profileError.message,
+        code: profileError.code,
+        details: profileError.details,
+        hint: profileError.hint,
+      });
       // Clean up auth user on profile creation failure
       try {
+        console.log('🧹 Cleaning up auth user:', authUserId);
         await supabaseAdmin.auth.admin.deleteUser(authUserId);
+        console.log('✅ Auth user deleted');
       } catch (deleteErr) {
-        console.error('Error cleaning up auth user:', deleteErr);
+        console.error('❌ Error cleaning up auth user:', deleteErr);
+      }
       }
       
       return NextResponse.json(
