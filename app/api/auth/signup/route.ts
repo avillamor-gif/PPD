@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase-admin';
 import { sendVerificationEmail } from '@/lib/email';
+import config from '@/lib/config';
 import { randomBytes } from 'crypto';
 
 // Helper function to convert Supabase errors to user-friendly messages
@@ -175,15 +176,23 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Send verification email
-    const emailResult = await sendVerificationEmail(email, token);
-    
-    if (!emailResult.success) {
-      console.error('Email send error:', emailResult);
-      return NextResponse.json(
-        { error: 'Account created but verification email could not be sent. Please check your email settings or contact support.' },
-        { status: 500 }
-      );
+    // Send verification email (skip if feature is disabled)
+    if (config.features.emailVerificationRequired) {
+      const emailResult = await sendVerificationEmail(email, token);
+      
+      if (!emailResult.success) {
+        console.error('Email send error:', emailResult);
+        return NextResponse.json(
+          { error: 'Account created but verification email could not be sent. Please check your email settings or contact support.' },
+          { status: 500 }
+        );
+      }
+    } else {
+      // Mark email as verified immediately if email verification is disabled
+      await supabaseAdmin
+        .from('user_profiles')
+        .update({ email_verified: true })
+        .eq('id', authUserId);
     }
 
     return NextResponse.json({
