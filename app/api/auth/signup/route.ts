@@ -21,17 +21,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Check if user already exists
-    const { data: existingUsers } = await supabaseAdmin.auth.admin.listUsers();
-    const userExists = existingUsers?.users?.some((u: any) => u.email === email);
-
-    if (userExists) {
-      return NextResponse.json(
-        { error: 'Email already registered' },
-        { status: 400 }
-      );
-    }
-
     // Create auth user
     const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
       email,
@@ -41,28 +30,42 @@ export async function POST(req: NextRequest) {
 
     if (authError || !authData?.user) {
       console.error('Auth creation error:', authError);
+      const message = authError?.message || 'Failed to create account';
+      // Handle email already registered error
+      if (message.includes('already') || message.includes('exist')) {
+        return NextResponse.json(
+          { error: 'Email already registered' },
+          { status: 400 }
+        );
+      }
       return NextResponse.json(
-        { error: 'Failed to create account' },
+        { error: message },
         { status: 500 }
       );
     }
 
     // Create user profile with display name and Expert role (role_id = 3)
-    const { error: profileError } = await supabaseAdmin
+    const { data: profileData, error: profileError } = await supabaseAdmin
       .from('user_profiles')
       .insert({
         id: authData.user.id,
         display_name: displayName,
         email_verified: false,
         role_id: 3, // Expert role
-      });
+      })
+      .select();
 
     if (profileError) {
-      console.error('Profile creation error:', profileError);
+      console.error('Profile creation error:', {
+        message: profileError.message,
+        code: profileError.code,
+        details: profileError.details,
+        hint: profileError.hint,
+      });
       // Try to clean up the auth user
       await supabaseAdmin.auth.admin.deleteUser(authData.user.id);
       return NextResponse.json(
-        { error: 'Failed to create user profile' },
+        { error: 'Failed to create user profile', details: profileError.message },
         { status: 500 }
       );
     }

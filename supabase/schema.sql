@@ -24,7 +24,6 @@ INSERT INTO roles (name, description) VALUES
   ('admin', 'Administrator with full access'),
   ('moderator', 'Forum moderator'),
   ('expert', 'Policy expert or contributor'),
-  ('user', 'Regular user'),
   ('guest', 'Unregistered guest')
 ON CONFLICT (name) DO NOTHING;
 
