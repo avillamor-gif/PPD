@@ -49,6 +49,10 @@ CREATE TABLE IF NOT EXISTS policies (
   other_links TEXT, -- Additional references
   language VARCHAR(10), -- Language of the policy
   created_by UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+  approval_status VARCHAR(50) DEFAULT 'pending', -- pending, approved, rejected
+  approved_by UUID REFERENCES auth.users(id) ON DELETE SET NULL, -- Admin who approved
+  approval_date TIMESTAMP WITH TIME ZONE, -- When it was approved
+  rejection_reason TEXT, -- If rejected, why
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -60,6 +64,8 @@ CREATE INDEX IF NOT EXISTS idx_policies_year ON policies(year DESC);
 CREATE INDEX IF NOT EXISTS idx_policies_category ON policies(category);
 CREATE INDEX IF NOT EXISTS idx_policies_lifecycle_stage ON policies(lifecycle_stage);
 CREATE INDEX IF NOT EXISTS idx_policies_status ON policies(status);
+CREATE INDEX IF NOT EXISTS idx_policies_approval_status ON policies(approval_status);
+CREATE INDEX IF NOT EXISTS idx_policies_pending ON policies(approval_status) WHERE approval_status = 'pending';
 CREATE INDEX IF NOT EXISTS idx_policies_created_at ON policies(created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_policies_level ON policies(level);
 

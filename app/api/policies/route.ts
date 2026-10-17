@@ -166,6 +166,8 @@ export async function POST(request: NextRequest) {
       id: uniqueSlug,
       slug: uniqueSlug,
       ...convertedData,
+      approval_status: 'pending', // Expert submissions start as pending
+      created_by: (await request.headers.get('x-user-id')) || undefined,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };
