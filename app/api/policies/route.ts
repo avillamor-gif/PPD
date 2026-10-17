@@ -166,6 +166,7 @@ export async function POST(request: NextRequest) {
       id: uniqueSlug,
       slug: uniqueSlug,
       ...convertedData,
+      approval_status: 'pending', // Expert submissions start as pending for admin review
       created_by: (await request.headers.get('x-user-id')) || undefined,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
@@ -173,6 +174,7 @@ export async function POST(request: NextRequest) {
 
     console.log('💾 [POST] Saving to Supabase:', { 
       id: policyData.id,
+      approval_status: policyData.approval_status,
       other_links: (policyData as any).other_links,
       allKeys: Object.keys(policyData)
     });
@@ -214,7 +216,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           success: true,
-          message: 'Policy submitted successfully',
+          message: 'Policy submitted successfully! Your policy is now under review by our admin team.',
+          submissionStatus: 'pending_approval',
           data: data[0],
         },
         { status: 201 }
