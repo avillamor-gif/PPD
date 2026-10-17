@@ -90,15 +90,14 @@ export async function POST(req: NextRequest) {
     const authUserId = authData.user.id;
     console.log('✅ Auth user created:', authUserId);
 
-    // 2. Create user profile with display name
+    // 2. Create or update user profile
     const { error: profileError } = await supabaseAdmin
       .from('user_profiles')
-      .insert({
+      .upsert({
         id: authUserId,
         display_name: displayName,
         email_verified: false,
-        // Let database default role_id to 3 (expert)
-      });
+      }, { onConflict: 'id' });
 
     if (profileError) {
       console.error('❌ Profile creation error:', {
