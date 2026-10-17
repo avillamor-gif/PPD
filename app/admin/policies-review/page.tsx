@@ -1,8 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import { AlertCircle, CheckCircle, XCircle, Loader2 } from 'lucide-react';
+import { AlertCircle, CheckCircle, XCircle, Loader2, Lock } from 'lucide-react';
+import { UserRole } from '@/lib/roles';
 
 interface PendingPolicy {
   id: string;
@@ -14,16 +16,77 @@ interface PendingPolicy {
   approval_status: string;
 }
 
+const roleIdMap: Record<number, UserRole> = {
+  1: UserRole.ADMIN,
+  2: UserRole.MODERATOR,
+  3: UserRole.EXPERT,
+  5: UserRole.GUEST,
+};
+
 export default function PoliciesReviewPage() {
+  const router = useRouter();
   const [policies, setPolicies] = useState<PendingPolicy[]>([]);
   const [loading, setLoading] = useState(true);
   const [approving, setApproving] = useState<string | null>(null);
   const [rejectionReason, setRejectionReason] = useState('');
   const [selectedPolicy, setSelectedPolicy] = useState<string | null>(null);
+  const [userRole, setUserRole] = useState<UserRole | null>(null);
+  const [accessDenied, setAccessDenied] = useState(false);
 
   useEffect(() => {
-    fetchPendingPolicies();
+    checkAdminAccess();
   }, []);
+
+  const checkAdminAccess = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        setAccessDenied(true);
+        setLoading(false);
+        return;
+      }
+
+      // Fetch user role
+      const { data: profile, error } = await supabase
+        .from('user_profiles')
+        .select('role_id')
+        .eq('id', session.user.id)
+        .single();
+
+      if (error || !profile) {
+        setAccessDenied(true);
+        setLoading(false);
+        return;
+      }
+
+      const role = roleIdMap[profile.role_id] || UserRole.EXPERT;
+      setUserRole(role);
+
+      // Only admins can access this page
+      if (role !== UserRole.ADMIN) {
+        setAccessDenied(true);
+        setLoading(false);
+        return;
+      }
+
+      // Admin access granted, fetch policies
+      fetchPendingPolicies();
+    } catch (error) {
+      console.error('Error checking admin access:', error);
+      setAccessDenied(true);
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (accessDenied) {
+      const timer = setTimeout(() => {
+        router.push('/admin');
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [accessDenied, router]);
 
   const fetchPendingPolicies = async () => {
     try {
@@ -128,6 +191,19 @@ export default function PoliciesReviewPage() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <Loader2 className="w-8 h-8 animate-spin text-ocean" />
+      </div>
+    );
+  }
+
+  if (accessDenied) {
+    return (
+      <div className="max-w-md mx-auto px-6 py-12 text-center">
+        <div className="w-16 h-16 rounded-full bg-coral/10 flex items-center justify-center mx-auto mb-6">
+          <Lock className="w-8 h-8 text-coral" />
+        </div>
+        <h1 className="text-2xl font-bold text-ink mb-2">Access Denied</h1>
+        <p className="text-ink/60 mb-6">Only administrators can approve policy submissions.</p>
+        <p className="text-sm text-ink/50">Redirecting to admin panel...</p>
       </div>
     );
   }

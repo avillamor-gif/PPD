@@ -4,7 +4,16 @@ import { useState, useEffect } from 'react';
 import { COUNTRIES } from '@/lib/constants';
 import Link from 'next/link';
 import { Trash2, ExternalLink, Pencil, Loader } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
+import { UserRole } from '@/lib/roles';
 import type { Policy } from '@/lib/types/policy';
+
+const roleIdMap: Record<number, UserRole> = {
+  1: UserRole.ADMIN,
+  2: UserRole.MODERATOR,
+  3: UserRole.EXPERT,
+  5: UserRole.GUEST,
+};
 
 export default function AdminManagePage() {
   const [policies, setPolicies] = useState<Policy[]>([]);
@@ -12,6 +21,8 @@ export default function AdminManagePage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<{ id: string; slug?: string } | null>(null);
+  const [userRole, setUserRole] = useState<UserRole | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
   
   // Filter states
   const [searchQuery, setSearchQuery] = useState('');
@@ -47,6 +58,37 @@ export default function AdminManagePage() {
   const statuses = Array.from(new Set(policies.map(p => p.status)));
   const years = Array.from(new Set(policies.map(p => p.year))).sort((a, b) => b - a);
 
+  // Get user role and ID first
+  useEffect(() => {
+    const getUserRole = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (!session) {
+          setLoading(false);
+          return;
+        }
+
+        setUserId(session.user.id);
+
+        const { data: profile, error } = await supabase
+          .from('user_profiles')
+          .select('role_id')
+          .eq('id', session.user.id)
+          .single();
+
+        if (!error && profile) {
+          const role = roleIdMap[profile.role_id] || UserRole.EXPERT;
+          setUserRole(role);
+        }
+      } catch (error) {
+        console.error('Error fetching user role:', error);
+      }
+    };
+
+    getUserRole();
+  }, []);
+
   // Fetch policies
   useEffect(() => {
     const fetchPolicies = async () => {
@@ -56,7 +98,15 @@ export default function AdminManagePage() {
         if (!res.ok) throw new Error('Failed to fetch policies');
         const response = await res.json();
         const policiesData = response.data || response;
-        setPolicies(Array.isArray(policiesData) ? policiesData : []);
+        
+        let allPolicies = Array.isArray(policiesData) ? policiesData : [];
+        
+        // Filter for experts: show only their own submissions
+        if (userRole === UserRole.EXPERT && userId) {
+          allPolicies = allPolicies.filter(p => p.created_by === userId);
+        }
+        
+        setPolicies(allPolicies);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to load policies');
         console.error('Error fetching policies:', err);
@@ -64,8 +114,11 @@ export default function AdminManagePage() {
         setLoading(false);
       }
     };
-    fetchPolicies();
-  }, []);
+
+    if (userRole !== null) {
+      fetchPolicies();
+    }
+  }, [userRole, userId]);
 
   // Apply filters
   useEffect(() => {
