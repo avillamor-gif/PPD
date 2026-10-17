@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Playfair_Display, Inter, Fraunces, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { SiteHeader, SiteFooter } from "./components/site-chrome";
+import NotificationCenter from "./components/NotificationCenter";
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
@@ -47,6 +48,7 @@ export default function RootLayout({
         <SiteHeader />
         <main className="flex-1">{children}</main>
         <SiteFooter />
+        <NotificationCenter />
       </body>
     </html>
   );

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { AlertCircle, Loader2, Check } from 'lucide-react';
 import PasswordInput from '@/app/components/PasswordInput';
+import { showSuccess, showError } from '@/lib/notifications';
 
 export default function SignupPage() {
   const router = useRouter();
@@ -94,6 +95,7 @@ export default function SignupPage() {
         }
         
         setError(errorMsg);
+        showError('Signup Failed', errorMsg);
         setLoading(false);
         return;
       }
@@ -106,13 +108,17 @@ export default function SignupPage() {
         password: '',
         confirmPassword: '',
       });
+      
+      showSuccess('✓ Account Created!', 'Your account has been created successfully. Redirecting to login...');
 
       // Redirect to login after success
       setTimeout(() => {
         router.push('/auth/login');
       }, 2000);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      const errorMsg = err instanceof Error ? err.message : 'An error occurred';
+      setError(errorMsg);
+      showError('Signup Error', errorMsg);
       setLoading(false);
     }
   };

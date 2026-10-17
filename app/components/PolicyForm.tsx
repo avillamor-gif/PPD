@@ -5,6 +5,7 @@ import { COUNTRIES, REGIONS } from '@/lib/constants';
 import { useReferenceData } from '@/lib/hooks/useReferenceData';
 import { supabase } from '@/lib/supabase';
 import { MultiSelectDropdown } from './MultiSelectDropdown';
+import { showSuccess, showError } from '@/lib/notifications';
 import type { Policy, PolicyLevel, PolicyStatus } from '@/lib/types';
 
 const LEVELS: PolicyLevel[] = ['National', 'Sub-national', 'Regional', 'International'];
@@ -221,6 +222,14 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
 
       setSubmitted(true);
       
+      // Show success notification
+      showSuccess(
+        '✓ Policy Submitted!',
+        isEditing 
+          ? 'Your policy has been updated successfully.' 
+          : 'Your policy submission is under review by our admin team.'
+      );
+      
       // Reset form only on create, not on edit
       if (!isEditing) {
         setFormData({
@@ -250,7 +259,9 @@ export function PolicyForm({ initialData, isEditing = false, onSuccess }: Policy
         }
       }, 3500);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      const errorMessage = err instanceof Error ? err.message : 'An error occurred';
+      setError(errorMessage);
+      showError('Submission Failed', errorMessage);
     } finally {
       setLoading(false);
     }
