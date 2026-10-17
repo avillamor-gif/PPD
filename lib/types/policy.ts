@@ -1,6 +1,7 @@
 export type PolicyStatus = "Unknown" | "In Force" | "Proposed" | "Phased" | "Repealed" | "Draft";
 export type PolicyCategory = "Umbrella law" | "Environment Impact Assessment (EIA)" | "Waste Management Regulation" | "Recycling Regulation" | "Penalities" | "Taxes" | "Incentives" | "Polluter Pays" | "Bans" | "Waste Reduction" | "Single-Use Plastics" | "Hazardous Waste" | "Waste Burning" | "Reuse" | "Redesign" | "Waste Trade" | "Plastic Alternatives" | "Upstream" | "Midstream" | "Downstream";
 export type PolicyLevel = "National" | "Sub-national" | "Regional" | "International";
+export type ApprovalStatus = "draft" | "pending" | "approved" | "rejected";
 
 export interface Policy {
   id: string;
@@ -24,5 +25,10 @@ export interface Policy {
   lifecycleStages?: string[] | null;
   created_at?: string;
   updated_at?: string;
+  created_by?: string;
   keywords?: string;
+  approval_status?: ApprovalStatus;
+  approved_by?: string;
+  approval_date?: string;
+  rejection_reason?: string;
 }

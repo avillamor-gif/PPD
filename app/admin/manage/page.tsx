@@ -302,6 +302,7 @@ export default function AdminManagePage() {
                   <th className="px-6 py-4 text-left text-sm font-mono uppercase tracking-widest text-ink/60">Country</th>
                   <th className="px-6 py-4 text-left text-sm font-mono uppercase tracking-widest text-ink/60">Category</th>
                   <th className="px-6 py-4 text-left text-sm font-mono uppercase tracking-widest text-ink/60">Status</th>
+                  <th className="px-6 py-4 text-left text-sm font-mono uppercase tracking-widest text-ink/60">Approval</th>
                   <th className="px-6 py-4 text-left text-sm font-mono uppercase tracking-widest text-ink/60">Year</th>
                   <th className="px-6 py-4 text-left text-sm font-mono uppercase tracking-widest text-ink/60">Actions</th>
                 </tr>
@@ -314,6 +315,19 @@ export default function AdminManagePage() {
                     'Proposed': 'bg-coral/10 text-coral',
                     'Phased': 'bg-sand text-ink',
                     'Repealed': 'bg-ink/10 text-ink/60',
+                  };
+
+                  // Get approval status display
+                  const approvalStatus = policy.approval_status || 'draft';
+                  const isPublished = approvalStatus === 'approved' || approvalStatus === 'draft';
+                  const approvalStatusDisplay = isPublished ? 'Published' : 
+                    approvalStatus === 'pending' ? 'Pending for Approval' :
+                    approvalStatus === 'rejected' ? 'Rejected' : 'Unknown';
+                  
+                  const approvalColors: Record<string, string> = {
+                    'Published': 'bg-ocean/10 text-ocean',
+                    'Pending for Approval': 'bg-amber-100 text-amber-700',
+                    'Rejected': 'bg-coral/10 text-coral',
                   };
 
                   return (
@@ -329,6 +343,11 @@ export default function AdminManagePage() {
                       <td className="px-6 py-4">
                         <span className={`inline-block px-3 py-1 rounded-full text-xs font-mono font-semibold ${statusColors[policy.status] || statusColors['In Force']}`}>
                           {policy.status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className={`inline-block px-3 py-1 rounded-full text-xs font-mono font-semibold ${approvalColors[approvalStatusDisplay] || 'bg-ink/10 text-ink/60'}`}>
+                          {approvalStatusDisplay}
                         </span>
                       </td>
                       <td className="px-6 py-4 text-sm text-ink/60 font-mono">{policy.year}</td>
