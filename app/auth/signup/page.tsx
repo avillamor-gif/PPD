@@ -92,8 +92,9 @@ export default function SignupPage() {
         confirmPassword: '',
       });
 
+      // Redirect to login after success
       setTimeout(() => {
-        router.push(`/auth/verify-pending?email=${encodeURIComponent(formData.email)}`);
+        router.push('/auth/login');
       }, 2000);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
@@ -111,14 +112,12 @@ export default function SignupPage() {
           
           <div className="space-y-2">
             <h1 className="text-3xl font-bold text-ink">Account Created!</h1>
-            <p className="text-ink/60">Check your email at <span className="font-mono text-ocean">{email}</span> to verify your account.</p>
+            <p className="text-ink/60">Welcome! You can now log in with your email and password.</p>
           </div>
 
           <div className="bg-ocean/10 p-4 rounded-lg border border-ocean/20">
-            <p className="text-sm text-ink/70">We've sent you a verification link. Click it to complete your signup.</p>
+            <p className="text-sm text-ink/70">Redirecting to login page...</p>
           </div>
-
-          <p className="text-sm text-ink/50">Redirecting to verification page...</p>
         </div>
       </div>
     );

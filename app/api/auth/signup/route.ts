@@ -62,11 +62,11 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 1. Create auth user (Supabase Auth handles email verification automatically)
+    // 1. Create auth user
     const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
       email,
       password,
-      email_confirm: false, // Send confirmation email automatically
+      email_confirm: true, // Auto-confirm email to skip verification
     });
 
     if (authError) {
@@ -111,10 +111,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Success! Supabase Auth sends verification email automatically
+    // Success! Account created and email auto-verified
     return NextResponse.json({
       success: true,
-      message: 'Account created. Please check your email to verify your account.',
+      message: 'Account created successfully! You can now log in.',
       userId: authUserId,
     });
 
