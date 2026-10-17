@@ -183,6 +183,9 @@ export async function GET(
     const { id } = await params;
     console.log(`[GET] Fetching policy with id: "${id}"`);
 
+    // Check if user is admin
+    const isAdmin = await isAdminUser(request);
+
     // Try to fetch by slug first (URLs always use slugs)
     let { data, error } = await supabaseAdmin
       .from('policies')
@@ -221,6 +224,14 @@ export async function GET(
     }
 
     if (error || !data) {
+      return NextResponse.json(
+        { success: false, error: 'Policy not found' },
+        { status: 404 }
+      );
+    }
+
+    // Check approval status - only show pending/rejected policies to admins
+    if (!isAdmin && data.approval_status !== 'approved') {
       return NextResponse.json(
         { success: false, error: 'Policy not found' },
         { status: 404 }

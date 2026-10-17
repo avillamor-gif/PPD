@@ -52,7 +52,8 @@ export async function GET(req: NextRequest) {
     // Build query
     let query = supabaseAdmin
       .from('policies')
-      .select('id, slug, title, commencement_date, country, level, category, status, lifecycle_stage, authority, link, other_links, summary, keywords, language');
+      .select('id, slug, title, commencement_date, country, level, category, status, lifecycle_stage, authority, link, other_links, summary, keywords, language')
+      .eq('approval_status', 'approved');
 
     // Apply filters - use 'in' for multiple values
     if (statuses.length > 0) {

@@ -238,10 +238,12 @@ export async function POST(request: NextRequest) {
 
 export async function GET() {
   try {
-    // Fetch policies from Supabase
+    // Fetch only approved policies for public view
+    // Pending and rejected policies are only visible to admins
     const { data, error } = await supabaseAdmin
       .from('policies')
       .select('*')
+      .eq('approval_status', 'approved')
       .order('year', { ascending: false });
 
     if (error) {

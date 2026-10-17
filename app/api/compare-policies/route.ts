@@ -27,11 +27,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Fetch policies from database
+    // Fetch policies from database - only approved policies for public comparison
     const { data: policies, error: dbError } = await supabaseAdmin
       .from('policies')
       .select('id, title, summary, category, status, level, year, country')
-      .in('id', policyIds);
+      .in('id', policyIds)
+      .eq('approval_status', 'approved');
 
     if (dbError || !policies || policies.length < 2) {
       return NextResponse.json(
