@@ -82,9 +82,9 @@ export default function ForumModerationPage() {
         .eq('id', user.id)
         .single();
 
-      // Check if role_id is 1 (admin) or 2 (moderator)
-      if (profile?.role_id !== 1 && profile?.role_id !== 2) {
-        console.log('[MODERATION PAGE] User role_id:', profile?.role_id, '(not admin/moderator)');
+      // Check if role_id is 1 (admin), 2 (moderator), or 3 (expert)
+      if (profile?.role_id !== 1 && profile?.role_id !== 2 && profile?.role_id !== 3) {
+        console.log('[MODERATION PAGE] User role_id:', profile?.role_id, '(not admin/moderator/expert)');
         router.push('/');
         return;
       }
