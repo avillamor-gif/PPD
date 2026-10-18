@@ -47,7 +47,7 @@ export default function AdminLayout({
         { href: '/admin/statuses', label: 'Statuses', requiredRole: [UserRole.ADMIN] }
       ]
     },
-    { href: '/admin/manage', label: 'Manage Entries', requiredRole: [UserRole.ADMIN, UserRole.MODERATOR] },
+    { href: '/admin/manage', label: 'Manage Entries', requiredRole: [UserRole.ADMIN, UserRole.MODERATOR, UserRole.EXPERT] },
   ];
 
   // Fetch current user role (optimized - only fetch once on mount)
