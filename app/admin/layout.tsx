@@ -37,7 +37,7 @@ export default function AdminLayout({
     { href: '/admin', label: 'Dashboard', requiredRole: [UserRole.ADMIN, UserRole.MODERATOR, UserRole.EXPERT] },
     { href: '/admin/users', label: 'Users', requiredRole: [UserRole.ADMIN] },
     { href: '/admin/policies-review', label: 'Policy Approvals', requiredRole: [UserRole.ADMIN] },
-    { href: '/admin/moderation', label: 'Moderation', requiredRole: [UserRole.ADMIN, UserRole.MODERATOR, UserRole.EXPERT] },
+    { href: '/admin/moderation', label: 'Moderation', requiredRole: [UserRole.ADMIN, UserRole.MODERATOR] },
     { 
       href: '/admin/submit', 
       label: 'Submit Entry',
