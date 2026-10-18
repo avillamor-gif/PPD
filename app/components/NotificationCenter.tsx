@@ -75,7 +75,7 @@ export default function NotificationCenter() {
               className={`${colors.bg} ${colors.border} border-2 rounded-lg p-4 shadow-lg animate-in fade-in slide-in-from-top-4 duration-300`}
             >
               <div className="flex items-start gap-3">
-                <div className={`${colors.text} flex-shrink-0 mt-0.5`}>{icon}</div>
+                <div className={`${colors.text} shrink-0 mt-0.5`}>{icon}</div>
                 <div className="flex-1">
                   <h3 className={`${colors.text} font-bold text-sm`}>{notification.title}</h3>
                   {notification.message && (
@@ -84,7 +84,7 @@ export default function NotificationCenter() {
                 </div>
                 <button
                   onClick={() => removeNotification(notification.id)}
-                  className={`${colors.text} hover:opacity-70 flex-shrink-0`}
+                  className={`${colors.text} hover:opacity-70 shrink-0`}
                 >
                   <X className="w-4 h-4" />
                 </button>

@@ -309,7 +309,7 @@ export default function SearchPage() {
             {rows.length > 0 && isLoggedIn && (
               <button
                 onClick={() => setShowExportModal(true)}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-ocean/10 text-ocean hover:bg-ocean/20 transition font-medium text-sm flex-shrink-0 mt-1"
+                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-ocean/10 text-ocean hover:bg-ocean/20 transition font-medium text-sm shrink-0 mt-1"
               >
                 <Download className="w-4 h-4" />
                 Export
@@ -332,7 +332,7 @@ export default function SearchPage() {
             />
             <Search className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-ink/40" />
           </div>
-          <div className="flex-shrink-0">
+          <div className="shrink-0">
             <Select 
               label="Sort" 
               value={sortBy} 

@@ -155,7 +155,7 @@ export default function SignupPage() {
 
           {error && (
             <div className="flex gap-3 p-4 rounded-lg bg-coral/10 border border-coral/20">
-              <AlertCircle className="w-5 h-5 text-coral flex-shrink-0 mt-0.5" />
+              <AlertCircle className="w-5 h-5 text-coral shrink-0 mt-0.5" />
               <p className="text-sm text-coral">{error}</p>
             </div>
           )}

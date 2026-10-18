@@ -372,7 +372,7 @@ export function PolicyImplementationStatus({
               <div key={entry.id} className="flex gap-3 group">
                 {/* Timeline year circle and line */}
                 <div className="flex flex-col items-center">
-                  <div className="w-12 h-12 rounded-full bg-ocean flex items-center justify-center flex-shrink-0">
+                  <div className="w-12 h-12 rounded-full bg-ocean flex items-center justify-center shrink-0">
                     <span className="text-white text-xs font-bold">
                       {new Date(entry.change_date).getFullYear()}
                     </span>

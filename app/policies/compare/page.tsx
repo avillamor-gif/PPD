@@ -102,7 +102,7 @@ function CompareContent() {
         </section>
         <section className="mx-auto max-w-350 px-6 py-12 lg:px-10">
           <div className="rounded-2xl border border-coral/30 bg-coral/5 p-6 flex gap-4">
-            <AlertCircle className="w-6 h-6 text-coral flex-shrink-0 mt-1" />
+            <AlertCircle className="w-6 h-6 text-coral shrink-0 mt-1" />
             <div>
               <h3 className="font-semibold text-coral mb-2">Comparison Error</h3>
               <p className="text-ink/60">{error}</p>
