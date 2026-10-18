@@ -199,14 +199,24 @@ export function SiteHeader() {
                       </Link>
                     )}
                     {userProfile?.role_id === 3 && (
-                      <Link
-                        href="/admin/manage"
-                        className="px-4 py-2 text-sm text-ocean hover:bg-sand transition flex items-center gap-2 border-b border-rule font-medium"
-                        onClick={() => setDropdownOpen(false)}
-                      >
-                        <LayoutDashboard className="w-4 h-4" />
-                        Manage Entries
-                      </Link>
+                      <>
+                        <Link
+                          href="/admin/submit"
+                          className="px-4 py-2 text-sm text-coral hover:bg-sand transition flex items-center gap-2 font-medium"
+                          onClick={() => setDropdownOpen(false)}
+                        >
+                          <LayoutDashboard className="w-4 h-4" />
+                          Submit Entry
+                        </Link>
+                        <Link
+                          href="/admin/manage"
+                          className="px-4 py-2 text-sm text-ocean hover:bg-sand transition flex items-center gap-2 border-b border-rule font-medium"
+                          onClick={() => setDropdownOpen(false)}
+                        >
+                          <LayoutDashboard className="w-4 h-4" />
+                          Manage Entries
+                        </Link>
+                      </>
                     )}
                     <Link
                       href="/dashboard"
@@ -335,13 +345,22 @@ export function SiteHeader() {
                     </Link>
                   )}
                   {userProfile?.role_id === 3 && (
-                    <Link
-                      href="/admin/manage"
-                      className="block px-4 py-2 rounded-lg hover:bg-sand transition text-ink text-center"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      Manage Entries
-                    </Link>
+                    <>
+                      <Link
+                        href="/admin/submit"
+                        className="block px-4 py-2 rounded-lg hover:bg-sand transition text-ink text-center"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        Submit Entry
+                      </Link>
+                      <Link
+                        href="/admin/manage"
+                        className="block px-4 py-2 rounded-lg hover:bg-sand transition text-ink text-center"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        Manage Entries
+                      </Link>
+                    </>
                   )}
                   <button
                     onClick={() => {
