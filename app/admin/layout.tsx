@@ -34,7 +34,7 @@ export default function AdminLayout({
   
   // Define all navigation items with role-based access
   const allNavItems: NavItem[] = [
-    { href: '/admin', label: 'Dashboard', requiredRole: [UserRole.ADMIN, UserRole.MODERATOR, UserRole.EXPERT] },
+    { href: '/admin', label: 'Dashboard', requiredRole: [UserRole.ADMIN, UserRole.MODERATOR] },
     { href: '/admin/users', label: 'Users', requiredRole: [UserRole.ADMIN] },
     { href: '/admin/policies-review', label: 'Policy Approvals', requiredRole: [UserRole.ADMIN] },
     { href: '/admin/moderation', label: 'Moderation', requiredRole: [UserRole.ADMIN, UserRole.MODERATOR] },
@@ -43,8 +43,8 @@ export default function AdminLayout({
       label: 'Submit Entry',
       requiredRole: [UserRole.ADMIN, UserRole.MODERATOR, UserRole.EXPERT],
       submenu: [
-        { href: '/admin/instrument-types', label: 'Instrument Types', requiredRole: [UserRole.ADMIN] },
-        { href: '/admin/statuses', label: 'Statuses', requiredRole: [UserRole.ADMIN] }
+        { href: '/admin/instrument-types', label: 'Instrument Types', requiredRole: [UserRole.ADMIN, UserRole.MODERATOR, UserRole.EXPERT] },
+        { href: '/admin/statuses', label: 'Statuses', requiredRole: [UserRole.ADMIN, UserRole.MODERATOR, UserRole.EXPERT] }
       ]
     },
     { href: '/admin/manage', label: 'Manage Entries', requiredRole: [UserRole.ADMIN, UserRole.MODERATOR, UserRole.EXPERT] },
