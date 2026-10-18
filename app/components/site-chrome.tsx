@@ -200,6 +200,16 @@ export function SiteHeader() {
                         Admin Dashboard
                       </Link>
                     )}
+                    {userProfile?.role_id === 3 && (
+                      <Link
+                        href="/admin/manage"
+                        className="px-4 py-2 text-sm text-ocean hover:bg-sand transition flex items-center gap-2 border-b border-rule font-medium"
+                        onClick={() => setDropdownOpen(false)}
+                      >
+                        <LayoutDashboard className="w-4 h-4" />
+                        Manage Entries
+                      </Link>
+                    )}
                     <Link
                       href="/dashboard"
                       className="px-4 py-2 text-sm text-ink hover:bg-sand transition flex items-center gap-2 border-t border-rule font-medium"
@@ -324,6 +334,15 @@ export function SiteHeader() {
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       Admin Dashboard
+                    </Link>
+                  )}
+                  {userProfile?.role_id === 3 && (
+                    <Link
+                      href="/admin/manage"
+                      className="block px-4 py-2 rounded-lg hover:bg-sand transition text-ink text-center"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Manage Entries
                     </Link>
                   )}
                   <button
