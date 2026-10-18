@@ -90,10 +90,8 @@ export function SiteHeader() {
       1: 'admin',
       2: 'moderator',
       3: 'expert',
-      4: 'user',
-      5: 'guest'
     };
-    return roles[roleId] || 'user';
+    return roles[roleId] || 'expert';
   };
 
   const loadProfile = async (userId: string) => {

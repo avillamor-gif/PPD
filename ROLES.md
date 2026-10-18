@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Plastic Policy Database uses a role-based access control system with 4 main roles plus a guest role. Each role has specific permissions and capabilities.
+The Plastic Policy Database uses a role-based access control system with 3 main roles. Each role has specific permissions and capabilities.
 
 ---
 
@@ -12,8 +12,6 @@ The Plastic Policy Database uses a role-based access control system with 4 main 
 ADMIN (Level 5)
   └─ MODERATOR (Level 4)
       └─ EXPERT (Level 3)
-          └─ USER (Level 2)
-              └─ GUEST (Level 1)
 ```
 
 Higher-level roles have access to all lower-level features plus additional capabilities.
@@ -140,92 +138,26 @@ Higher-level roles have access to all lower-level features plus additional capab
 
 ---
 
-### 4. **USER** (Regular User)
-**Level:** 2
-
-**Description:** Regular user with discussion and database access.
-
-**Capabilities:**
-- **Forum Participation**
-  - Create threads
-  - Create and edit own comments
-  - Delete own comments
-  - Delete own threads
-  - Participate in discussions
-
-- **Database Access**
-  - Search and browse policies
-  - View policy details
-  - View country data
-  - Export search results
-
-- **Profile**
-  - View and edit own profile
-  - View personal statistics
-  - Follow users (if implemented)
-
-**Restrictions:**
-- Cannot create/edit policies
-- Cannot moderate content
-- Cannot manage other users
-- Cannot access admin panel
-
-**Access Routes:**
-- `/profile/[id]` (own profile)
-- `/search`
-- `/countries`
-- `/policies/[id]`
-- `/notifications`
-
----
-
-### 5. **GUEST** (Read-Only Access)
-**Level:** 1 (Lowest)
-
-**Description:** Limited read-only access to public content. No login required.
-
-**Capabilities:**
-- **Public Access**
-  - View policies
-  - Search database
-  - View country data
-  - View public user profiles
-
-**Restrictions:**
-- Cannot create content
-- Cannot modify anything
-- Cannot access forum discussions
-- Cannot see private user information
-
-**Access Routes:**
-- `/` (home)
-- `/search`
-- `/countries`
-- `/policies/[id]`
-- `/about`
-
----
-
 ## Permission Matrix
 
-| Permission | Admin | Moderator | Expert | User | Guest |
-|-----------|-------|-----------|--------|------|-------|
-| View Users | ✓ | ✗ | ✗ | ✗ | ✗ |
-| Manage Users | ✓ | ✗ | ✗ | ✗ | ✗ |
-| Change Roles | ✓ | ✗ | ✗ | ✗ | ✗ |
-| View Analytics | ✓ | ✗ | ✗ | ✗ | ✗ |
-| Create Policy | ✓ | ✗ | ✓ | ✗ | ✗ |
-| Edit Policy | ✓ | ✗ | ✓* | ✗ | ✗ |
-| Delete Policy | ✓ | ✗ | ✗ | ✗ | ✗ |
-| Moderate Content | ✓ | ✓ | ✗ | ✗ | ✗ |
-| Manage Forum | ✓ | ✓ | ✗ | ✗ | ✗ |
-| Create Thread | ✓ | ✓ | ✓ | ✓ | ✗ |
-| Edit Thread | ✓ | ✓ | ✓ | ✓* | ✗ |
-| Create Comment | ✓ | ✓ | ✓ | ✓ | ✗ |
-| Edit Comment | ✓ | ✓ | ✓ | ✓* | ✗ |
-| View Profile | ✓ | ✓ | ✓ | ✓ | ✓ |
-| Edit Profile | ✓ | ✓ | ✓ | ✓* | ✗ |
-| Search DB | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Permission | Admin | Moderator | Expert |
+|-----------|-------|-----------|--------|
+| View Users | ✓ | ✗ | ✗ |
+| Manage Users | ✓ | ✗ | ✗ |
+| Change Roles | ✓ | ✗ | ✗ |
+| View Analytics | ✓ | ✗ | ✗ |
+| Create Policy | ✓ | ✗ | ✓ |
+| Edit Policy | ✓ | ✗ | ✓* |
+| Delete Policy | ✓ | ✗ | ✗ |
+| Moderate Content | ✓ | ✓ | ✗ |
+| Manage Forum | ✓ | ✓ | ✗ |
+| Create Thread | ✓ | ✓ | ✓ |
+| Edit Thread | ✓ | ✓ | ✓ |
+| Create Comment | ✓ | ✓ | ✓ |
+| Edit Comment | ✓ | ✓ | ✓ |
+| View Profile | ✓ | ✓ | ✓ |
+| Edit Profile | ✓ | ✓ | ✓* |
+| Search DB | ✓ | ✓ | ✓ |
 
 *Only own content
 
@@ -242,8 +174,6 @@ export enum UserRole {
   ADMIN = 'admin',
   MODERATOR = 'moderator',
   EXPERT = 'expert',
-  USER = 'user',
-  GUEST = 'guest',
 }
 ```
 

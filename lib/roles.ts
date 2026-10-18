@@ -5,14 +5,12 @@
  * 1. ADMIN - Full system access, user management, moderation
  * 2. MODERATOR - Forum moderation, content review
  * 3. EXPERT - Default role, policy contributor
- * 4. GUEST - No authentication required
  */
 
 export enum UserRole {
   ADMIN = 'admin',
   MODERATOR = 'moderator',
   EXPERT = 'expert',
-  GUEST = 'guest',
 }
 
 /**
@@ -117,14 +115,6 @@ export const rolePermissions: Record<UserRole, string[]> = {
     'search_policies',
     'export_results',
   ],
-
-  [UserRole.GUEST]: [
-    // Read-only access
-    'view_database',
-    'view_policy',
-    'search_policies',
-    'view_public_profiles',
-  ],
 };
 
 /**
@@ -134,7 +124,6 @@ export const roleHierarchy: Record<UserRole, number> = {
   [UserRole.ADMIN]: 5,
   [UserRole.MODERATOR]: 4,
   [UserRole.EXPERT]: 3,
-  [UserRole.GUEST]: 1,
 };
 
 /**
@@ -182,7 +171,6 @@ export function getRoleDisplayName(role: UserRole): string {
     [UserRole.ADMIN]: 'Administrator',
     [UserRole.MODERATOR]: 'Moderator',
     [UserRole.EXPERT]: 'Expert / Contributor',
-    [UserRole.GUEST]: 'Guest',
   };
   return displayNames[role];
 }
@@ -198,7 +186,6 @@ export function getRoleDescription(role: UserRole): string {
       'Forum moderation, content review, policy management, and discussion leadership',
     [UserRole.EXPERT]:
       'Default role for policy contributors, can submit and manage policy entries',
-    [UserRole.GUEST]: 'Limited read-only access to public content',
   };
   return descriptions[role];
 }

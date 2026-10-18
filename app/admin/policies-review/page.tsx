@@ -20,7 +20,6 @@ const roleIdMap: Record<number, UserRole> = {
   1: UserRole.ADMIN,
   2: UserRole.MODERATOR,
   3: UserRole.EXPERT,
-  5: UserRole.GUEST,
 };
 
 export default function PoliciesReviewPage() {

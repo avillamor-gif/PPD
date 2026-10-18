@@ -91,7 +91,6 @@ export async function protectRouteByRole(
     [UserRole.ADMIN]: 5,
     [UserRole.MODERATOR]: 4,
     [UserRole.EXPERT]: 3,
-    [UserRole.GUEST]: 1,
   };
 
   if (roleHierarchy[user.userRole] < roleHierarchy[requiredRole]) {

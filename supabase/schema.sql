@@ -23,8 +23,7 @@ CREATE TABLE IF NOT EXISTS roles (
 INSERT INTO roles (name, description) VALUES
   ('admin', 'Administrator with full access'),
   ('moderator', 'Forum moderator'),
-  ('expert', 'Policy expert or contributor'),
-  ('guest', 'Unregistered guest')
+  ('expert', 'Policy expert or contributor')
 ON CONFLICT (name) DO NOTHING;
 
 -- ============================================

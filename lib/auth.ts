@@ -81,7 +81,6 @@ export async function hasRole(requiredRole: UserRole): Promise<boolean> {
     [UserRole.ADMIN]: 5,
     [UserRole.MODERATOR]: 4,
     [UserRole.EXPERT]: 3,
-    [UserRole.GUEST]: 1,
   };
 
   return roleHierarchy[user.role] >= roleHierarchy[requiredRole];
@@ -117,7 +116,6 @@ export async function requireRole(requiredRole: UserRole): Promise<AuthUser> {
     [UserRole.ADMIN]: 5,
     [UserRole.MODERATOR]: 4,
     [UserRole.EXPERT]: 3,
-    [UserRole.GUEST]: 1,
   };
 
   if (roleHierarchy[user.role] < roleHierarchy[requiredRole]) {
