@@ -314,13 +314,6 @@
   background: #e8efe7;
 }
 
-.policy-table tbody td.checkbox-cell {
-  position: sticky;
-  left: 0;
-  z-index: 1;
-  background: inherit;
-}
-
 .policy-table thead th button {
   display: flex;
   gap: 7px;
