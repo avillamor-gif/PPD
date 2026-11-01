@@ -620,6 +620,7 @@ export default function SearchPage() {
                   onClick={() => {
                     setCompareSelection({});
                     setShowCompareBar(false);
+                    setShowCompareModal(false);
                   }}
                 >
                   Clear selection
@@ -654,6 +655,13 @@ export default function SearchPage() {
                                 const newSelection = { ...compareSelection };
                                 delete newSelection[p.id];
                                 setCompareSelection(newSelection);
+                                
+                                // Close modal if less than 2 policies remain
+                                const remainingCount = Object.keys(newSelection).length;
+                                if (remainingCount < 2) {
+                                  setShowCompareModal(false);
+                                  setShowCompareBar(false);
+                                }
                               }}
                             >
                               Remove
