@@ -494,109 +494,156 @@
   align-items: center;
 }
 
-/* Compare Modal */
+/* Side-by-side policy comparison */
+.compare-modal[hidden] {
+  display: none !important;
+}
+
 .compare-modal {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 50;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
+  inset: 0;
+  z-index: 80;
 }
 
 .compare-modal-backdrop {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(4px);
+  background: rgba(18, 31, 28, 0.58);
 }
 
 .compare-modal-dialog {
   position: relative;
   z-index: 1;
-  background: #fff;
-  border-radius: 8px;
-  max-width: 90vw;
-  max-height: 85vh;
-  overflow: auto;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  width: min(1200px, calc(100vw - 24px));
+  max-height: calc(100vh - 24px);
+  overflow: hidden;
+  margin: 12px auto;
+  background: #fffdfa;
+  border: 1px solid #cad4ca;
+  border-radius: 20px;
+  box-shadow: 0 28px 60px rgba(15, 32, 28, 0.28);
+  display: flex;
+  flex-direction: column;
 }
 
 .compare-modal-head {
-  padding: 28px;
-  border-bottom: 1px solid var(--explore-line);
-  position: sticky;
-  top: 0;
-  background: #fff;
   display: flex;
-  align-items: flex-start;
   justify-content: space-between;
-  gap: 20px;
+  gap: 18px;
+  padding: 22px 24px;
+  border-bottom: 1px solid #d7ddd4;
+  background: #f8f6ef;
 }
 
 .compare-modal-head h2 {
-  margin: 12px 0 8px 0;
-  font-size: 24px;
-  color: var(--explore-ink);
+  margin: 6px 0 6px;
+  font-size: 34px;
+  line-height: 1.04;
+  color: #203731;
 }
 
 .compare-modal-head p {
-  color: var(--explore-muted);
-  font-size: 13px;
   margin: 0;
+  color: #53635b;
+  max-width: 720px;
 }
 
 .compare-close {
-  flex-shrink: 0;
-  border: 0;
-  background: transparent;
-  font-size: 24px;
+  border: 1px solid #c8d2c8;
+  background: #fffdfa;
+  border-radius: 999px;
+  width: 42px;
+  height: 42px;
+  font-size: 20px;
   cursor: pointer;
-  color: var(--explore-muted);
+  color: #31453e;
+  flex-shrink: 0;
   padding: 0;
-  width: 32px;
-  height: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .compare-close:hover {
-  color: var(--explore-ink);
+  background: #f5f2e8;
 }
 
 .compare-modal-body {
-  padding: 28px;
+  padding: 18px 24px 26px;
+  overflow: auto;
+}
+
+.compare-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 18px;
+  margin-bottom: 16px;
+}
+
+.compare-summary p {
+  margin: 0;
+  color: #596960;
+}
+
+.compare-summary .compare-clear {
+  white-space: nowrap;
+}
+
+.compare-table-wrap {
+  overflow: auto;
+  border: 1px solid #d3dbd1;
+  border-radius: 12px;
+  background: #fff;
 }
 
 .compare-table {
   width: 100%;
   border-collapse: collapse;
+  min-width: 780px;
 }
 
-.compare-table th {
-  text-align: left;
-  padding: 16px 12px;
-  border-bottom: 2px solid var(--explore-line);
-  background: var(--explore-green);
-  font-weight: 600;
-  font-size: 13px;
-  color: var(--explore-ink);
-}
-
+.compare-table th,
 .compare-table td {
-  padding: 14px 12px;
-  border-bottom: 1px solid var(--explore-line);
-  font-size: 13px;
-  color: var(--explore-ink);
+  border-bottom: 1px solid #e2e8e0;
+  padding: 14px 14px;
+  vertical-align: top;
+  text-align: left;
 }
 
-.compare-table tr:hover {
-  background: var(--explore-green);
+.compare-table thead th {
+  background: #f5f2e8;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #4c5f57;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.compare-table tbody th {
+  width: 190px;
+  background: #fbfaf5;
+  color: #2b423a;
+  font-size: 13px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.compare-cell-topics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.compare-cell-link {
+  color: var(--coral);
+  font-weight: 700;
+}
+
+.compare-empty {
+  color: #79857e;
 }
 
 /* Checkbox */
@@ -673,17 +720,27 @@
   }
 
   .compare-modal-dialog {
-    max-width: 100%;
-    max-height: 100%;
-    border-radius: 0;
+    width: calc(100vw - 10px);
+    max-height: calc(100vh - 10px);
+    margin: 5px auto;
+    border-radius: 14px;
   }
 
-  .compare-modal-head {
-    padding: 20px;
-  }
-
+  .compare-modal-head,
   .compare-modal-body {
-    padding: 20px;
+    padding: 16px;
+  }
+
+  .compare-modal-head h2 {
+    font-size: 28px;
+  }
+
+  .compare-summary {
+    flex-direction: column;
+  }
+
+  .compare-table tbody th {
+    width: 140px;
   }
 }
 
