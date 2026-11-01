@@ -578,12 +578,16 @@ export default function SearchPage() {
       {showCompareModal && (
         <div className="compare-modal">
           <div className="compare-modal-backdrop" onClick={() => setShowCompareModal(false)} />
-          <div className="compare-modal-dialog" role="dialog" aria-modal="true">
+          <div className="compare-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="compareModalTitle">
             <div className="compare-modal-head">
               <div>
-                <div className="text-xs font-mono uppercase tracking-widest text-coral">POLICY COMPARISON</div>
-                <h2 className="font-display text-2xl font-bold">Compare selected policies</h2>
-                <p className="text-sm text-muted mt-2">
+                <div style={{ fontSize: '12px', letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--coral)', marginBottom: '6px' }}>
+                  POLICY COMPARISON
+                </div>
+                <h2 id="compareModalTitle" style={{ fontSize: '34px', lineHeight: '1.04', margin: '6px 0', color: '#203731' }}>
+                  Compare selected policies
+                </h2>
+                <p style={{ margin: '0', color: '#53635b', maxWidth: '720px', marginTop: '6px' }}>
                   Compare the details recorded for each policy. Read the source documents before drawing legal conclusions.
                 </p>
               </div>
@@ -596,70 +600,139 @@ export default function SearchPage() {
               </button>
             </div>
             <div className="compare-modal-body">
-              <table className="compare-table">
-                <tbody>
-                  <tr>
-                    <th>Title</th>
-                    {getSelectedPolicies().map((p) => (
-                      <td key={p.id} className="font-semibold">{p.title}</td>
-                    ))}
-                  </tr>
-                  <tr>
-                    <th>Country</th>
-                    {getSelectedPolicies().map((p) => (
-                      <td key={p.id}>{p.country}</td>
-                    ))}
-                  </tr>
-                  <tr>
-                    <th>Region</th>
-                    {getSelectedPolicies().map((p) => (
-                      <td key={p.id}>{p.region || '—'}</td>
-                    ))}
-                  </tr>
-                  <tr>
-                    <th>Year</th>
-                    {getSelectedPolicies().map((p) => (
-                      <td key={p.id}>{p.year || '—'}</td>
-                    ))}
-                  </tr>
-                  <tr>
-                    <th>Government Level</th>
-                    {getSelectedPolicies().map((p) => (
-                      <td key={p.id}>{p.level || '—'}</td>
-                    ))}
-                  </tr>
-                  <tr>
-                    <th>Document Type</th>
-                    {getSelectedPolicies().map((p) => (
-                      <td key={p.id}>{p.type || '—'}</td>
-                    ))}
-                  </tr>
-                  <tr>
-                    <th>Policy Date</th>
-                    {getSelectedPolicies().map((p) => (
-                      <td key={p.id}>{formatDate(p.policy_date || p.date_effective)}</td>
-                    ))}
-                  </tr>
-                  <tr>
-                    <th>Last Reviewed</th>
-                    {getSelectedPolicies().map((p) => (
-                      <td key={p.id}>{formatDate(p.last_reviewed)}</td>
-                    ))}
-                  </tr>
-                  <tr>
-                    <th>Topics</th>
-                    {getSelectedPolicies().map((p) => (
-                      <td key={p.id}>
-                        <ul className="text-xs space-y-1">
-                          {p.topics?.map((t: string) => (
-                            <li key={t}>{t}</li>
-                          ))}
-                        </ul>
-                      </td>
-                    ))}
-                  </tr>
-                </tbody>
-              </table>
+              <div className="compare-summary">
+                <p>
+                  {getSelectedPolicies().length} policies selected. The table uses details from the database. Follow the links to read each policy record.
+                </p>
+                <button
+                  type="button"
+                  className="btn-secondary"
+                  style={{
+                    padding: '8px 16px',
+                    border: '1px solid #cad4ca',
+                    background: '#fffdfa',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    color: '#203731',
+                    fontWeight: '600',
+                    whiteSpace: 'nowrap',
+                  }}
+                  onClick={() => {
+                    setCompareSelection({});
+                    setShowCompareBar(false);
+                  }}
+                >
+                  Clear selection
+                </button>
+              </div>
+              <div className="compare-table-wrap">
+                <table className="compare-table">
+                  <thead>
+                    <tr>
+                      <th scope="col">Field</th>
+                      {getSelectedPolicies().map((p) => (
+                        <th key={p.id} scope="col">
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                            <strong style={{ fontSize: '16px', color: '#203731' }}>{p.title}</strong>
+                            <span style={{ fontSize: '12px', color: '#63726b', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                              {p.country} · {p.year || 'N.D.'} · {p.type || 'Type not listed'}
+                            </span>
+                            <button
+                              type="button"
+                              style={{
+                                marginTop: '8px',
+                                border: 'none',
+                                background: 'none',
+                                padding: '0',
+                                color: 'var(--coral)',
+                                fontWeight: '700',
+                                cursor: 'pointer',
+                                fontSize: '13px',
+                                textAlign: 'left',
+                              }}
+                              onClick={() => {
+                                const newSelection = { ...compareSelection };
+                                delete newSelection[p.id];
+                                setCompareSelection(newSelection);
+                              }}
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <th scope="row">Country</th>
+                      {getSelectedPolicies().map((p) => (
+                        <td key={p.id}>{p.country}</td>
+                      ))}
+                    </tr>
+                    <tr>
+                      <th scope="row">Region</th>
+                      {getSelectedPolicies().map((p) => (
+                        <td key={p.id}>{p.region || 'Not listed'}</td>
+                      ))}
+                    </tr>
+                    <tr>
+                      <th scope="row">Year</th>
+                      {getSelectedPolicies().map((p) => (
+                        <td key={p.id}>{p.year || 'N.D.'}</td>
+                      ))}
+                    </tr>
+                    <tr>
+                      <th scope="row">Government level</th>
+                      {getSelectedPolicies().map((p) => (
+                        <td key={p.id}>{p.level || 'Not listed'}</td>
+                      ))}
+                    </tr>
+                    <tr>
+                      <th scope="row">Document type</th>
+                      {getSelectedPolicies().map((p) => (
+                        <td key={p.id}>{p.type || 'Not listed'}</td>
+                      ))}
+                    </tr>
+                    <tr>
+                      <th scope="row">Policy date</th>
+                      {getSelectedPolicies().map((p) => (
+                        <td key={p.id}>{formatDate(p.policy_date || p.date_effective) || 'Not listed'}</td>
+                      ))}
+                    </tr>
+                    <tr>
+                      <th scope="row">Topics</th>
+                      {getSelectedPolicies().map((p) => (
+                        <td key={p.id}>
+                          {p.topics && p.topics.length > 0 ? (
+                            <div className="compare-cell-topics">
+                              {p.topics.map((t: string) => (
+                                <span key={t} style={{ display: 'inline-block', padding: '4px 8px', background: '#edf4ef', borderRadius: '4px', fontSize: '12px' }}>
+                                  {t}
+                                </span>
+                              ))}
+                            </div>
+                          ) : (
+                            <span className="compare-empty">Not classified</span>
+                          )}
+                        </td>
+                      ))}
+                    </tr>
+                    <tr>
+                      <th scope="row">Summary</th>
+                      {getSelectedPolicies().map((p) => (
+                        <td key={p.id}>{p.summary || 'Not listed'}</td>
+                      ))}
+                    </tr>
+                    <tr>
+                      <th scope="row">Last reviewed</th>
+                      {getSelectedPolicies().map((p) => (
+                        <td key={p.id}>{formatDate(p.last_reviewed) || 'Not recorded'}</td>
+                      ))}
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>
