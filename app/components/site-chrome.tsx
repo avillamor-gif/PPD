@@ -133,11 +133,12 @@ export function SiteHeader() {
             height={40}
             className="shrink-0"
           />
-          <div className="flex flex-col">
-            <div className="hidden md:block font-display font-bold text-xl leading-tight whitespace-nowrap">
-              <span className="text-ink">Plastic Policy</span>
-              <br />
-              <span className="text-coral">Database</span>
+          <div className="flex flex-col gap-0">
+            <div className="hidden md:block font-display font-bold text-lg leading-none whitespace-nowrap">
+              <span className="text-ink">PLASTIC POLICY</span>
+            </div>
+            <div className="hidden md:block font-display font-bold text-lg leading-none whitespace-nowrap">
+              <span className="text-coral">DATABASE</span>
             </div>
           </div>
         </Link>
