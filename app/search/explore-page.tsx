@@ -15,8 +15,19 @@ const transformPolicies = (policies: any[]) => {
       ...p,
       countryCode: p.country,
       country: countryData?.name || p.country,
+      region: countryData?.region || '',
     };
   });
+};
+
+const formatDate = (dateString: string | null | undefined): string => {
+  if (!dateString) return '—';
+  try {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+  } catch {
+    return dateString;
+  }
 };
 
 type SortField = 'year' | 'country' | 'title' | 'region' | 'level' | 'type' | 'date';
@@ -434,6 +445,7 @@ export default function SearchPage() {
                               Policy / Instrument <span className="sort-arrow">{getSortArrow('title')}</span>
                             </button>
                           </th>
+                          <th scope="col">Region</th>
                           <th scope="col" className="col-topic">Topic</th>
                           <th scope="col" aria-sort={getSortAria('level')}>
                             <button
@@ -450,10 +462,11 @@ export default function SearchPage() {
                               onClick={() => handleSort('type')}
                               data-sort="type"
                             >
-                              Type <span className="sort-arrow">{getSortArrow('type')}</span>
+                              Document Type <span className="sort-arrow">{getSortArrow('type')}</span>
                             </button>
                           </th>
-                          <th scope="col">Status</th>
+                          <th scope="col">Policy Date</th>
+                          <th scope="col">Last Reviewed</th>
                         </tr>
                       </thead>
                       <tbody id="tableRows">
@@ -474,6 +487,7 @@ export default function SearchPage() {
                               </Link>
                               <span className="table-policy-small">{policy.instrument_type}</span>
                             </td>
+                            <td>{policy.region || '—'}</td>
                             <td className="table-topic-cell">
                               {policy.topics?.slice(0, 2).map((topic: string) => (
                                 <span key={topic} className="table-topic">
@@ -483,19 +497,8 @@ export default function SearchPage() {
                             </td>
                             <td>{policy.level || '—'}</td>
                             <td>{policy.type || '—'}</td>
-                            <td>
-                              <span
-                                className={`inline-block px-2 py-1 rounded text-xs font-semibold ${
-                                  policy.status === 'In Force'
-                                    ? 'bg-ocean/20 text-ocean'
-                                    : policy.status === 'Proposed'
-                                    ? 'bg-coral/20 text-coral'
-                                    : 'bg-sand text-ink'
-                                }`}
-                              >
-                                {policy.status}
-                              </span>
-                            </td>
+                            <td>{formatDate(policy.policy_date || policy.date_effective)}</td>
+                            <td>{formatDate(policy.last_reviewed)}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -624,6 +627,12 @@ export default function SearchPage() {
                     ))}
                   </tr>
                   <tr>
+                    <th>Region</th>
+                    {getSelectedPolicies().map((p) => (
+                      <td key={p.id}>{p.region || '—'}</td>
+                    ))}
+                  </tr>
+                  <tr>
                     <th>Year</th>
                     {getSelectedPolicies().map((p) => (
                       <td key={p.id}>{p.year || '—'}</td>
@@ -636,15 +645,21 @@ export default function SearchPage() {
                     ))}
                   </tr>
                   <tr>
-                    <th>Type</th>
+                    <th>Document Type</th>
                     {getSelectedPolicies().map((p) => (
                       <td key={p.id}>{p.type || '—'}</td>
                     ))}
                   </tr>
                   <tr>
-                    <th>Status</th>
+                    <th>Policy Date</th>
                     {getSelectedPolicies().map((p) => (
-                      <td key={p.id}>{p.status}</td>
+                      <td key={p.id}>{formatDate(p.policy_date || p.date_effective)}</td>
+                    ))}
+                  </tr>
+                  <tr>
+                    <th>Last Reviewed</th>
+                    {getSelectedPolicies().map((p) => (
+                      <td key={p.id}>{formatDate(p.last_reviewed)}</td>
                     ))}
                   </tr>
                   <tr>
