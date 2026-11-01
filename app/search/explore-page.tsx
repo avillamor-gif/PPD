@@ -43,7 +43,7 @@ interface Policy {
   year?: number;
   level?: string;
   type?: string;
-  instrument_type?: string;
+  category?: string;
   summary?: string;
   [key: string]: any;
 }
@@ -88,11 +88,14 @@ export default function SearchPage() {
           setPolicies(transformed);
           setFilteredPolicies(transformed);
           
-          // Extract unique instrument types
+          // Extract unique instrument types (from category field)
           const instrumentTypes = new Set<string>();
           transformed.forEach((p: Policy) => {
-            if (p.instrument_type) {
-              instrumentTypes.add(p.instrument_type);
+            if (p.category) {
+              p.category.split(',').forEach((cat: string) => {
+                const trimmed = cat.trim();
+                if (trimmed) instrumentTypes.add(trimmed);
+              });
             }
           });
           setAllInstrumentTypes(Array.from(instrumentTypes).sort());
@@ -128,7 +131,7 @@ export default function SearchPage() {
           p.title?.toLowerCase().includes(term) ||
           p.country?.toLowerCase().includes(term) ||
           p.summary?.toLowerCase().includes(term) ||
-          p.instrument_type?.toLowerCase().includes(term)
+          p.category?.toLowerCase().includes(term)
       );
     }
 
@@ -139,7 +142,9 @@ export default function SearchPage() {
 
     // Instrument Type filter
     if (selectedInstrumentType) {
-      filtered = filtered.filter((p) => p.instrument_type === selectedInstrumentType);
+      filtered = filtered.filter((p) =>
+        p.category?.includes(selectedInstrumentType)
+      );
     }
 
     // Status filter
@@ -504,13 +509,13 @@ export default function SearchPage() {
                               <Link href={`/policies/${policy.id}`} className="table-policy-link">
                                 {policy.title}
                               </Link>
-                              <span className="table-policy-small">{policy.instrument_type}</span>
+                              <span className="table-policy-small">{policy.category}</span>
                             </td>
                             <td>{policy.region || '—'}</td>
                             <td className="table-instrument-type-cell">
-                              {policy.instrument_type ? (
+                              {policy.category ? (
                                 <span className="table-instrument-type">
-                                  {policy.instrument_type}
+                                  {policy.category}
                                 </span>
                               ) : (
                                 '—'
@@ -749,9 +754,9 @@ export default function SearchPage() {
                       <th scope="row">Instrument Type</th>
                       {getSelectedPolicies().map((p) => (
                         <td key={p.id}>
-                          {p.instrument_type ? (
+                          {p.category ? (
                             <div className="compare-cell-instrument-type">
-                              {p.instrument_type}
+                              {p.category}
                             </div>
                           ) : (
                             <span className="compare-empty">Not listed</span>
