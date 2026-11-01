@@ -30,7 +30,7 @@ const formatDate = (dateString: string | null | undefined): string => {
   }
 };
 
-type SortField = 'year' | 'country' | 'title' | 'region' | 'level' | 'type' | 'date';
+type SortField = 'year' | 'country' | 'title' | 'region' | 'level' | 'status' | 'date';
 type SortOrder = 'asc' | 'desc' | 'none';
 
 interface Policy {
@@ -64,7 +64,8 @@ export default function SearchPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCountry, setSelectedCountry] = useState('');
-  const [selectedTopic, setSelectedTopic] = useState('');
+  const [selectedKeywords, setSelectedKeywords] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState('');
   const [selectedLevel, setSelectedLevel] = useState('');
   const [selectedYear, setSelectedYear] = useState('');
   const [viewMode, setViewMode] = useState<'table' | 'list'>('table');
@@ -72,7 +73,8 @@ export default function SearchPage() {
   const [compareSelection, setCompareSelection] = useState<CompareSelection>({});
   const [showCompareBar, setShowCompareBar] = useState(false);
   const [showCompareModal, setShowCompareModal] = useState(false);
-  const [allTopics, setAllTopics] = useState<any[]>([]);
+  const [allKeywords, setAllKeywords] = useState<any[]>([]);
+  const [allStatuses, setAllStatuses] = useState<any[]>([]);
 
   // Fetch policies
   useEffect(() => {
@@ -86,12 +88,23 @@ export default function SearchPage() {
           setPolicies(transformed);
           setFilteredPolicies(transformed);
           
-          // Extract unique topics
-          const topics = new Set<string>();
+          // Extract unique keywords
+          const keywords = new Set<string>();
           transformed.forEach((p: Policy) => {
-            p.topics?.forEach((t: string) => topics.add(t));
+            if (p.keywords) {
+              p.keywords.split(',').forEach((k: string) => keywords.add(k.trim()));
+            }
           });
-          setAllTopics(Array.from(topics).sort());
+          setAllKeywords(Array.from(keywords).sort());
+          
+          // Extract unique statuses
+          const statuses = new Set<string>();
+          transformed.forEach((p: Policy) => {
+            if (p.status) {
+              statuses.add(p.status);
+            }
+          });
+          setAllStatuses(Array.from(statuses).sort());
         }
       } catch (error) {
         console.error('Error fetching policies:', error);
@@ -115,7 +128,7 @@ export default function SearchPage() {
           p.title?.toLowerCase().includes(term) ||
           p.country?.toLowerCase().includes(term) ||
           p.summary?.toLowerCase().includes(term) ||
-          p.topics?.some((t: string) => t.toLowerCase().includes(term))
+          p.keywords?.toLowerCase().includes(term)
       );
     }
 
@@ -124,11 +137,16 @@ export default function SearchPage() {
       filtered = filtered.filter((p) => p.countryCode === selectedCountry);
     }
 
-    // Topic filter
-    if (selectedTopic) {
+    // Keywords filter
+    if (selectedKeywords) {
       filtered = filtered.filter((p) =>
-        p.topics?.includes(selectedTopic)
+        p.keywords?.toLowerCase().includes(selectedKeywords.toLowerCase())
       );
+    }
+
+    // Status filter
+    if (selectedStatus) {
+      filtered = filtered.filter((p) => p.status === selectedStatus);
     }
 
     // Level filter
@@ -166,7 +184,8 @@ export default function SearchPage() {
     policies,
     searchTerm,
     selectedCountry,
-    selectedTopic,
+    selectedKeywords,
+    selectedStatus,
     selectedLevel,
     selectedYear,
     sortState,
@@ -203,7 +222,8 @@ export default function SearchPage() {
   const clearFilters = () => {
     setSearchTerm('');
     setSelectedCountry('');
-    setSelectedTopic('');
+    setSelectedKeywords('');
+    setSelectedStatus('');
     setSelectedLevel('');
     setSelectedYear('');
     setSortState({ field: null, order: 'none' });
@@ -291,17 +311,34 @@ export default function SearchPage() {
             </div>
 
             <div className="filter-block">
-              <label htmlFor="topicFilter">Policy topic</label>
+              <label htmlFor="keywordsFilter">Keywords</label>
               <select
-                id="topicFilter"
-                value={selectedTopic}
-                onChange={(e) => setSelectedTopic(e.target.value)}
+                id="keywordsFilter"
+                value={selectedKeywords}
+                onChange={(e) => setSelectedKeywords(e.target.value)}
                 className="filter-select"
               >
-                <option value="">All topics</option>
-                {allTopics?.map((topic) => (
-                  <option key={topic} value={topic}>
-                    {topic}
+                <option value="">All keywords</option>
+                {allKeywords?.map((keyword) => (
+                  <option key={keyword} value={keyword}>
+                    {keyword}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="filter-block">
+              <label htmlFor="statusFilter">Status</label>
+              <select
+                id="statusFilter"
+                value={selectedStatus}
+                onChange={(e) => setSelectedStatus(e.target.value)}
+                className="filter-select"
+              >
+                <option value="">All statuses</option>
+                {allStatuses?.map((status) => (
+                  <option key={status} value={status}>
+                    {status}
                   </option>
                 ))}
               </select>
@@ -430,7 +467,7 @@ export default function SearchPage() {
                             </button>
                           </th>
                           <th scope="col">Region</th>
-                          <th scope="col" className="col-topic">Topic</th>
+                          <th scope="col" className="col-keywords">Keywords</th>
                           <th scope="col" aria-sort={getSortAria('level')}>
                             <button
                               type="button"
@@ -440,13 +477,13 @@ export default function SearchPage() {
                               Government Level <span className="sort-arrow">{getSortArrow('level')}</span>
                             </button>
                           </th>
-                          <th scope="col" aria-sort={getSortAria('type')}>
+                          <th scope="col" aria-sort={getSortAria('status')}>
                             <button
                               type="button"
-                              onClick={() => handleSort('type')}
-                              data-sort="type"
+                              onClick={() => handleSort('status')}
+                              data-sort="status"
                             >
-                              Document Type <span className="sort-arrow">{getSortArrow('type')}</span>
+                              Status <span className="sort-arrow">{getSortArrow('status')}</span>
                             </button>
                           </th>
                           <th scope="col">Policy Date</th>
@@ -472,15 +509,17 @@ export default function SearchPage() {
                               <span className="table-policy-small">{policy.instrument_type}</span>
                             </td>
                             <td>{policy.region || '—'}</td>
-                            <td className="table-topic-cell">
-                              {policy.topics?.slice(0, 2).map((topic: string) => (
-                                <span key={topic} className="table-topic">
-                                  {topic}
+                            <td className="table-keywords-cell">
+                              {policy.keywords ? (
+                                <span className="table-keywords">
+                                  {policy.keywords}
                                 </span>
-                              ))}
+                              ) : (
+                                '—'
+                              )}
                             </td>
                             <td>{policy.level || '—'}</td>
-                            <td>{policy.type || '—'}</td>
+                            <td>{policy.status || '—'}</td>
                             <td>{formatDate(policy.policy_date || policy.date_effective)}</td>
                             <td>{formatDate(policy.last_reviewed)}</td>
                           </tr>
@@ -697,9 +736,9 @@ export default function SearchPage() {
                       ))}
                     </tr>
                     <tr>
-                      <th scope="row">Document type</th>
+                      <th scope="row">Status</th>
                       {getSelectedPolicies().map((p) => (
-                        <td key={p.id}>{p.type || 'Not listed'}</td>
+                        <td key={p.id}>{p.status || 'Not listed'}</td>
                       ))}
                     </tr>
                     <tr>
@@ -709,19 +748,15 @@ export default function SearchPage() {
                       ))}
                     </tr>
                     <tr>
-                      <th scope="row">Topics</th>
+                      <th scope="row">Keywords</th>
                       {getSelectedPolicies().map((p) => (
                         <td key={p.id}>
-                          {p.topics && p.topics.length > 0 ? (
-                            <div className="compare-cell-topics">
-                              {p.topics.map((t: string) => (
-                                <span key={t} style={{ display: 'inline-block', padding: '4px 8px', background: '#edf4ef', borderRadius: '4px', fontSize: '12px' }}>
-                                  {t}
-                                </span>
-                              ))}
+                          {p.keywords ? (
+                            <div className="compare-cell-keywords">
+                              {p.keywords}
                             </div>
                           ) : (
-                            <span className="compare-empty">Not classified</span>
+                            <span className="compare-empty">Not listed</span>
                           )}
                         </td>
                       ))}
