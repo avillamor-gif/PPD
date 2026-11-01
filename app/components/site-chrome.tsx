@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { Menu, X, LogIn, LogOut, User, Settings, LayoutDashboard } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
@@ -125,14 +126,19 @@ export function SiteHeader() {
       <nav className="mx-auto max-w-350 px-4 py-3 md:px-6 flex items-center justify-between gap-4 md:gap-8">
         {/* Logo Section */}
         <Link href="/" className="flex items-center gap-3 shrink-0 group hover:opacity-85 transition-opacity">
-          {/* Wave/Ripple Logo */}
-          <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0">
-            <path d="M4 16C4 16 8 10 16 10C24 10 28 16 28 16" stroke="#E88860" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-            <path d="M2 20C2 20 7 12 16 12C25 12 30 20 30 20" stroke="#E88860" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.6"/>
-            <path d="M6 22C6 22 10 18 16 18C22 18 26 22 26 22" stroke="#E88860" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" opacity="0.3"/>
-          </svg>
+          <Image
+            src="/ppd_logo.webp"
+            alt="Plastic Policy Database"
+            width={40}
+            height={40}
+            className="shrink-0"
+          />
           <div className="flex flex-col">
-            <div className="hidden md:block font-display font-bold text-2xl text-coral leading-tight whitespace-nowrap">Plastic Policy Database</div>
+            <div className="hidden md:block font-display font-bold text-xl leading-tight whitespace-nowrap">
+              <span className="text-ink">Plastic Policy</span>
+              <br />
+              <span className="text-coral">Database</span>
+            </div>
           </div>
         </Link>
 
