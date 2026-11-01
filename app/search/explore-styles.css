@@ -301,6 +301,10 @@
   min-width: 290px;
 }
 
+.policy-table thead th.col-instrument-type {
+  min-width: 220px;
+}
+
 .policy-table thead th.col-topic {
   min-width: 150px;
 }
