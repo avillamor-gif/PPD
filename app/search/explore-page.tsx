@@ -401,23 +401,7 @@ export default function SearchPage() {
                       </caption>
                       <thead>
                         <tr>
-                          <th scope="col" className="col-compare" style={{ textAlign: 'center' }}>
-                            <input
-                              type="checkbox"
-                              checked={selectedCount > 0}
-                              onChange={(e) => {
-                                if (e.target.checked) {
-                                  const newSelection: CompareSelection = {};
-                                  filteredPolicies.forEach((p) => {
-                                    newSelection[p.id] = true;
-                                  });
-                                  setCompareSelection(newSelection);
-                                } else {
-                                  setCompareSelection({});
-                                }
-                              }}
-                            />
-                          </th>
+                          <th scope="col" className="col-compare">Compare</th>
                           <th scope="col" aria-sort={getSortAria('year')}>
                             <button
                               type="button"

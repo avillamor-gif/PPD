@@ -308,6 +308,17 @@
 .policy-table thead th.col-compare {
   width: 60px;
   text-align: center;
+  position: sticky;
+  left: 0;
+  z-index: 3;
+  background: #e8efe7;
+}
+
+.policy-table tbody td.checkbox-cell {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background: inherit;
 }
 
 .policy-table thead th button {
