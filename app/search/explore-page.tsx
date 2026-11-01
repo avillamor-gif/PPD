@@ -64,7 +64,7 @@ export default function SearchPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCountry, setSelectedCountry] = useState('');
-  const [selectedKeywords, setSelectedKeywords] = useState('');
+  const [selectedInstrumentType, setSelectedInstrumentType] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
   const [selectedLevel, setSelectedLevel] = useState('');
   const [selectedYear, setSelectedYear] = useState('');
@@ -73,7 +73,7 @@ export default function SearchPage() {
   const [compareSelection, setCompareSelection] = useState<CompareSelection>({});
   const [showCompareBar, setShowCompareBar] = useState(false);
   const [showCompareModal, setShowCompareModal] = useState(false);
-  const [allKeywords, setAllKeywords] = useState<any[]>([]);
+  const [allInstrumentTypes, setAllInstrumentTypes] = useState<any[]>([]);
   const [allStatuses, setAllStatuses] = useState<any[]>([]);
 
   // Fetch policies
@@ -88,14 +88,14 @@ export default function SearchPage() {
           setPolicies(transformed);
           setFilteredPolicies(transformed);
           
-          // Extract unique keywords
-          const keywords = new Set<string>();
+          // Extract unique instrument types
+          const instrumentTypes = new Set<string>();
           transformed.forEach((p: Policy) => {
-            if (p.keywords) {
-              p.keywords.split(',').forEach((k: string) => keywords.add(k.trim()));
+            if (p.instrument_type) {
+              instrumentTypes.add(p.instrument_type);
             }
           });
-          setAllKeywords(Array.from(keywords).sort());
+          setAllInstrumentTypes(Array.from(instrumentTypes).sort());
           
           // Extract unique statuses
           const statuses = new Set<string>();
@@ -128,7 +128,7 @@ export default function SearchPage() {
           p.title?.toLowerCase().includes(term) ||
           p.country?.toLowerCase().includes(term) ||
           p.summary?.toLowerCase().includes(term) ||
-          p.keywords?.toLowerCase().includes(term)
+          p.instrument_type?.toLowerCase().includes(term)
       );
     }
 
@@ -137,11 +137,9 @@ export default function SearchPage() {
       filtered = filtered.filter((p) => p.countryCode === selectedCountry);
     }
 
-    // Keywords filter
-    if (selectedKeywords) {
-      filtered = filtered.filter((p) =>
-        p.keywords?.toLowerCase().includes(selectedKeywords.toLowerCase())
-      );
+    // Instrument Type filter
+    if (selectedInstrumentType) {
+      filtered = filtered.filter((p) => p.instrument_type === selectedInstrumentType);
     }
 
     // Status filter
@@ -184,7 +182,7 @@ export default function SearchPage() {
     policies,
     searchTerm,
     selectedCountry,
-    selectedKeywords,
+    selectedInstrumentType,
     selectedStatus,
     selectedLevel,
     selectedYear,
@@ -222,7 +220,7 @@ export default function SearchPage() {
   const clearFilters = () => {
     setSearchTerm('');
     setSelectedCountry('');
-    setSelectedKeywords('');
+    setSelectedInstrumentType('');
     setSelectedStatus('');
     setSelectedLevel('');
     setSelectedYear('');
@@ -311,17 +309,17 @@ export default function SearchPage() {
             </div>
 
             <div className="filter-block">
-              <label htmlFor="keywordsFilter">Keywords</label>
+              <label htmlFor="instrumentTypeFilter">Instrument Type</label>
               <select
-                id="keywordsFilter"
-                value={selectedKeywords}
-                onChange={(e) => setSelectedKeywords(e.target.value)}
+                id="instrumentTypeFilter"
+                value={selectedInstrumentType}
+                onChange={(e) => setSelectedInstrumentType(e.target.value)}
                 className="filter-select"
               >
-                <option value="">All keywords</option>
-                {allKeywords?.map((keyword) => (
-                  <option key={keyword} value={keyword}>
-                    {keyword}
+                <option value="">All instrument types</option>
+                {allInstrumentTypes?.map((instrumentType) => (
+                  <option key={instrumentType} value={instrumentType}>
+                    {instrumentType}
                   </option>
                 ))}
               </select>
@@ -467,7 +465,7 @@ export default function SearchPage() {
                             </button>
                           </th>
                           <th scope="col">Region</th>
-                          <th scope="col" className="col-keywords">Keywords</th>
+                          <th scope="col" className="col-instrument-type">Instrument Type</th>
                           <th scope="col" aria-sort={getSortAria('level')}>
                             <button
                               type="button"
@@ -509,10 +507,10 @@ export default function SearchPage() {
                               <span className="table-policy-small">{policy.instrument_type}</span>
                             </td>
                             <td>{policy.region || '—'}</td>
-                            <td className="table-keywords-cell">
-                              {policy.keywords ? (
-                                <span className="table-keywords">
-                                  {policy.keywords}
+                            <td className="table-instrument-type-cell">
+                              {policy.instrument_type ? (
+                                <span className="table-instrument-type">
+                                  {policy.instrument_type}
                                 </span>
                               ) : (
                                 '—'
@@ -748,12 +746,12 @@ export default function SearchPage() {
                       ))}
                     </tr>
                     <tr>
-                      <th scope="row">Keywords</th>
+                      <th scope="row">Instrument Type</th>
                       {getSelectedPolicies().map((p) => (
                         <td key={p.id}>
-                          {p.keywords ? (
-                            <div className="compare-cell-keywords">
-                              {p.keywords}
+                          {p.instrument_type ? (
+                            <div className="compare-cell-instrument-type">
+                              {p.instrument_type}
                             </div>
                           ) : (
                             <span className="compare-empty">Not listed</span>
