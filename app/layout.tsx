@@ -6,6 +6,9 @@ import NotificationCenter from "./components/NotificationCenter";
 export const metadata: Metadata = {
   title: "Plastic Policy Database | Asia Pacific",
   description: "A comprehensive repository of plastic-related regulations at the national and regional levels across Asia Pacific.",
+  icons: {
+    icon: '/ppd_logo.webp',
+  },
 };
 
 export default function RootLayout({
