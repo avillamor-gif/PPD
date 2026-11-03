@@ -539,7 +539,7 @@ export default function SearchPage() {
 
             {/* List View */}
             {viewMode === 'list' && (
-              <div className="space-y-4">
+              <div className="space-y-6">
                 {loading ? (
                   <div className="flex items-center justify-center py-12">
                     <Loader className="w-6 h-6 text-coral animate-spin" />
@@ -550,19 +550,23 @@ export default function SearchPage() {
                   </div>
                 ) : (
                   filteredPolicies.map((policy) => (
-                    <div
-                      key={policy.id}
-                      className="border border-rule rounded-lg p-4 hover:bg-sand/50 transition"
-                    >
+                    <div key={policy.id}>
                       <div className="flex gap-3 items-start">
                         <input
                           type="checkbox"
                           checked={compareSelection[policy.id] || false}
                           onChange={() => handleCompareToggle(policy.id)}
                           className="mt-1"
+                          style={{
+                            width: '20px',
+                            height: '20px',
+                            minWidth: '20px',
+                            cursor: 'pointer',
+                            accentColor: 'var(--coral)',
+                          }}
                         />
                         <div className="flex-1">
-                          <div className="flex gap-2 flex-wrap mb-2">
+                          <div className="flex gap-2 flex-wrap mb-3">
                             {policy.year && (
                               <span
                                 style={{
@@ -595,37 +599,76 @@ export default function SearchPage() {
                                 {policy.country}
                               </span>
                             )}
-                            {policy.status && (
+                            {policy.region && (
                               <span
                                 style={{
                                   display: 'inline-block',
                                   padding: '6px 14px',
-                                  background: '#f0f3f0',
+                                  background: '#f5f2e8',
                                   color: '#2b3228',
                                   fontSize: '13px',
                                   fontWeight: '600',
                                   borderRadius: '20px',
-                                  border: '1px solid #dae3d8',
+                                  border: '1px solid #e8e3d6',
                                 }}
                               >
-                                {policy.status}
+                                {policy.region}
                               </span>
                             )}
-                          </div>
-                          <Link href={`/policies/${policy.id}`} className="text-coral font-semibold hover:underline">
-                            {policy.title}
-                          </Link>
-                          <p className="text-sm text-muted mt-1">{policy.region}</p>
-                          <p className="text-xs text-ink/60 mt-2">{policy.summary}</p>
-                          <div className="flex gap-2 mt-3 flex-wrap">
                             {policy.category && (
-                              <span className="inline-block px-2 py-1 bg-sand text-xs rounded">
+                              <span
+                                style={{
+                                  display: 'inline-block',
+                                  padding: '6px 14px',
+                                  background: '#f5f2e8',
+                                  color: '#2b3228',
+                                  fontSize: '13px',
+                                  fontWeight: '600',
+                                  borderRadius: '20px',
+                                  border: '1px solid #e8e3d6',
+                                }}
+                              >
                                 {policy.category}
                               </span>
                             )}
+                            {policy.level && (
+                              <span
+                                style={{
+                                  display: 'inline-block',
+                                  padding: '6px 14px',
+                                  background: '#f5f2e8',
+                                  color: '#2b3228',
+                                  fontSize: '13px',
+                                  fontWeight: '600',
+                                  borderRadius: '20px',
+                                  border: '1px solid #e8e3d6',
+                                }}
+                              >
+                                {policy.level}
+                              </span>
+                            )}
                           </div>
+                          <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#203731', marginBottom: '8px', lineHeight: '1.3' }}>
+                            {policy.title}
+                          </h3>
+                          <p style={{ fontSize: '14px', color: '#596960', marginBottom: '12px', lineHeight: '1.5' }}>
+                            {policy.summary}
+                          </p>
+                          <div style={{ display: 'flex', gap: '12px', alignItems: 'center', fontSize: '13px', color: '#63726b', marginBottom: '6px' }}>
+                            <span>{formatDate(policy.policy_date || policy.date_effective)}</span>
+                            <span>•</span>
+                            <span>{policy.category || 'Not listed'}</span>
+                            <span>•</span>
+                            <Link href={`/policies/${policy.id}`} style={{ color: 'var(--coral)', fontWeight: '700', textDecoration: 'none' }}>
+                              View policy ↗
+                            </Link>
+                          </div>
+                          <p style={{ fontSize: '13px', color: '#79857e', marginTop: '4px' }}>
+                            Last record review: {formatDate(policy.last_reviewed) || 'not recorded'}
+                          </p>
                         </div>
                       </div>
+                      <div style={{ height: '1px', background: '#dae3d8', marginTop: '16px' }} />
                     </div>
                   ))
                 )}
