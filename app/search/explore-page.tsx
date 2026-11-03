@@ -578,12 +578,12 @@ export default function SearchPage() {
                                 style={{
                                   display: 'inline-block',
                                   padding: '6px 14px',
-                                  background: '#ffe8f0',
-                                  color: '#c05574',
-                                  fontSize: '13px',
+                                  background: '#f5f2e8',
+                                  color: '#2b3228',
+                                  fontSize: '12px',
                                   fontWeight: '600',
                                   borderRadius: '20px',
-                                  border: '1px solid #f5c5d9',
+                                  border: '1px solid #e8e3d6',
                                 }}
                               >
                                 {policy.year}
@@ -596,7 +596,7 @@ export default function SearchPage() {
                                   padding: '6px 14px',
                                   background: '#f5f2e8',
                                   color: '#2b3228',
-                                  fontSize: '13px',
+                                  fontSize: '12px',
                                   fontWeight: '600',
                                   borderRadius: '20px',
                                   border: '1px solid #e8e3d6',
@@ -612,7 +612,7 @@ export default function SearchPage() {
                                   padding: '6px 14px',
                                   background: '#f5f2e8',
                                   color: '#2b3228',
-                                  fontSize: '13px',
+                                  fontSize: '12px',
                                   fontWeight: '600',
                                   borderRadius: '20px',
                                   border: '1px solid #e8e3d6',
@@ -628,7 +628,7 @@ export default function SearchPage() {
                                   padding: '6px 14px',
                                   background: '#f5f2e8',
                                   color: '#2b3228',
-                                  fontSize: '13px',
+                                  fontSize: '12px',
                                   fontWeight: '600',
                                   borderRadius: '20px',
                                   border: '1px solid #e8e3d6',
