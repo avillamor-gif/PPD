@@ -632,10 +632,10 @@ export default function SearchPage() {
                               </span>
                             )}
                           </div>
-                          <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#1a1a1a', marginBottom: '8px', lineHeight: '1.3' }}>
+                          <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#1a1a1a', marginBottom: '8px', lineHeight: '1.3', fontFamily: 'ui-serif, Georgia, serif' }}>
                             {policy.title}
                           </h3>
-                          <p style={{ fontSize: '14px', color: '#808080', marginBottom: '12px', lineHeight: '1.5' }}>
+                          <p style={{ fontSize: '14px', color: '#666666', marginBottom: '12px', lineHeight: '1.5' }}>
                             {policy.summary}
                           </p>
                           <div style={{ display: 'flex', gap: '12px', alignItems: 'center', fontSize: '13px', color: '#63726b', marginBottom: '6px' }}>
