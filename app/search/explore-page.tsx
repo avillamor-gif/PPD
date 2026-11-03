@@ -578,12 +578,12 @@ export default function SearchPage() {
                                 style={{
                                   display: 'inline-block',
                                   padding: '6px 14px',
-                                  background: '#f5f2e8',
+                                  background: '#ffffff',
                                   color: '#2b3228',
                                   fontSize: '12px',
                                   fontWeight: '600',
                                   borderRadius: '20px',
-                                  border: '1px solid #e8e3d6',
+                                  border: '1px solid #d9d6ce',
                                 }}
                               >
                                 {policy.year}
@@ -594,12 +594,12 @@ export default function SearchPage() {
                                 style={{
                                   display: 'inline-block',
                                   padding: '6px 14px',
-                                  background: '#f5f2e8',
+                                  background: '#ffffff',
                                   color: '#2b3228',
                                   fontSize: '12px',
                                   fontWeight: '600',
                                   borderRadius: '20px',
-                                  border: '1px solid #e8e3d6',
+                                  border: '1px solid #d9d6ce',
                                 }}
                               >
                                 {policy.country}
@@ -610,12 +610,12 @@ export default function SearchPage() {
                                 style={{
                                   display: 'inline-block',
                                   padding: '6px 14px',
-                                  background: '#f5f2e8',
+                                  background: '#ffffff',
                                   color: '#2b3228',
                                   fontSize: '12px',
                                   fontWeight: '600',
                                   borderRadius: '20px',
-                                  border: '1px solid #e8e3d6',
+                                  border: '1px solid #d9d6ce',
                                 }}
                               >
                                 {policy.region}
@@ -626,12 +626,12 @@ export default function SearchPage() {
                                 style={{
                                   display: 'inline-block',
                                   padding: '6px 14px',
-                                  background: '#f5f2e8',
+                                  background: '#ffffff',
                                   color: '#2b3228',
                                   fontSize: '12px',
                                   fontWeight: '600',
                                   borderRadius: '20px',
-                                  border: '1px solid #e8e3d6',
+                                  border: '1px solid #d9d6ce',
                                 }}
                               >
                                 {policy.level}
