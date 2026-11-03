@@ -562,17 +562,67 @@ export default function SearchPage() {
                           className="mt-1"
                         />
                         <div className="flex-1">
+                          <div className="flex gap-2 flex-wrap mb-2">
+                            {policy.year && (
+                              <span
+                                style={{
+                                  display: 'inline-block',
+                                  padding: '6px 14px',
+                                  background: '#ffe8f0',
+                                  color: '#c05574',
+                                  fontSize: '13px',
+                                  fontWeight: '600',
+                                  borderRadius: '20px',
+                                  border: '1px solid #f5c5d9',
+                                }}
+                              >
+                                {policy.year}
+                              </span>
+                            )}
+                            {policy.country && (
+                              <span
+                                style={{
+                                  display: 'inline-block',
+                                  padding: '6px 14px',
+                                  background: '#f5f2e8',
+                                  color: '#2b3228',
+                                  fontSize: '13px',
+                                  fontWeight: '600',
+                                  borderRadius: '20px',
+                                  border: '1px solid #e8e3d6',
+                                }}
+                              >
+                                {policy.country}
+                              </span>
+                            )}
+                            {policy.status && (
+                              <span
+                                style={{
+                                  display: 'inline-block',
+                                  padding: '6px 14px',
+                                  background: '#f0f3f0',
+                                  color: '#2b3228',
+                                  fontSize: '13px',
+                                  fontWeight: '600',
+                                  borderRadius: '20px',
+                                  border: '1px solid #dae3d8',
+                                }}
+                              >
+                                {policy.status}
+                              </span>
+                            )}
+                          </div>
                           <Link href={`/policies/${policy.id}`} className="text-coral font-semibold hover:underline">
                             {policy.title}
                           </Link>
-                          <p className="text-sm text-muted mt-1">{policy.country}</p>
+                          <p className="text-sm text-muted mt-1">{policy.region}</p>
                           <p className="text-xs text-ink/60 mt-2">{policy.summary}</p>
                           <div className="flex gap-2 mt-3 flex-wrap">
-                            {policy.topics?.map((topic: string) => (
-                              <span key={topic} className="inline-block px-2 py-1 bg-green/50 text-xs rounded">
-                                {topic}
+                            {policy.category && (
+                              <span className="inline-block px-2 py-1 bg-sand text-xs rounded">
+                                {policy.category}
                               </span>
-                            ))}
+                            )}
                           </div>
                         </div>
                       </div>
