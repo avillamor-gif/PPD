@@ -615,22 +615,6 @@ export default function SearchPage() {
                                 {policy.region}
                               </span>
                             )}
-                            {policy.category && (
-                              <span
-                                style={{
-                                  display: 'inline-block',
-                                  padding: '6px 14px',
-                                  background: '#f5f2e8',
-                                  color: '#2b3228',
-                                  fontSize: '13px',
-                                  fontWeight: '600',
-                                  borderRadius: '20px',
-                                  border: '1px solid #e8e3d6',
-                                }}
-                              >
-                                {policy.category}
-                              </span>
-                            )}
                             {policy.level && (
                               <span
                                 style={{
