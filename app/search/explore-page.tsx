@@ -573,22 +573,6 @@ export default function SearchPage() {
                       <div className="flex gap-3 items-start">
                         <div className="flex-1">
                           <div className="flex gap-2 flex-wrap mb-3">
-                            {policy.year && (
-                              <span
-                                style={{
-                                  display: 'inline-block',
-                                  padding: '6px 14px',
-                                  background: '#ffffff',
-                                  color: '#2b3228',
-                                  fontSize: '12px',
-                                  fontWeight: '600',
-                                  borderRadius: '20px',
-                                  border: '1px solid #d9d6ce',
-                                }}
-                              >
-                                {policy.year}
-                              </span>
-                            )}
                             {policy.country && (
                               <span
                                 style={{
