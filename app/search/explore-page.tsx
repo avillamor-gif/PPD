@@ -550,7 +550,7 @@ export default function SearchPage() {
                   </div>
                 ) : (
                   filteredPolicies.map((policy) => (
-                    <div key={policy.id}>
+                    <div key={policy.id} style={{ marginTop: '20px' }}>
                       <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', marginBottom: '12px' }}>
                         <input
                           type="checkbox"
@@ -638,7 +638,7 @@ export default function SearchPage() {
                               </span>
                             )}
                           </div>
-                          <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#1a1a1a', marginBottom: '8px', lineHeight: '1.3', fontFamily: 'ui-serif, Georgia, serif' }}>
+                          <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#1a1a1a', marginBottom: '8px', lineHeight: '1.3' }}>
                             {policy.title}
                           </h3>
                           <p style={{ fontSize: '14px', color: '#666666', marginBottom: '12px', lineHeight: '1.5' }}>
