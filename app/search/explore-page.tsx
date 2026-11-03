@@ -393,7 +393,7 @@ export default function SearchPage() {
                 </strong>
                 <p className="compare-helper">
                   <span className="compare-dot"></span>
-                  Select 2 or more policies to compare
+                  SELECT 2 OR MORE POLICIES TO COMPARE
                 </p>
               </div>
               <div className="result-tools">

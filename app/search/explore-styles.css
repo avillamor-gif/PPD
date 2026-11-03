@@ -170,8 +170,8 @@
 
 .compare-dot {
   display: inline-block;
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
   background: var(--explore-pink);
   border-radius: 0%;
 }
