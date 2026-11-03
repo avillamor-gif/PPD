@@ -539,7 +539,7 @@ export default function SearchPage() {
 
             {/* List View */}
             {viewMode === 'list' && (
-              <div className="space-y-6">
+              <div className="space-y-6" style={{ paddingTop: '20px' }}>
                 {loading ? (
                   <div className="flex items-center justify-center py-12">
                     <Loader className="w-6 h-6 text-coral animate-spin" />
@@ -550,7 +550,7 @@ export default function SearchPage() {
                   </div>
                 ) : (
                   filteredPolicies.map((policy) => (
-                    <div key={policy.id} style={{ marginTop: '20px' }}>
+                    <div key={policy.id}>
                       <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', marginBottom: '12px' }}>
                         <input
                           type="checkbox"
