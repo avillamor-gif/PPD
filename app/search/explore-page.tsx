@@ -638,7 +638,7 @@ export default function SearchPage() {
                               </span>
                             )}
                           </div>
-                          <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#1a1a1a', marginBottom: '8px', lineHeight: '1.3' }}>
+                          <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#1a1a1a', marginBottom: '8px', lineHeight: '1.3', fontFamily: '-apple-system, BlinkMacSystemFont, "San Francisco", "Segoe UI", sans-serif' }}>
                             {policy.title}
                           </h3>
                           <p style={{ fontSize: '14px', color: '#666666', marginBottom: '12px', lineHeight: '1.5' }}>
