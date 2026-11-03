@@ -557,17 +557,17 @@ export default function SearchPage() {
                           checked={compareSelection[policy.id] || false}
                           onChange={() => handleCompareToggle(policy.id)}
                           style={{
-                            width: '20px',
-                            height: '20px',
-                            minWidth: '20px',
+                            width: '16px',
+                            height: '16px',
+                            minWidth: '16px',
                             cursor: 'pointer',
                             accentColor: 'var(--coral)',
-                            marginTop: '2px',
+                            marginTop: '3px',
                           }}
                         />
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <span style={{ fontSize: '14px', color: '#63726b' }}>Select to compare</span>
-                          <span style={{ fontSize: '12px', color: '#999', fontWeight: '500' }}>Up to 4 policies</span>
+                          <span style={{ fontSize: '14px', color: '#63726b', fontFamily: 'var(--font-sans)' }}>Select to compare</span>
+                          <span style={{ fontSize: '12px', color: '#999', fontWeight: '500', fontFamily: 'var(--font-sans)' }}>Up to 4 policies</span>
                         </div>
                       </div>
                       <div className="flex gap-3 items-start">
@@ -638,7 +638,7 @@ export default function SearchPage() {
                               </span>
                             )}
                           </div>
-                          <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#1a1a1a', marginBottom: '8px', lineHeight: '1.3', fontFamily: '-apple-system, BlinkMacSystemFont, "San Francisco", "Segoe UI", sans-serif' }}>
+                          <h3 style={{ fontSize: '18px', fontWeight: '700', color: '#1a1a1a', marginBottom: '8px', lineHeight: '1.3', fontFamily: 'var(--font-sans)' }}>
                             {policy.title}
                           </h3>
                           <p style={{ fontSize: '14px', color: '#666666', marginBottom: '12px', lineHeight: '1.5' }}>
