@@ -566,7 +566,7 @@ export default function SearchPage() {
                           }}
                         />
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <span style={{ fontSize: '14px', color: '#63726b', fontFamily: 'var(--font-sans)' }}>Select to compare</span>
+                          <span style={{ fontSize: '14px', color: '#63726b', fontFamily: 'var(--font-sans)', fontWeight: '700' }}>Select to compare</span>
                           <span style={{ fontSize: '12px', color: '#999', fontWeight: '500', fontFamily: 'var(--font-sans)' }}>Up to 4 policies</span>
                         </div>
                       </div>
